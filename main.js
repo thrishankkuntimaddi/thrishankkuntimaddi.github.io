@@ -144,12 +144,41 @@ if (!calm()) {
         scrollTo(0, tour.pos);
         if (tour.pos >= maxScroll() - 0.5) { tour.on = false; tour.done = true; }
       }
-    } else if (!tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open')) tourPlay();
+    } else if (!tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open') && !resumeDlg.open) tourPlay();
     tourUI(now);
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
 }
+
+/* ---------------------------------------------------------
+   Resume: preview in a dialog, always showing the latest
+   published version (see update-resume.sh). The buttons only
+   appear once a resume has been published.
+   --------------------------------------------------------- */
+const resumeDlg = $('#resumeDlg');
+const RESUME = 'resume/Thrishank-Kuntimaddi-Resume.pdf';
+let resumeV = '';
+fetch('resume/meta.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject())).then((m) => {
+  resumeV = `?v=${m.updated}`;
+  const d = new Date(`${m.updated}T00:00:00`);
+  $('#resumeDate').textContent = `Updated ${d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`;
+  $('#resumeDownload').href = RESUME + resumeV;
+  $('#resumeOpen').href = RESUME + resumeV;
+  $$('[data-resume-slot]').forEach((el) => { el.hidden = false; });
+}).catch(() => {});
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-resume]');
+  if (!a || !resumeDlg.showModal) return; // without <dialog> support the link just opens the PDF
+  e.preventDefault();
+  setMenu(false);
+  const img = $('#resumeImg');
+  if (!img.getAttribute('src')) img.src = `resume/preview.jpg${resumeV}`;
+  tourPause(false);
+  resumeDlg.showModal();
+});
+$('#resumeClose').addEventListener('click', () => resumeDlg.close());
+resumeDlg.addEventListener('click', (e) => { if (e.target === resumeDlg) resumeDlg.close(); }); // click outside closes
 
 // In-page links glide smoothly instead of jumping.
 document.addEventListener('click', (e) => {
@@ -343,8 +372,8 @@ function createEngine(THREE, PP) {
     b.color = col;
     const s = (b.size || (0.8 + Math.cbrt(Math.max(b.m, 0.05)) * 0.5));
     const core = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({ color: b.planet ? col : col.clone().lerp(new THREE.Color(uni().light ? col : '#ffffff'), 0.55), transparent: true }));
-    core.scale.setScalar(0.035 * s * (b.planet ? 2.4 : 1));
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, depthWrite: false, blending: additive() ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: uni().light ? 0.35 : 1 }));
+    core.scale.setScalar(0.035 * s * (b.planet ? 2.4 : 1) * (uni().light ? 1.5 : 1));
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, depthWrite: false, blending: additive() ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: uni().light ? 0.6 : 1 }));
     glow.scale.setScalar(0.5 * s * (b.glowScale ?? 1));
     glow.userData.alpha = b.glowAlpha ?? 1;
     b.core = core; b.glow = glow;
@@ -541,7 +570,8 @@ function createEngine(THREE, PP) {
     const portal = activeEl?.querySelector?.('.portal');
     if (portal) {
       const r = portal.getBoundingClientRect();
-      const s = Math.min(Math.max((H / Math.max(r.height, 1)) * 0.62, 0.85), 2.6);
+      const halo = portal.querySelector('.mock') ? 0.6 : 1; // systems orbit around app previews instead of hiding behind them
+      const s = Math.min(Math.max((H / Math.max(r.height, 1)) * 0.62 * halo, 0.5), 2.6);
       return { x: r.left + r.width / 2, y: r.top + r.height / 2, s };
     }
     if (activeEl?.id === 'hero') return isSmall() ? { x: W / 2, y: H * 0.3, s: 1.25 } : { x: W * 0.7, y: H * 0.48, s: 1 };
@@ -722,7 +752,7 @@ function createEngine(THREE, PP) {
       b.glow.position.copy(b.core.position);
       const eo = b.escaped ? Math.max(0, 1 - (Math.hypot(b.x[0] - com.x, b.x[1] - com.y, b.x[2] - com.z) - sceneCfg.escR) / 12) : 1;
       b.core.material.opacity = o * eo;
-      b.glow.material.opacity = o * eo * (uni().light ? 0.35 : 1) * b.glow.userData.alpha;
+      b.glow.material.opacity = o * eo * (uni().light ? 0.6 : 1) * b.glow.userData.alpha;
       if (b.trail) b.trail.line.material.opacity = o;
     }
     starfield.rotation.z += dt * 0.004;

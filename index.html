@@ -10,10 +10,10 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Thrishank Kuntimaddi — Frontend Developer">
   <meta property="og:description" content="I design and build interfaces people enjoy using. A self-touring portfolio with live 3D gravity scenes.">
-  <meta property="og:image" content="https://thrishankkuntimaddi.github.io/My_Portofolio/assets/og.jpg">
-  <meta property="og:url" content="https://thrishankkuntimaddi.github.io/My_Portofolio/">
+  <meta property="og:image" content="https://thrishankkuntimaddi.github.io/assets/og.jpg">
+  <meta property="og:url" content="https://thrishankkuntimaddi.github.io/">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://thrishankkuntimaddi.github.io/My_Portofolio/assets/og.jpg">
+  <meta name="twitter:image" content="https://thrishankkuntimaddi.github.io/assets/og.jpg">
 
   <!-- The edition (a light colour palette) is chosen automatically from the visitor's local time, before first paint -->
   <script>
@@ -59,6 +59,7 @@
           <li><a href="#poelys">Poelys</a></li>
           <li><a href="#more">More work</a></li>
           <li><a href="#about">About</a></li>
+          <li data-resume-slot hidden><a href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume>Resume</a></li>
           <li><a href="#contact" class="btn btn-gloss btn-sm">Contact</a></li>
         </ul>
       </nav>
@@ -85,6 +86,7 @@
           <div class="hero-actions">
             <a href="#work" class="btn btn-gloss">See my projects <span aria-hidden="true">↓</span></a>
             <a href="mailto:thrishankkuntimaddi@gmail.com" class="btn btn-paper">Email me</a>
+            <a href="resume/Thrishank-Kuntimaddi-Resume.pdf" class="btn btn-paper" data-resume data-resume-slot hidden>View resume</a>
           </div>
           <ul class="facts">
             <li><b>6</b><span>live products</span></li>
@@ -131,6 +133,16 @@
         <article class="project" data-scene="lagrange">
           <div class="window portal reveal" aria-hidden="true">
             <div class="win-bar"><i></i><i></i><i></i><span>ORUINWAN.SYS</span><b>LIVE</b></div>
+            <div class="mock mock-chat">
+              <aside><b>Oruinwan</b><span class="on"># general</span><span># design</span><span># launch</span><span>● Asha</span><span>● Ravi</span></aside>
+              <div class="chat">
+                <p class="msg m1"><i>A</i><span>Can we ship on Friday?</span></p>
+                <p class="msg me m2"><span>Yes. <u>@ai</u> summarise this thread</span></p>
+                <p class="msg ai m3"><i>✦</i><span>3 open items. Launch is on track.</span></p>
+                <p class="task m4">✓ Task created · <b>Ship v1.0</b></p>
+                <div class="composer">Message #general</div>
+              </div>
+            </div>
             <p class="win-tag">Three people.<br>One conversation.</p>
           </div>
           <div class="card project-card reveal">
@@ -153,6 +165,15 @@
         <article class="project flip" data-scene="binary">
           <div class="window portal reveal" aria-hidden="true">
             <div class="win-bar"><i></i><i></i><i></i><span>EXPENSE.SYS</span><b>LIVE</b></div>
+            <div class="mock mock-money">
+              <p class="mm-hi">Good morning <span>Nov 2026</span></p>
+              <p class="mm-label">Spent this month</p>
+              <p class="mm-big">₹25,849</p>
+              <div class="mm-bar"><i></i></div>
+              <ul class="mm-row"><li><span>Today</span><b>₹35</b></li><li><span>Saved</span><b>₹5,000</b></li><li><span>Safe today</span><b>₹410</b></li></ul>
+              <div class="mm-entry"><span class="type">chai 20 vada 15</span></div>
+              <p class="mm-chips"><span>Food · ₹20</span><span>Food · ₹15</span></p>
+            </div>
             <p class="win-tag">Money in, money out.<br>Kept in balance.</p>
           </div>
           <div class="card project-card reveal">
@@ -176,6 +197,12 @@
         <article class="project" data-scene="debris">
           <div class="window portal reveal" aria-hidden="true">
             <div class="win-bar"><i></i><i></i><i></i><span>SENTINEL.SYS</span><b>LIVE</b></div>
+            <div class="mock-hud">
+              <span class="ring"></span>
+              <p class="hud-pc">Collision risk <b>LOW</b></p>
+              <div class="hud-chart"><i style="--h:35%"></i><i style="--h:60%" class="bad"></i><i style="--h:82%" class="bad"></i><i style="--h:44%"></i><i style="--h:26%"></i><i style="--h:18%"></i><i style="--h:52%"></i><i style="--h:90%" class="bad"></i><i style="--h:66%" class="bad"></i><i style="--h:30%"></i><i style="--h:22%"></i><i style="--h:40%"></i><em></em></div>
+              <p class="hud-cap">Launch window · pick a safe minute</p>
+            </div>
             <p class="win-tag">Navigate around<br>the hazards.</p>
           </div>
           <div class="card project-card reveal">
@@ -198,6 +225,13 @@
         <article class="project flip" data-scene="solar">
           <div class="window portal reveal" aria-hidden="true">
             <div class="win-bar"><i></i><i></i><i></i><span>LEARN.SYS</span><b>LIVE</b></div>
+            <div class="mock mock-notes">
+              <p class="mn-crumb">DSA Basics › Binary Search <span>7-day streak</span></p>
+              <p class="mn-title">Binary Search</p>
+              <p class="mn-line"></p><p class="mn-line short"></p>
+              <pre class="mn-code"><span>lo, hi = 0, n - 1</span><span>while lo &lt;= hi:</span><span>  mid = (lo + hi) // 2</span><span>  if a[mid] == x: return mid</span></pre>
+              <ul class="mn-check"><li>Read the note</li><li>Solve the problem</li><li>Review tomorrow</li></ul>
+            </div>
             <p class="win-tag">One concept<br>at a time.</p>
           </div>
           <div class="card project-card reveal">
@@ -242,6 +276,7 @@
           </div>
           <div class="window portal reveal" aria-hidden="true">
             <div class="win-bar"><i></i><i></i><i></i><span>POELYS.SYS</span><b>LIVE</b></div>
+            <span class="orbit-label">poelys</span>
             <p class="win-tag">Still building.<br>Always.</p>
           </div>
         </div>
@@ -309,7 +344,7 @@
         </header>
         <div class="about-grid">
           <div class="card about-card reveal">
-            <p class="about-lede">I'm a computer science engineer from India who fell for the screen in front of the user: how it looks, how it moves, and how it feels the hundredth time you open it.</p>
+            <p class="about-lede">I'm a computer science engineer from Bengaluru, India, who fell for the screen in front of the user: how it looks, how it moves, and how it feels the hundredth time you open it.</p>
             <p>I started in AI and computer vision. Now I design and build interfaces end to end, and I can build the backend behind them too, so an idea reaches people whole instead of as a mock-up.</p>
             <span class="stamp stamp-b" aria-hidden="true">Open to work</span>
           </div>
@@ -329,6 +364,7 @@
             <ul>
               <li><b>First prize</b>Project expo, Young Scientists' Conference, IISF</li>
               <li><b>Level 3</b>Smart India Hackathon 2023</li>
+              <li><b>Second prize</b>ImpactX 2024 Hackathon, sustainability track</li>
               <li><b>Participant</b>Yukti Innovation Regional Meet 2023</li>
             </ul>
           </div>
@@ -337,9 +373,10 @@
             <h3>Path</h3>
             <ul>
               <li><b>Now</b>Building products at Poelys</li>
+              <li><b>2025 –</b>Software Development Engineer, Chttrix</li>
               <li><b>2023</b>Data Science &amp; Machine Learning internship</li>
               <li><b>2022</b>AI with Python internship</li>
-              <li><b>B.Tech</b>Madanapalle Institute of Technology &amp; Science</li>
+              <li><b>2021 – 25</b>B.Tech, Computer Science (Data Science), MITS Madanapalle</li>
             </ul>
           </div>
         </div>
@@ -357,6 +394,7 @@
           <div class="contact-actions">
             <a class="btn btn-gloss" href="mailto:thrishankkuntimaddi@gmail.com">Write to me</a>
             <button class="btn btn-paper" id="copyBtn" type="button">Copy email</button>
+            <a class="btn btn-paper" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume data-resume-slot hidden>Resume</a>
           </div>
           <ul class="socials">
             <li><a href="https://poelys.com" target="_blank" rel="noopener">Poelys ↗</a></li>
@@ -375,6 +413,22 @@
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
+
+  <!-- Resume preview. The file, preview image and date are published by update-resume.sh -->
+  <dialog class="resume" id="resumeDlg" aria-labelledby="resumeTitle">
+    <header class="resume-head">
+      <div>
+        <h2 id="resumeTitle">My resume</h2>
+        <p id="resumeDate">Latest version</p>
+      </div>
+      <button class="btn btn-paper btn-sm" id="resumeClose" type="button" aria-label="Close resume preview">Close ✕</button>
+    </header>
+    <div class="resume-body"><img id="resumeImg" alt="Preview of the first page of Thrishank Kuntimaddi's resume" width="1314" height="1700"></div>
+    <footer class="resume-foot">
+      <a class="btn btn-gloss" id="resumeDownload" href="resume/Thrishank-Kuntimaddi-Resume.pdf" download="Thrishank-Kuntimaddi-Resume.pdf">Download PDF ↓</a>
+      <a class="btn btn-paper" id="resumeOpen" href="resume/Thrishank-Kuntimaddi-Resume.pdf" target="_blank" rel="noopener">Open in new tab ↗</a>
+    </footer>
+  </dialog>
 
   <!-- Auto-tour status: the page scrolls itself and yields the moment the visitor takes over -->
   <button class="tour" id="tour" type="button" hidden aria-live="polite">
