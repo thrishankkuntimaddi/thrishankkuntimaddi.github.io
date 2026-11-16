@@ -1,86 +1,56 @@
 /* =========================================================
    Thrishank Kuntimaddi: portfolio
-   UI layer (works without WebGL) + a 3D N-body universe.
+   Everything here is automatic: the colour edition follows
+   the visitor's local time, the page tours itself, and the
+   3D gravity scenes change with each section.
    ========================================================= */
 const root = document.documentElement;
-root.classList.add('js');
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const osReduced = matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
-const isSmall = () => innerWidth < 900;
-const calm = () => osReduced.matches || root.dataset.motion === 'calm';
+const calm = () => osReduced.matches;
+const isSmall = () => innerWidth < 980;
 
 /* ---------------------------------------------------------
-   Universes: shared by CSS (data-universe) and WebGL
+   Editions: light palettes shared by the CSS and the 3D scene
    --------------------------------------------------------- */
+const INK = ['#ff7a59', '#3b9bff', '#8f6bff', '#19b894', '#f2a51a', '#ff5fa2'];
+const rotate = (arr, n) => arr.slice(n).concat(arr.slice(0, n));
 const UNIVERSES = {
-  nebula:   { name: 'Nebula',   bg: '#05040b', stars: ['#ffd27a', '#ff7ab6', '#7ad7ff', '#c4a7ff', '#9effc9', '#ffa07a'], dust: '#a99bff', planet: '#4f7cff', bloom: 1.15 },
-  solar:    { name: 'Solar',    bg: '#0a0503', stars: ['#ffcf6b', '#ff7b3a', '#fff1c9', '#ff4d2e', '#ffd9a0', '#ffa94d'], dust: '#ffb98a', planet: '#ff8a3d', bloom: 1.25 },
-  ice:      { name: 'Ice',      bg: '#02080d', stars: ['#7fe3ff', '#e0f8ff', '#5b8cff', '#a5b4fc', '#67e8f9', '#c4b5fd'], dust: '#9fdcff', planet: '#3b82f6', bloom: 1.1 },
-  eclipse:  { name: 'Eclipse',  bg: '#000000', stars: ['#ffffff', '#e5e5e5', '#bdbdbd', '#ffffff', '#d4d4d4', '#9e9e9e'], dust: '#ffffff', planet: '#9ca3af', bloom: 1.3 },
-  terminal: { name: 'Terminal', bg: '#010501', stars: ['#39ff6a', '#c8ffcf', '#16a34a', '#86efac', '#4ade80', '#bbf7d0'], dust: '#39ff6a', planet: '#16a34a', bloom: 1.0 },
-  paper:    { name: 'Paper',    bg: '#f4efe4', stars: ['#1b1915', '#c2410c', '#1d4ed8', '#15803d', '#7c3aed', '#be185d'], dust: '#1b1915', planet: '#1d4ed8', bloom: 0, light: true },
+  morning: { name: 'Morning edition', greet: 'Good morning',   bg: '#fbf8f2', stars: rotate(INK, 0), dust: '#c9bfb4', planet: '#3b9bff', bloom: 0, light: true },
+  noon:    { name: 'Noon edition',    greet: 'Good afternoon', bg: '#f6fafe', stars: rotate(INK, 1), dust: '#b7c6d8', planet: '#ff7a59', bloom: 0, light: true },
+  dusk:    { name: 'Dusk edition',    greet: 'Good evening',   bg: '#fbf7fd', stars: rotate(INK, 2), dust: '#c9bcd9', planet: '#ff5fa2', bloom: 0, light: true },
+  night:   { name: 'Night edition',   greet: 'Hello, night owl', bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#b4cfc7', planet: '#8f6bff', bloom: 0, light: true },
 };
-const ACCENTS = ['#ffd27a', '#ff6b4a', '#f43f5e', '#ec4899', '#a78bfa', '#60a5fa', '#22d3ee', '#34d399', '#a3e635'];
+const edition = UNIVERSES[root.dataset.edition] ? root.dataset.edition : 'morning';
+const settings = { universe: edition, accent: '', g: 1, speed: 1, trail: 0.8, glow: 1 };
 const SCENE_NAMES = { figure8: 'Figure-8', lagrange: 'Lagrange', binary: 'Binary', debris: 'Debris field', solar: 'Planetary', studio: 'Poelys', chaos: 'Chaos', pythagorean: 'Pythagorean' };
 
-/* ---------------------------------------------------------
-   Settings (persisted, shareable)
-   --------------------------------------------------------- */
-const KEY = 'tk-universe';
-const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch { return {}; } };
-const settings = Object.assign({ universe: root.dataset.universe || 'nebula', accent: '', motion: '', g: 1, speed: 1, trail: 0.7, glow: 1 }, load());
-const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
-if (UNIVERSES[hashParams.get('u')]) settings.universe = hashParams.get('u');
-if (!UNIVERSES[settings.universe]) settings.universe = 'nebula';
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch { /* private mode */ } };
+// The engine was written with optional UI hooks; this site has no controls, so they are no-ops.
+const hashParams = new URLSearchParams('');
+const toast = () => {};
+const showSceneLabel = () => {};
+const syncLabUI = () => {};
 
 /* ---------------------------------------------------------
-   Small UI helpers
+   Automatic personal touches: greeting, edition, visit count
    --------------------------------------------------------- */
-const toastEl = $('#toast');
-let toastT;
-function toast(msg, ms = 2000) {
-  toastEl.textContent = msg;
-  toastEl.classList.add('show');
-  clearTimeout(toastT);
-  toastT = setTimeout(() => toastEl.classList.remove('show'), ms);
-}
-const sceneLabelEl = $('#sceneLabel');
-let labelT;
-function showSceneLabel(text) {
-  if (!text) return;
-  sceneLabelEl.textContent = text;
-  sceneLabelEl.classList.add('show');
-  clearTimeout(labelT);
-  labelT = setTimeout(() => sceneLabelEl.classList.remove('show'), 2600);
-}
-
-let lastPoint = { x: innerWidth / 2, y: innerHeight / 2 };
-addEventListener('pointerdown', (e) => { lastPoint = { x: e.clientX, y: e.clientY }; }, { passive: true, capture: true });
-function withReveal(fn) {
-  if (calm() || !document.startViewTransition) return fn();
-  const { x, y } = lastPoint;
-  const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-  const vt = document.startViewTransition(fn);
-  vt.ready.then(() => root.animate(
-    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-    { duration: 700, easing: 'cubic-bezier(.2,.7,.2,1)', pseudoElement: '::view-transition-new(root)' }
-  )).catch(() => {});
-}
-
-/* ---------------------------------------------------------
-   Nav, progress, menu
-   --------------------------------------------------------- */
+let visits = 1;
+try { visits = (parseInt(localStorage.getItem('tk-visits'), 10) || 0) + 1; localStorage.setItem('tk-visits', String(visits)); } catch { /* private mode */ }
+$('#greeting').textContent = UNIVERSES[edition].greet;
+$('#editionText').textContent = UNIVERSES[edition].name;
+$('#visitText').textContent = `Visit №${visits}`;
+$('meta[name="theme-color"]').content = UNIVERSES[edition].bg;
 $('#year').textContent = new Date().getFullYear();
+// The hero shows a different orbit on each visit.
+$('#hero').dataset.scene = ['figure8', 'lagrange', 'solar'][(visits - 1) % 3];
+
+/* ---------------------------------------------------------
+   Nav + reveals
+   --------------------------------------------------------- */
 const nav = $('.nav');
-const bar = $('#progressBar');
-function onScrollUI() {
-  nav.classList.toggle('scrolled', scrollY > 10);
-  const max = document.documentElement.scrollHeight - innerHeight;
-  bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
-}
+const onScrollUI = () => nav.classList.toggle('scrolled', scrollY > 10);
 onScrollUI();
 addEventListener('scroll', onScrollUI, { passive: true });
 
@@ -92,184 +62,110 @@ function setMenu(open) {
   menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 }
 menuBtn.addEventListener('click', () => setMenu(!links.classList.contains('open')));
-links.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
 
-/* ---------------------------------------------------------
-   Hero title (words fly in from depth) + 3D reveals
-   --------------------------------------------------------- */
 const heroTitle = $('.hero-title');
-$$('.w', heroTitle).forEach((w, i) => w.style.setProperty('--i', i));
+$$('.line', heroTitle).forEach((l, i) => l.style.setProperty('--i', i));
 requestAnimationFrame(() => requestAnimationFrame(() => heroTitle.classList.add('in')));
 
 const revealEls = $$('.reveal');
 if ('IntersectionObserver' in window && !calm()) {
   const io = new IntersectionObserver((entries) => {
     entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.06 });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
   revealEls.forEach((el) => io.observe(el));
 } else revealEls.forEach((el) => el.classList.add('in'));
 
-/* ---------------------------------------------------------
-   3D tilt + magnetic buttons (mouse only)
-   --------------------------------------------------------- */
-if (finePointer) {
-  $$('.tilt').forEach((el) => {
-    el.addEventListener('pointermove', (e) => {
-      if (calm() || el.classList.contains('portal')) return;
-      const r = el.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-      el.style.setProperty('--rx', `${(0.5 - y) * 9}deg`);
-      el.style.setProperty('--ry', `${(x - 0.5) * 11}deg`);
-      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      el.style.setProperty('--my', `${e.clientY - r.top}px`);
-      el.classList.add('is-tilting');
-    });
-    el.addEventListener('pointerleave', () => {
-      el.classList.remove('is-tilting');
-      el.style.setProperty('--rx', '0deg');
-      el.style.setProperty('--ry', '0deg');
-    });
-  });
-  $$('.magnetic').forEach((el) => {
-    el.addEventListener('pointermove', (e) => {
-      if (calm()) return;
-      const r = el.getBoundingClientRect();
-      el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.2}px, ${(e.clientY - r.top - r.height / 2) * 0.3}px)`;
-    });
-    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
-  });
-}
+const copyBtn = $('#copyBtn');
+copyBtn.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText($('#emailLink').textContent.trim()); copyBtn.textContent = 'Copied ✓'; }
+  catch { copyBtn.textContent = 'Select the email above'; }
+  setTimeout(() => { copyBtn.textContent = 'Copy email'; }, 1800);
+});
 
 /* ---------------------------------------------------------
-   Copy + share
+   Auto-tour: the page scrolls itself. Any input from the
+   visitor pauses it at once; it resumes after a short idle.
    --------------------------------------------------------- */
-$('#copyBtn').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText($('#emailLink').textContent.trim()); toast('Email copied ✓'); }
-  catch { toast('thrishankkuntimaddi@gmail.com'); }
+const IDLE_MS = 5000;
+const tourEl = $('#tour'), tourTxt = $('#tourTxt'), tourIco = $('#tourIco'), tourBar = $('#tourBar');
+const tour = { on: false, pos: 0, speed: 0, resumeAt: performance.now() + 2600, held: false, done: false, glide: null };
+const maxScroll = () => Math.max(0, root.scrollHeight - innerHeight);
+const cruise = () => (isSmall() ? 62 : 84); // pixels per second
+
+function tourUI(now) {
+  let txt, ico;
+  if (tour.done) { txt = 'Replay the tour'; ico = '↻'; }
+  else if (tour.on) { txt = 'Auto-tour playing · scroll to take over'; ico = '❚❚'; }
+  else if (tour.held) { txt = 'Tour paused · tap to resume'; ico = '▶'; }
+  else { txt = `You have control · tour resumes in ${Math.max(1, Math.ceil((tour.resumeAt - now) / 1000))}s`; ico = '▶'; }
+  if (tourTxt.textContent !== txt) tourTxt.textContent = txt;
+  if (tourIco.textContent !== ico) tourIco.textContent = ico;
+  const m = maxScroll();
+  tourBar.style.transform = `scaleX(${m ? Math.min(1, scrollY / m) : 0})`;
+}
+function tourPause(hold) {
+  tour.on = false; tour.speed = 0; tour.glide = null;
+  if (hold) tour.held = true;
+  tour.resumeAt = performance.now() + IDLE_MS;
+}
+function tourPlay() {
+  if (tour.done) { tour.done = false; glideTo(0, 1100, () => { tour.resumeAt = performance.now() + 900; }); return; }
+  tour.held = false; tour.on = true; tour.pos = scrollY; tour.speed = 0;
+}
+function glideTo(y, ms = 900, then) {
+  tourPause(false);
+  tour.glide = { y0: scrollY, y1: Math.min(Math.max(0, y), maxScroll()), t0: performance.now(), ms, then };
+}
+
+if (!calm()) {
+  tourEl.hidden = false;
+  tourEl.addEventListener('click', () => { if (tour.on) tourPause(true); else tourPlay(); });
+  // Anything the visitor does takes over immediately.
+  const yieldToUser = () => { if (tour.on || tour.glide) tourPause(false); else if (!tour.held) tour.resumeAt = performance.now() + IDLE_MS; };
+  addEventListener('wheel', yieldToUser, { passive: true });
+  addEventListener('touchstart', (e) => { if (!e.target.closest('#tour')) yieldToUser(); }, { passive: true });
+  addEventListener('touchmove', yieldToUser, { passive: true });
+  addEventListener('pointerdown', (e) => { if (!e.target.closest('#tour, a[href^="#"]')) yieldToUser(); }, { passive: true });
+  addEventListener('keydown', (e) => { if (!e.target.closest?.('#tour')) yieldToUser(); });
+
+  let last = performance.now();
+  const frame = (now) => {
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (tour.glide) {
+      const g = tour.glide, p = Math.min(1, (now - g.t0) / g.ms), e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      scrollTo(0, g.y0 + (g.y1 - g.y0) * e);
+      if (p >= 1) { tour.glide = null; tour.resumeAt = now + IDLE_MS; g.then?.(); }
+    } else if (tour.on) {
+      if (Math.abs(scrollY - tour.pos) > 4) tourPause(false); // scrollbar drag or any other outside scroll
+      else {
+        tour.speed += (cruise() - tour.speed) * (1 - Math.exp(-dt * 1.4)); // ease in, never jerk
+        tour.pos = Math.min(maxScroll(), tour.pos + tour.speed * dt);
+        scrollTo(0, tour.pos);
+        if (tour.pos >= maxScroll() - 0.5) { tour.on = false; tour.done = true; }
+      }
+    } else if (!tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open')) tourPlay();
+    tourUI(now);
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+
+// In-page links glide smoothly instead of jumping.
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const target = a.getAttribute('href') === '#top' ? null : $(a.getAttribute('href'));
+  e.preventDefault();
+  setMenu(false);
+  const y = target ? target.getBoundingClientRect().top + scrollY - 70 : 0;
+  if (calm()) scrollTo(0, y); else glideTo(y, 1000);
 });
 
 /* =========================================================
-   Universe lab panel (built from data)
-   ========================================================= */
-const lab = $('#lab');
-const labScrim = $('#labScrim');
-const uniGrid = $('#uniGrid');
-Object.entries(UNIVERSES).forEach(([id, u]) => {
-  const b = document.createElement('button');
-  b.type = 'button'; b.className = 'uni'; b.dataset.universe = id;
-  b.style.cssText = `--u-bg:${u.bg};--c1:${u.stars[0]};--c2:${u.stars[1]};--c3:${u.stars[2]}`;
-  b.innerHTML = `<span class="uni-prev"><i></i><i></i><i></i></span><span class="uni-name">${u.name}</span>`;
-  uniGrid.appendChild(b);
-});
-const accentRow = $('#accentRow');
-accentRow.innerHTML =
-  `<button type="button" class="acc acc-default" data-accent="" aria-label="Universe default" title="Universe default"></button>` +
-  ACCENTS.map((c) => `<button type="button" class="acc" data-accent="${c}" style="--c:${c}" aria-label="Star colour ${c}" title="${c}"></button>`).join('') +
-  `<label class="acc acc-custom" title="Any colour"><input type="color" id="accentPicker" value="#ffd27a" aria-label="Custom star colour"></label>`;
-const sceneSeg = $('#sceneSeg');
-sceneSeg.innerHTML = Object.entries(SCENE_NAMES).map(([id, n]) => `<button type="button" data-scene-btn="${id}">${n}</button>`).join('');
-
-const sliders = {
-  g:     { el: $('#gIn'), out: $('#gOut'), fmt: (v) => `${(+v).toFixed(2)}×` },
-  speed: { el: $('#sIn'), out: $('#sOut'), fmt: (v) => `${(+v).toFixed(2)}×` },
-  trail: { el: $('#tIn'), out: $('#tOut'), fmt: (v) => (v < 0.35 ? 'short' : v < 0.7 ? 'medium' : 'long') },
-  glow:  { el: $('#bIn'), out: $('#bOut'), fmt: (v) => (+v).toFixed(2) },
-};
-function paintSlider(s) {
-  const { el } = s;
-  el.style.setProperty('--fill', `${((el.value - el.min) / (el.max - el.min)) * 100}%`);
-  s.out.textContent = s.fmt(el.value);
-}
-
-function syncLabUI() {
-  $$('.uni', uniGrid).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.universe === settings.universe)));
-  $$('[data-accent]', accentRow).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.accent === settings.accent)));
-  $$('[data-set-motion]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setMotion === settings.motion)));
-  $$('[data-scene-btn]').forEach((b) => b.setAttribute('aria-pressed', String(engine && b.dataset.sceneBtn === engine.sceneName)));
-  Object.entries(sliders).forEach(([k, s]) => { s.el.value = settings[k]; paintSlider(s); });
-}
-
-function applyUniverseCSS() {
-  root.dataset.universe = settings.universe;
-  if (settings.accent) root.style.setProperty('--accent', settings.accent); else root.style.removeProperty('--accent');
-  settings.motion ? (root.dataset.motion = settings.motion) : delete root.dataset.motion;
-  $('meta[name="theme-color"]').content = UNIVERSES[settings.universe].bg;
-}
-
-function setUniverse(id, animate = true) {
-  const run = () => { settings.universe = id; applyUniverseCSS(); engine?.setUniverse(); syncLabUI(); save(); };
-  animate ? withReveal(run) : run();
-}
-
-let labOpener = null;
-function openLab(from) {
-  labOpener = from || document.activeElement;
-  lab.hidden = false; labScrim.hidden = false;
-  syncLabUI();
-  ($('.uni[aria-pressed="true"]', lab) || lab).focus();
-}
-function closeLab() {
-  if (lab.hidden) return;
-  lab.hidden = true; labScrim.hidden = true;
-  labOpener?.focus?.();
-}
-$$('[data-open-lab]').forEach((b) => b.addEventListener('click', () => (lab.hidden ? openLab(b) : closeLab())));
-$('#labClose').addEventListener('click', closeLab);
-labScrim.addEventListener('click', closeLab);
-
-lab.addEventListener('click', (e) => {
-  const u = e.target.closest('.uni');
-  if (u) return setUniverse(u.dataset.universe);
-  const a = e.target.closest('[data-accent]');
-  if (a) { settings.accent = a.dataset.accent; applyUniverseCSS(); engine?.setUniverse(); syncLabUI(); save(); return; }
-  const m = e.target.closest('[data-set-motion]');
-  if (m) { settings.motion = m.dataset.setMotion; applyUniverseCSS(); engine?.motionChanged(); syncLabUI(); save(); return; }
-  const sc = e.target.closest('[data-scene-btn]');
-  if (sc && engine) { engine.lockScene(sc.dataset.sceneBtn); syncLabUI(); }
-});
-$('#accentPicker').addEventListener('input', (e) => { settings.accent = e.target.value; applyUniverseCSS(); engine?.setUniverse(); syncLabUI(); save(); });
-Object.entries(sliders).forEach(([k, s]) => s.el.addEventListener('input', () => {
-  settings[k] = +s.el.value; paintSlider(s); engine?.settingsChanged(k); save();
-}));
-$('#resetBtn').addEventListener('click', () => {
-  Object.assign(settings, { universe: 'nebula', accent: '', motion: '', g: 1, speed: 1, trail: 0.7, glow: 1 });
-  withReveal(() => { applyUniverseCSS(); engine?.setUniverse(); engine?.unlockScene(true); syncLabUI(); save(); });
-  toast('Universe reset');
-});
-
-applyUniverseCSS();
-
-/* =========================================================
-   Sharing
-   ========================================================= */
-function shareURL() {
-  const p = new URLSearchParams();
-  p.set('u', settings.universe);
-  if (engine && document.body.classList.contains('playing')) { p.set('play', engine.sceneName); p.set('seed', engine.seed); }
-  return `${location.origin}${location.pathname}#${p.toString()}`;
-}
-async function share() {
-  const url = shareURL();
-  const data = { title: 'Thrishank Kuntimaddi', text: 'A portfolio that is a live 3D gravity simulation. Try to break it.', url };
-  try {
-    if (navigator.share) { await navigator.share(data); return; }
-    await navigator.clipboard.writeText(url); toast('Link copied. It opens this exact universe.');
-  } catch (err) { if (err?.name !== 'AbortError') toast(url, 4000); }
-}
-document.addEventListener('click', (e) => { if (e.target.closest('[data-share]')) share(); });
-
-/* =========================================================
-   The engine (Three.js). Everything above works without it.
+   The 3D universe (visuals only). The page works without it.
    ========================================================= */
 let engine = null;
-const queued = [];
-function whenEngine(fn) {
-  if (engine) return fn(engine);
-  queued.push(fn);
-  toast('Warming up the universe…', 1500);
-}
-$('#playBtn').addEventListener('click', () => whenEngine((e) => e.enterPlay()));
-$('#disturbBtn').addEventListener('click', () => whenEngine((e) => e.disturb()));
 try {
   const test = document.createElement('canvas');
   if (!(test.getContext('webgl2') || test.getContext('webgl'))) throw new Error('no webgl');
@@ -281,27 +177,10 @@ try {
     import('three/addons/postprocessing/OutputPass.js'),
   ]);
   engine = createEngine(THREE, { EffectComposer, RenderPass, UnrealBloomPass, OutputPass });
-  queued.splice(0).forEach((fn) => fn(engine));
 } catch (err) {
   console.warn('[universe] running without WebGL:', err?.message || err);
   root.classList.add('no-webgl');
-  $('#playBtn').hidden = true;
-  $('#disturbBtn').hidden = true;
-  $$('.hud, .hero-hint').forEach((el) => (el.hidden = true));
 }
-syncLabUI();
-
-/* ---------------------------------------------------------
-   Keyboard
-   --------------------------------------------------------- */
-document.addEventListener('keydown', (e) => {
-  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName) && document.activeElement.type !== 'range';
-  if (e.key === 'Escape') { closeLab(); setMenu(false); engine?.exitPlay(); return; }
-  if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
-  const k = e.key.toLowerCase();
-  if (k === 'u') { e.preventDefault(); lab.hidden ? openLab() : closeLab(); }
-  if (k === 'd' && engine) engine.disturb();
-});
 
 /* =========================================================
    Engine implementation
@@ -752,67 +631,8 @@ function createEngine(THREE, PP) {
     cam.zoom = Math.min(3, Math.max(0.35, cam.zoom * Math.exp(e.deltaY * 0.001)));
   }, { passive: false });
 
-  /* ---- sandbox ---- */
-  const playHud = $('#playHud');
-  let prePlayScroll = 0;
-  function enterPlay(name) {
-    prePlayScroll = scrollY;
-    document.body.classList.add('playing');
-    playHud.hidden = false;
-    closeLab();
-    if (name && SCENES[name]) lockScene(name);
-    else locked = sceneName;
-    toast(finePointer ? 'Drag to rotate · scroll to zoom · click to drop a star' : 'Drag to rotate · pinch to zoom · tap to drop a star', 3200);
-  }
-  function exitPlay() {
-    if (!document.body.classList.contains('playing')) return;
-    document.body.classList.remove('playing');
-    playHud.hidden = true;
-    cam.zoom = 1;
-    if (location.hash.includes('play')) history.replaceState(null, '', location.pathname);
-    unlockScene();
-    scrollTo({ top: prePlayScroll });
-  }
-  $('#exitPlay').addEventListener('click', exitPlay);
-  const sceneOrder = Object.keys(SCENES);
-  const uniOrder = Object.keys(UNIVERSES);
-  document.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-act]');
-    if (!b) return;
-    const act = b.dataset.act;
-    if (act === 'disturb') disturb();
-    if (act === 'add') addStarAt(innerWidth * (0.3 + Math.random() * 0.4), innerHeight * (0.3 + Math.random() * 0.4));
-    if (act === 'scene') { seed = (Math.random() * 1e9) | 0; const n = sceneOrder[(sceneOrder.indexOf(sceneName) + 1) % sceneOrder.length]; lockScene(n); toast(SCENE_NAMES[n]); }
-    if (act === 'universe') { const n = uniOrder[(uniOrder.indexOf(settings.universe) + 1) % uniOrder.length]; setUniverse(n); toast(UNIVERSES[n].name); }
-    if (act === 'snap') snapshot();
-  });
-
   function lockScene(name) { locked = name; transitionTo(name); showSceneLabel(SCENE_NAMES[name]); }
   function unlockScene(rebuild) { locked = null; updateActive(true); if (rebuild) transitionTo(activeEl?.dataset.scene || 'figure8'); }
-
-  /* ---- snapshot (shareable PNG with a signature) ---- */
-  function snapshot() {
-    renderFrame(0);
-    const W = canvas.width, H = canvas.height;
-    const out = document.createElement('canvas'); out.width = W; out.height = H;
-    const g = out.getContext('2d');
-    g.drawImage(canvas, 0, 0);
-    const k = W / innerWidth;
-    g.font = `${14 * k}px "JetBrains Mono", monospace`;
-    g.fillStyle = uni().light ? 'rgba(20,20,20,.75)' : 'rgba(255,255,255,.8)';
-    g.fillText(`${SCENE_NAMES[sceneName].toUpperCase()} · ${uni().name.toUpperCase()} · ${bodies.filter((b) => b.m > 0).length} BODIES`, 24 * k, H - 46 * k);
-    g.font = `italic ${26 * k}px "Instrument Serif", serif`;
-    g.fillText('Thrishank Kuntimaddi', 24 * k, H - 18 * k);
-    out.toBlob(async (blob) => {
-      const file = new File([blob], `universe-${sceneName}.png`, { type: 'image/png' });
-      try {
-        if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: 'My universe', text: shareURL() }); return; }
-      } catch (err) { if (err?.name === 'AbortError') return; }
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-      toast('Snapshot saved');
-    }, 'image/png');
-  }
 
   /* ---- universe / settings changes ---- */
   function setUniverseGL() {
@@ -854,7 +674,7 @@ function createEngine(THREE, PP) {
   }
 
   /* ---- loop ---- */
-  let needsRender = true, last = performance.now(), running = true;
+  let needsRender = true, last = performance.now(), running = true, rafId = 0;
   function resize() {
     renderer.setSize(innerWidth, innerHeight, false);
     composer.setSize(innerWidth, innerHeight);
@@ -863,7 +683,7 @@ function createEngine(THREE, PP) {
     needsRender = true;
   }
   addEventListener('resize', resize);
-  document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) { last = performance.now(); requestAnimationFrame(loop); } });
+  document.addEventListener('visibilitychange', () => { running = !document.hidden; cancelAnimationFrame(rafId); if (running) { last = performance.now(); rafId = requestAnimationFrame(loop); } });
   addEventListener('scroll', () => { updateActive(); needsRender = true; }, { passive: true });
 
   function renderFrame(dt) {
@@ -913,7 +733,7 @@ function createEngine(THREE, PP) {
 
   function loop(now) {
     if (!running) return;
-    const dt = Math.min((now - last) / 1000, 0.1);
+    const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
     last = now;
 
     // crossfade between systems
@@ -933,7 +753,7 @@ function createEngine(THREE, PP) {
       renderFrame(dt);
       needsRender = false;
     }
-    requestAnimationFrame(loop);
+    rafId = requestAnimationFrame(loop);
   }
 
   // Start
@@ -941,12 +761,7 @@ function createEngine(THREE, PP) {
   activeEl.classList.add('active');
   buildScene(activeEl.dataset.scene || 'figure8');
   setUniverseGL();
-  const startPlay = hashParams.get('play');
-  if (startPlay && SCENES[startPlay]) {
-    const s = parseInt(hashParams.get('seed'), 10); if (s) seed = s;
-    setTimeout(() => enterPlay(startPlay), 300);
-  }
-  requestAnimationFrame(loop);
+  rafId = requestAnimationFrame(loop);
   updateHUD(performance.now() + 1000);
 
   return {
@@ -955,6 +770,6 @@ function createEngine(THREE, PP) {
     setUniverse: setUniverseGL,
     settingsChanged,
     motionChanged() { needsRender = true; if (calm()) buildScene(sceneName); },
-    disturb, enterPlay, exitPlay, lockScene, unlockScene,
+    disturb, lockScene, unlockScene,
   };
 }

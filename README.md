@@ -1,31 +1,27 @@
 # Thrishank Kuntimaddi — Portfolio
 
-A portfolio that is also a live **3D three-body gravity simulation**.
+A light, paper-and-retro portfolio that runs itself.
 
-- **Hero:** the stable figure-8 three-body orbit, with a live energy readout. Press *Disturb* and it turns chaotic until a star escapes.
-- **Scroll-driven universe:** every section switches the simulation (Lagrange triangle, binary pair, debris field, planetary system, chaos, the Pythagorean problem), and the camera flies to frame each project's portal.
-- **Sandbox:** full-screen mode. Drag to rotate, pinch or scroll to zoom, tap to drop stars. Snapshots save or share a signed PNG, and share links reproduce the same universe.
-- **Universe lab** (press `U`): 6 universes (Nebula, Solar, Ice, Eclipse, Terminal, Paper), star colours with a custom picker, and gravity, time, trail and glow sliders.
-- Works on phones, respects reduced motion (Calm mode), and falls back to a static page without WebGL.
+- **Auto-tour:** the page scrolls on its own. Any scroll, tap or key press hands control to the visitor at once, and the tour resumes after five idle seconds.
+- **Automatic editions:** four light colour palettes (Morning, Noon, Dusk, Night) chosen from the visitor's local time. There are no theme controls.
+- **Live 3D gravity scenes:** a real N-body simulation drawn as pastel ink orbits on paper. Each section has its own system, framed by a glossy glass window. The hero orbit changes on every visit.
+- **One layout per project:** a window, a card, three points and two buttons (Open live, Code).
+- Works on phones, respects reduced motion (no tour, no animation), and still shows all content without WebGL.
 
 ## Stack
 
-Plain HTML, CSS and JavaScript (ES modules) with no build step. Three.js 0.160 (WebGL + UnrealBloom) is loaded from jsDelivr through an import map. Physics is a hand-written leapfrog N-body integrator with softening.
+Plain HTML, CSS and JavaScript (ES modules) with no build step. Three.js 0.160 is loaded from jsDelivr through an import map. Physics is a hand-written leapfrog integrator.
 
 ```
-index.html   page, content, import map
-style.css    universe tokens, glass UI, 3D tilt and reveals, sandbox and lab UI
-main.js      UI layer + the WebGL engine (physics, camera, scenes, sharing)
+index.html   page and content
+style.css    edition tokens, cards, glass windows, stickers, auto-tour pill
+main.js      editions, auto-tour, reveals + the WebGL engine
 assets/      me.jpg, og.jpg (social preview), favicon.svg
 ```
 
 ## Run locally
 
-ES modules need a server (not `file://`):
-
 ```
 python3 -m http.server 8080
-# open http://localhost:8080
+# open http://localhost:8080  (add ?edition=dusk to preview another edition)
 ```
-
-Share links: `#u=paper` opens a universe, and `#play=chaos&seed=123&u=ice` opens the sandbox on a specific system.
