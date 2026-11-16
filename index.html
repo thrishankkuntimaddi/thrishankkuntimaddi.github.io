@@ -1,234 +1,461 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head> 
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content=""IE=edge>
-        <meta name="viewport" content="width=device-width, initial-scale=1,0">
-        <title>
-            Thrishank Kuntimaddi
-        </title>
-        <link rel="stylesheet" href="style.css">
-        <script src="https://kit.fontawesome.com/4074419aa8.js" crossorigin="anonymous"></script>
-    </head>
-    <body>
-        <div id="header">
-            <div class="container">
-                <nav>
-                    <img src="images/Icon.png" class="logo">
-                    <ul id="sidemenu">
-                        <li><a href="#header">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#services">Achievements</a></li>
-                        <li><a href="#portfolio">Projects</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                        <i class="fa-solid fa-circle-xmark" onclick="closemenu()"></i>
-                    </ul>
-                    <i class="fa-solid fa-bars" onclick="openmenu()"></i>
-                </nav>
-                <div class="header-text">
-                    <p>AI Developer</p>
-                    <h1>
-                        Hi, I'm <span>Thrishank</span><br> from   India
-                    </h1>
-                </div>
+<html lang="en" data-universe="nebula">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Thrishank Kuntimaddi — Frontend Developer</title>
+  <meta name="description" content="Frontend developer obsessed with UI/UX. Play with a live 3D gravity simulation, then explore Oruinwan, Expense Tracker, SentinelFlight, LearnViaNotes and more.">
+  <meta name="theme-color" content="#05040b">
 
-            </div>
-        </div>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Thrishank Kuntimaddi — I build interfaces you want to play with">
+  <meta property="og:description" content="A portfolio that is a live 3D three-body simulation. Disturb the orbit, fling a star, share your universe.">
+  <meta property="og:image" content="assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
 
-
-        <div id="about">
-            <div class="container">
-                <div class="row">
-                    <div class="about-col-1">
-                        <img src="images/backg.png">
-
-                    </div>
-                    <div class="about-col-2">
-                        <h1 class="sub-title">About Me</h1>
-                        <p class="paaa">Passionate about AI development and the creation of AI Assistants, I am driven to explore and innovate at the forefront of artificial intelligence. With a keen interest in leveraging AI to enhance user experiences, I aspire to contribute to the development of intelligent systems that simplify tasks and empower users. Additionally, I am enthusiastic about integrating augmented reality (AR) technology into AI solutions, aiming to create immersive and interactive experiences that push the boundaries of innovation.</p>
-
-                        <div class="tab-titles">
-                            <p class="tab-links active-link" onclick="opentab('skills')">Skills</p>
-                            <p class="tab-links" onclick="opentab('experiences')">Experiences</p>
-                            <p class="tab-links" onclick="opentab('education')">Education</p>
-
-                        </div>
-                        <div class="tab-contents active-tab" id="skills">
-                            <ul>
-                                <li><span>Python Programming</span><br>Backend Development</li>
-                                <li><span>Artificial Intelligence</span><br>WebAI</li>
-                                <li><span>Data Science</span><br>WebData</li>
-                            </ul>
-                        </div>
-                        <div class="tab-contents" id="experiences">
-                            <ul>
-                                <li><span>28th Jul 2022 to 28th Oct 2022</span><br>Artificial Intelligence with Python</li>
-                                <li><span>01st Jun 2023 to 15th Jul 2023</span><br>Data Science and Machine Learning Internship</li>
-                            
-                            </ul>
-                        </div>
-                        <div class="tab-contents" id="education">
-                            <ul>
-                                <li><span>Pursuing</span><br>B-Tech from Madanapalle Institute of Technology & Science, Madanapalle</li>
-                                <li><span>2021</span><br>PUC from Nagarjuna Pre University College, Karnataka</li>
-                                <li><span>2019</span><br>Class X from Jeevananda English Medium High School, Andhra Pradesh</li>
-                            </ul>
-                        </div>
-                    
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-<!----  Services  -  --->
-
-<div id="services">
-    <div class="container">
-        <h1 class="sub-title">My Achievements</h1>
-        <div class="services-list">
-            <div>
-                <i class="fa-solid fa-code"></i>
-                <h2>Participated in Yukti Innovation, Regional Meet 2023</h2>
-                <p>Institutions' Innovation Council, REVA University</p>
-                <a href="#">Learn More</a>
-            </div>
-            <div>
-                <i class="fa-solid fa-code"></i>
-                <h2>First Prize Winner in Oral Presentation & Project Expo</h2>
-                <p>Young Scientists' Conference, Indian International Science Festival (IISF)</p>
-                <a href="#">Learn More</a>
-            </div>
-            <div>
-                <i class="fa-solid fa-code"></i>
-                <h2>Level 3, Smart India Hackathon (SIH) 2023 </h2>
-                <p>Project Title: Air and Water Quality Index</p>
-                <a href="#">Learn More</a>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!--- Portfolio --->
-
-<div id="portfolio">
-    <div class="container">
-        <h1 class="sub-title">My Projects</h1>
-        <div class="work-list">
-            <div class="work">
-                <img src="images/Project1.png">
-                <div class="layer">
-                    <h3>Smart Driver Monitoring and Assistant System</h3>
-                    <p class="paaa">Implemented a Smart Driver Monitoring and Assistance System utilizing OpenCV, which analyzes facial landmarks to detect signs of driver drowsiness, sleeping, or unconcerned behavior, and provides real-time alerts and assistance, thereby enhancing road safety.</p>
-                    <a href="#"><i class="fa-solid fa-link"></i></a>
-                </div>
-            </div>
-            <div class="work">
-                <img src="images/Project2.png">
-                <div class="layer">
-                    <h3>SmartDrive Guru : Chatbot for Smart Travel Assistance</h3>
-                    <p class="paaa">"DriveSmart Guru" is a chatbot designed to provide smart travel assistance, leveraging machine learning techniques to understand user input and offer personalized, real-time recommendations for optimized journeys.</p>
-                    <a href="#"><i class="fa-solid fa-link"></i></a>
-                </div>
-            </div>
-            <div class="work">
-                <img src="images/Project3.png">
-                <div class="layer">
-                    <h3>Autonomous flying copter for public safety</h3>
-                    <p class="paaa">An autonomous flying copter designed for public safety purposes, equipped with advanced sensors and AI algorithms to detect and respond to emergencies, enhancing overall safety and security in various environments.</p>
-                    <a href="#"><i class="fa-solid fa-link"></i></a>
-                </div>
-            </div>
-        </div>
-        <a href="#portfolio" class="btn">See More</a>
-    </div>
-</div>
-
-<!-- Contact-->
-
-<div id="contact">
-    <div class="container">
-        <div class="row">
-            <div class="contact-left">
-                <h1 class="sub-title">Contact Me</h1>
-                <p><i class="fa-solid fa-share-from-square"></i> thrishankkuntimaddi@gmail.com</p>
-                <p><i class="fa-solid fa-phone"></i> +91 9381870544</p>
-                <div class="social-icons">
-                    <a href="https://www.facebook.com/ThrishankKuntimaddi"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="https://twitter.com/ThrishankT"><i class="fa-brands fa-twitter-square"></i></a>
-                    <a href="https://www.instagram.com/just_thrishank/"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/"><i class="fa-brands fa-linkedin"></i></a>
-                    <a href="https://github.com/CipherShank"><i class="fa-brands fa-square-github"></i></i></a>
-                </div>
-                <a href="images/ThrishankKuntimaddi.pdf" download class="btn btn2">Download Resume</a>
-            </div>
-            <div class="contact-right">
-                <form name="submit-to-google-sheet">
-                    <input type="text" name="Name" placeholder="Your Name" required>
-                    <input type="email" name="Email" placeholder="Your Email" required>
-                    <textarea name="Message" rows="6" placeholder="Your Message"></textarea>
-                    <button type="submit" class="btn btn2">Submit</button>
-                </form>
-                <span id="msg"></span>
-            </div>
-        </div>
-    </div>
-    <div class="copyright">
-        <p>Copyright <i class="fa-solid fa-copyright"></i> Thrishank.<i class="fa-regular fa-heart"></i></p>
-    </div>
-</div>
-
-<script>
-    var tablinks = document.getElementsByClassName("tab-links");
-    var tabcontents = document.getElementsByClassName("tab-contents");
-
-    function opentab(tabname){
-        for(tablink of tablinks){
-            tablink.classList.remove("active-link");
-        }
-        for(tabcontent of tabcontents){
-            tabcontent.classList.remove("active-tab");
-        }
-        event.currentTarget.classList.add("active-link");
-        document.getElementById(tabname).classList.add("active-tab");
-    }
-
-
-</script>
-<script>
-    var sidemeu = document.getElementById("sidemenu");
-
-    function openmenu(){
-        sidemeu.style.right = "0";
-    }
-
-    function closemenu(){
-        sidemeu.style.right = "-200px";
-    }
-
-</script>
-
-  
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwSx69s-CSN8D83H2CGAGJHCJc01eUnaayGpy08UApyUubwY63oIcKYR-glc38NkCKBFw/exec'
-    const form = document.forms['submit-to-google-sheet']
-
-    const msg = document.getElementById("msg")
-  
-    form.addEventListener('submit', e => {
-      e.preventDefault()
-      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-        .then(response => {
-            msg.innerHTML = "Message Sent Successfully!"
-            setTimeout(function(){
-                msg.innerHTML = ""
-            }, 2000)
-            form.reset()
-        })
-        .catch(error => console.error('Error!', error.message))
-    })
+    (function () {
+      var d = document.documentElement, s = {};
+      try { s = JSON.parse(localStorage.getItem('tk-universe') || '{}') || {}; } catch (e) {}
+      var m = /[#&]u=([a-z]+)/.exec(location.hash);
+      d.dataset.universe = (m && m[1]) || s.universe || 'nebula';
+      if (s.motion) d.dataset.motion = s.motion;
+      if (s.accent) d.style.setProperty('--accent', s.accent);
+    })();
   </script>
 
-    </body>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js" crossorigin>
+</head>
+<body>
+  <a class="skip" href="#work">Skip to work</a>
+
+  <!-- The universe: one WebGL canvas behind everything -->
+  <canvas id="universe" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <header class="nav" id="top">
+    <div class="wrap nav-inner">
+      <a href="#top" class="brand" aria-label="Thrishank Kuntimaddi, home">
+        <span class="mono-mark">TK</span>
+        <span class="brand-name">Thrishank Kuntimaddi</span>
+      </a>
+      <nav aria-label="Primary">
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#work">Work</a></li>
+          <li><a href="#poelys">Poelys</a></li>
+          <li><a href="#more">Lab</a></li>
+          <li><a href="#craft">Craft</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact" class="nav-cta">Get in touch</a></li>
+        </ul>
+      </nav>
+      <div class="nav-tools">
+        <button class="icon-btn" data-open-lab aria-label="Open universe controls" title="Universe controls (U)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="2.6"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-60 12 12)"/></svg>
+        </button>
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero" data-scene="figure8" id="hero">
+      <div class="wrap hero-inner">
+        <p class="eyebrow"><span class="dot"></span> Frontend developer · UI/UX · India</p>
+        <h1 class="hero-title" aria-label="I build interfaces you want to play with.">
+          <span class="w">I</span> <span class="w">build</span> <span class="w">interfaces</span><br>
+          <span class="w">you</span> <span class="w">want</span> <span class="w">to</span> <em class="w">play&nbsp;with.</em>
+        </h1>
+        <p class="hero-sub">
+          Hi, I'm <strong>Thrishank</strong>. Behind this text is a real three-body gravity simulation,
+          running in 3D in your browser. I care about this level of detail in every interface I ship, and my products live at <a class="inline-link" href="https://poelys.com" target="_blank" rel="noopener">poelys.com</a>.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary magnetic" id="disturbBtn" type="button"><span class="btn-ico" aria-hidden="true">✷</span> Disturb the orbit</button>
+          <button class="btn btn-ghost magnetic" id="playBtn" type="button"><span class="btn-ico" aria-hidden="true">◎</span> Enter sandbox</button>
+          <a href="#work" class="btn btn-text">See my work ↓</a>
+        </div>
+        <p class="hero-hint only-fine">Drag to rotate space · click empty space to drop a star · press <kbd>U</kbd> for controls</p>
+        <p class="hero-hint only-touch">Tap <b>Enter sandbox</b> to rotate, pinch and drop stars with your fingers</p>
+      </div>
+
+      <div class="hud" aria-live="off">
+        <div><span>SYSTEM</span><b id="hudScene">FIGURE-8</b></div>
+        <div><span>BODIES</span><b id="hudBodies">3</b></div>
+        <div><span>ENERGY</span><b id="hudEnergy">−1.2870</b></div>
+        <div><span>T+</span><b id="hudTime">00:00.0</b></div>
+        <div><span>STATE</span><b id="hudState" class="ok">STABLE</b></div>
+      </div>
+      <a href="#work" class="scroll-cue" aria-label="Scroll to work"><span></span></a>
+    </section>
+
+    <!-- ============ FEATURED WORK ============ -->
+    <section id="work" class="section">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="kicker">01 — Selected work</p>
+          <h2>Every product is its own <em>system</em>.<br>Scroll, and watch the universe change with it.</h2>
+        </header>
+
+        <article class="case" data-scene="lagrange" data-scene-label="Oruinwan · three in balance">
+          <div class="case-media portal reveal" aria-hidden="true">
+            <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+            <div class="portal-top"><span>SYSTEM · LAGRANGE TRIANGLE</span><span class="ok">● LIVE</span></div>
+            <p class="portal-tag">Three people.<br>One conversation.</p>
+            <div class="portal-hud"><span>3 BODIES · EQUAL MASS</span><span class="portal-hint">drag the page background to rotate</span></div>
+          </div>
+          <div class="case-body glass reveal">
+            <div class="case-meta">
+              <span class="app-icon app-icon-glyph" aria-hidden="true">O</span>
+              <div><h3>Oruinwan</h3><p class="case-cat">Collaboration app · UI system · Open source</p></div>
+            </div>
+            <p class="case-lede">One workspace for every conversation. Channels, DMs, huddles, tasks, notes and AI share one interface, so a team stops jumping between five apps.</p>
+            <ul class="case-points">
+              <li>One interface that adapts from phone, to split view on tablets, to wide desktop. Phones on the web get the same UI as the app, so iPhone users get the full experience in Safari.</li>
+              <li>Designed so context never gets lost: a message becomes a task that points back to it, a call's recap lands in the channel that held it, and <code>@ai</code> works in any chat.</li>
+              <li>1,091 commits of iteration, with end-to-end tests that check what's actually visible on a phone screen.</li>
+            </ul>
+            <ul class="chips"><li>React 19</li><li>Tailwind</li><li>Vite</li><li>Yjs realtime</li><li>Socket.IO</li><li>Capacitor</li></ul>
+            <div class="case-links">
+              <a href="https://oruinwan.poelys.com" target="_blank" rel="noopener" class="link-strong">Open the app ↗</a>
+              <a href="https://github.com/thrishankkuntimaddi/Oruinwan" target="_blank" rel="noopener">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="case case-flip" data-scene="binary" data-scene-label="Expense Tracker · a balanced pair">
+          <div class="case-media portal reveal" aria-hidden="true">
+            <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+            <div class="portal-top"><span>SYSTEM · BINARY PAIR</span><span class="ok">● LIVE</span></div>
+            <p class="portal-tag">Money in, money out.<br>Kept in balance.</p>
+            <div class="portal-hud"><span>2 STARS + 1 PLANET</span><span class="portal-hint">drag the page background to rotate</span></div>
+          </div>
+          <div class="case-body glass reveal">
+            <div class="case-meta">
+              <span class="app-icon app-icon-glyph" aria-hidden="true">₹</span>
+              <div><h3>Expense Tracker</h3><p class="case-cat">Personal finance · Glass UI · v4.3</p></div>
+            </div>
+            <p class="case-lede">Your whole money life in one calm app: expenses, income, bills, budgets, goals, debts with friends and trip splits, in any currency.</p>
+            <ul class="case-points">
+              <li>Quick entry that reads like a text message: type “chai 20 vada 15” and it logs two expenses, each already categorised.</li>
+              <li>One big number up front, how it compares to your budget and a “safe to spend today” figure, instead of charts you have to decode.</li>
+              <li>A soft glass visual language that looks the same as a PWA, on Android (Capacitor) and on desktop (Tauri).</li>
+            </ul>
+            <ul class="chips"><li>React</li><li>Glassmorphism</li><li>PWA</li><li>Capacitor</li><li>Tauri</li><li>Firebase</li></ul>
+            <div class="case-links">
+              <a href="https://expensetracker-in.web.app/" target="_blank" rel="noopener" class="link-strong">Open the app ↗</a>
+              <a href="https://thrishankkuntimaddi.github.io/ExpenseTracker/" target="_blank" rel="noopener">Product page</a>
+              <a href="https://github.com/thrishankkuntimaddi/ExpenseTracker" target="_blank" rel="noopener">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="case" data-scene="debris" data-scene-label="SentinelFlight · Earth and its debris">
+          <div class="case-media portal reveal" aria-hidden="true">
+            <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+            <div class="portal-top"><span>SYSTEM · PLANET + DEBRIS</span><span class="ok">● LIVE</span></div>
+            <p class="portal-tag">Navigate around<br>the hazards.</p>
+            <div class="portal-hud"><span>SGP4-STYLE ORBITS</span><span class="portal-hint">drag the page background to rotate</span></div>
+          </div>
+          <div class="case-body glass reveal">
+            <div class="case-meta">
+              <span class="app-icon app-icon-glyph" aria-hidden="true">◎</span>
+              <div><h3>SentinelFlight</h3><p class="case-cat">3D game UI · Three.js · Space</p></div>
+            </div>
+            <p class="case-lede">Fly real rockets through the real sky. I turned dense orbital mechanics into a game anyone can play, with an AI copilot I trained to dodge real debris.</p>
+            <ul class="case-points">
+              <li>Hard data made readable: a launch-window chart, chase, onboard and map cameras, time warp, and a debrief with stars and a score.</li>
+              <li>A Three.js scene of the real tracked catalog. The orbit maths runs in Web Workers, so the interface stays smooth.</li>
+              <li>Under the hood, a Double DQN agent that was <strong>100% safe on 200 held-out scenarios</strong>.</li>
+            </ul>
+            <ul class="chips"><li>Three.js</li><li>WebGL</li><li>Web Workers</li><li>JavaScript</li><li>Python</li><li>PyTorch</li></ul>
+            <div class="case-links">
+              <a href="https://sentinelflight.poelys.com/" target="_blank" rel="noopener" class="link-strong">Launch it ↗</a>
+              <a href="https://github.com/thrishankkuntimaddi/Enhanced-Space-Debris-Avoidance-and-Trajectory-Optimization-System" target="_blank" rel="noopener">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="case case-flip" data-scene="solar" data-scene-label="LearnViaNotes · one concept at a time">
+          <div class="case-media portal reveal" aria-hidden="true">
+            <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+            <div class="portal-top"><span>SYSTEM · STAR + 4 PLANETS</span><span class="ok">● LIVE</span></div>
+            <p class="portal-tag">One concept<br>at a time.</p>
+            <div class="portal-hud"><span>ONE ORBIT AT A TIME</span><span class="portal-hint">drag the page background to rotate</span></div>
+          </div>
+          <div class="case-body glass reveal">
+            <div class="case-meta">
+              <span class="app-icon app-icon-glyph" aria-hidden="true">L</span>
+              <div><h3>LearnViaNotes</h3><p class="case-cat">Reading UX · Design system · PWA</p></div>
+            </div>
+            <p class="case-lede">A calm, focused interview sheet: 22 subjects and 150 coding problems in four languages. No sign-up wall. Just learn.</p>
+            <ul class="case-points">
+              <li>Rebuilt phone-first, with a hero for guests and learners, tinted categories and sticky filters.</li>
+              <li>Notes are structured blocks (callouts, code, tables) drawn by one set of reusable components, effectively a small design system for reading.</li>
+              <li>Read-aloud, a focus timer and spaced repetition, with offline support for anything you've already opened.</li>
+            </ul>
+            <ul class="chips"><li>React</li><li>TypeScript</li><li>Component system</li><li>PWA</li><li>Firebase</li></ul>
+            <div class="case-links">
+              <a href="https://www.learnvianotes.in/" target="_blank" rel="noopener" class="link-strong">Start learning ↗</a>
+              <a href="https://github.com/thrishankkuntimaddi/c-note" target="_blank" rel="noopener">Source</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+
+    <!-- ============ POELYS ============ -->
+    <section id="poelys" class="section" data-scene="studio" data-frame="left" data-scene-label="Poelys · one studio, six products in orbit">
+      <div class="wrap poelys">
+        <div class="poelys-space" aria-hidden="true"></div>
+        <div class="poelys-card glass tilt reveal">
+          <p class="kicker">Where my products live</p>
+          <h2><span class="poelys-word">Poelys</span><br>is my product studio.</h2>
+          <p class="poelys-lede">Every product on this page orbits one home. Poelys is where I design, build and ship them, from collaboration and finance to restaurants and space. Still building, always.</p>
+          <ul class="poelys-links">
+            <li><a href="https://oruinwan.poelys.com" target="_blank" rel="noopener"><span>oruinwan</span>.poelys.com <i>↗</i></a></li>
+            <li><a href="https://sentinelflight.poelys.com" target="_blank" rel="noopener"><span>sentinelflight</span>.poelys.com <i>↗</i></a></li>
+            <li><a href="https://yormenu.poelys.com" target="_blank" rel="noopener"><span>yormenu</span>.poelys.com <i>↗</i></a></li>
+            <li><a href="https://app.parla.poelys.com/welcome" target="_blank" rel="noopener"><span>parla</span>.poelys.com <i>↗</i></a></li>
+          </ul>
+          <a class="btn btn-primary magnetic poelys-cta" href="https://poelys.com" target="_blank" rel="noopener">Visit poelys.com <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAB ============ -->
+    <section id="more" class="section" data-scene="chaos" data-scene-label="The lab · five bodies, pure chaos">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="kicker">02 — The lab</p>
+          <h2>More interfaces I've shipped, or am building right now.</h2>
+        </header>
+        <div class="grid">
+          <a class="card tilt glass reveal" href="https://yormenu.poelys.com/" target="_blank" rel="noopener">
+            <div class="card-top"><span class="card-icon card-glyph pop" aria-hidden="true">Y</span><span class="tag tag-live">Live</span></div>
+            <h3>YorMenu</h3>
+            <p>A restaurant platform with a separate interface for every role: waiter, kitchen, billing counter and guest. Tables use traffic-light colours, labels come in English, Telugu or Hindi, and each owner picks a brand colour.</p>
+            <p class="card-stack">React · TypeScript · Firebase · Android · Desktop</p>
+          </a>
+          <a class="card tilt glass reveal" href="https://github.com/thrishankkuntimaddi/MsMinutes" target="_blank" rel="noopener">
+            <div class="card-top"><span class="card-icon card-glyph pop" aria-hidden="true">◔</span><span class="tag">In progress</span></div>
+            <h3>Ms. Minutes</h3>
+            <p>An AI companion with an animated face, rigged with spring physics, idle movement and lip-sync. She moves between your devices and will soon live in a tiny ESP32 desk clock.</p>
+            <p class="card-stack">TypeScript · Animation rig · Claude API · ESP32</p>
+          </a>
+          <a class="card tilt glass reveal" href="https://github.com/thrishankkuntimaddi/my-rovers" target="_blank" rel="noopener">
+            <div class="card-top"><span class="card-icon card-glyph pop" aria-hidden="true">⛭</span><span class="tag">Hardware</span></div>
+            <h3>My Rovers</h3>
+            <p>Home-built robotic rovers, driven from a tablet cockpit app I designed in an Apple-style Liquid Glass look.</p>
+            <p class="card-stack">Android app · ESP32 · Arduino</p>
+          </a>
+          <a class="card tilt glass reveal" href="https://thrishankkuntimaddi.github.io/Meditation/" target="_blank" rel="noopener">
+            <div class="card-top"><span class="card-icon card-glyph pop" aria-hidden="true">◌</span><span class="tag tag-live">Live</span></div>
+            <h3>Meditation</h3>
+            <p>Designed to stay out of the way: a warm stone palette, a breathing orb with eased motion, hold-to-end so a stray tap can't stop you, and an eyes-closed mode that dims to near-black.</p>
+            <p class="card-stack">React · TypeScript · Tailwind · Capacitor · Tauri</p>
+          </a>
+          <a class="card tilt glass reveal" href="https://thrishankkuntimaddi.github.io/clearmyMind" target="_blank" rel="noopener">
+            <div class="card-top"><span class="card-icon card-glyph pop" aria-hidden="true">✦</span><span class="tag tag-live">Live</span></div>
+            <h3>ClearMyMind</h3>
+            <p>Zero-friction input: one smart bar that searches as you type and adds the thought when you press Enter. Sort into sheets and colour tags, then clear it all away.</p>
+            <p class="card-stack">React 19 · Vite · Firebase</p>
+          </a>
+          <button class="card tilt glass card-play reveal" type="button" data-open-lab>
+            <div class="card-top"><span class="card-icon card-glyph pop" aria-hidden="true">✷</span><span class="tag tag-live">You're in it</span></div>
+            <h3>This universe</h3>
+            <p>A leapfrog N-body integrator, bloom-lit WebGL, scroll-driven camera flights, six universes and shareable links, all in about 1,400 lines of hand-written JavaScript and CSS, with no framework.</p>
+            <p class="card-stack">Three.js · WebGL · Physics · Vanilla JS <span class="card-cta">Open the controls →</span></p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CRAFT ============ -->
+    <section id="craft" class="section" data-scene="figure8" data-scene-label="Craft · the figure-8 orbit">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="kicker">03 — Craft</p>
+          <h2>The details I can't stop caring about.</h2>
+        </header>
+        <div class="craft-grid">
+          <div class="craft tilt glass reveal">
+            <div class="craft-demo demo-motion pop" aria-hidden="true"><span></span></div>
+            <h4>Motion with meaning</h4>
+            <p>Animation should explain where things came from and where they went. I tune every easing curve and respect reduced-motion settings.</p>
+          </div>
+          <div class="craft tilt glass reveal">
+            <div class="craft-demo demo-tokens pop" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+            <h4>Tokens, not hex codes</h4>
+            <p>Colour and type live in design tokens. Change the universe on this page and every component restyles from one source.</p>
+          </div>
+          <div class="craft tilt glass reveal">
+            <div class="craft-demo demo-a11y pop" aria-hidden="true"><span>Aa</span><b>AA</b></div>
+            <h4>Accessible by default</h4>
+            <p>Visible focus rings, semantic HTML, keyboard paths and real contrast. Even this 3D page works without WebGL or with motion turned off.</p>
+          </div>
+          <div class="craft tilt glass reveal">
+            <div class="craft-demo demo-phone pop" aria-hidden="true"><span></span></div>
+            <h4>Phone first, everywhere after</h4>
+            <p>I design for a thumb on a small screen first, then let the layout grow into split views and desktop, all from one codebase.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section id="about" class="section" data-scene="pythagorean" data-frame="left" data-scene-label="About · the Pythagorean problem: one star escapes">
+      <div class="wrap about">
+        <figure class="about-photo tilt reveal">
+          <img class="pop-soft" src="assets/me.jpg" alt="Portrait of Thrishank Kuntimaddi, smiling" loading="lazy" width="446" height="574">
+          <figcaption><span class="dot"></span> Thrishank · India</figcaption>
+        </figure>
+        <div class="about-body glass reveal">
+          <p class="kicker">04 — About</p>
+          <h2>Interfaces are where software meets people. That's my favourite place to work.</h2>
+          <p>I'm Thrishank, a computer science engineer from India. I started in AI and computer vision, but what kept pulling me back was the screen in front of the user: how it looks, how it moves, how it feels the hundredth time you open it.</p>
+          <p>Now I design and build interfaces end to end, from the first sketch in code to the release on web, Android and desktop. I can also build the backend behind them, so an idea reaches people whole instead of as a mock-up.</p>
+          <div class="skills">
+            <div><h4>Frontend</h4><p>React 19, TypeScript, Vite, HTML, modern CSS (custom properties, grid, <code>color-mix</code>, 3D transforms), Tailwind</p></div>
+            <div><h4>Motion &amp; 3D</h4><p>Three.js, WebGL, GLSL shaders, Canvas, CSS animation, View Transitions, Web Workers</p></div>
+            <div><h4>UX craft</h4><p>Design tokens and theming, phone-first responsive layout, accessibility, PWAs and offline</p></div>
+            <div><h4>Beyond the UI</h4><p>Capacitor, Tauri, Node.js, Firebase, PostgreSQL, Python, PyTorch, ESP32</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap timeline-wrap">
+        <div class="timeline glass reveal">
+          <h4 class="tl-title">Recognition</h4>
+          <ul>
+            <li><span class="tl-k">First prize</span>Oral presentation &amp; project expo, Young Scientists' Conference, Indian International Science Festival (IISF)</li>
+            <li><span class="tl-k">Level 3</span>Smart India Hackathon 2023, Air and Water Quality Index</li>
+            <li><span class="tl-k">Participant</span>Yukti Innovation Regional Meet 2023, Institution's Innovation Council, REVA University</li>
+          </ul>
+        </div>
+        <div class="timeline glass reveal">
+          <h4 class="tl-title">Experience &amp; education</h4>
+          <ul>
+            <li><span class="tl-k">Now</span>Designing and building products under Poelys: Oruinwan, Expense Tracker, SentinelFlight, LearnViaNotes, YorMenu</li>
+            <li><span class="tl-k">2023</span>Data Science &amp; Machine Learning internship</li>
+            <li><span class="tl-k">2022</span>Artificial Intelligence with Python internship</li>
+            <li><span class="tl-k">B.Tech</span>Madanapalle Institute of Technology &amp; Science</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section id="contact" class="section contact" data-scene="figure8" data-frame="top" data-scene-label="Contact · back to stable">
+      <div class="wrap reveal">
+        <p class="kicker">05 — Contact</p>
+        <h2 class="contact-title">Need an interface people will love?<br><em>Let's talk.</em></h2>
+        <p class="contact-sub">I'm open to frontend and UI engineering roles, freelance product work and collaborations.</p>
+        <a class="email" href="mailto:thrishankkuntimaddi@gmail.com" id="emailLink">thrishankkuntimaddi@gmail.com</a>
+        <div class="contact-actions">
+          <button class="btn btn-ghost btn-sm" id="copyBtn" type="button">Copy email</button>
+          <button class="btn btn-ghost btn-sm" data-share type="button">Share this site ↗</button>
+        </div>
+        <ul class="socials">
+          <li><a href="https://poelys.com" target="_blank" rel="noopener">Poelys ↗</a></li>
+          <li><a href="https://github.com/thrishankkuntimaddi" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a href="https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a href="https://twitter.com/ThrishankT" target="_blank" rel="noopener">X / Twitter ↗</a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>© <span id="year">2026</span> Thrishank Kuntimaddi · Designed, simulated &amp; built by hand</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+
+  <!-- Scene label that appears as the universe changes -->
+  <div class="scene-label" id="sceneLabel" aria-hidden="true"></div>
+
+  <!-- ============ SANDBOX HUD ============ -->
+  <div class="play-hud" id="playHud" hidden>
+    <div class="play-top">
+      <p class="play-title"><b>Sandbox</b> · <span class="only-fine">drag to rotate, scroll to zoom, click to drop a star</span><span class="only-touch">drag to rotate, pinch to zoom, tap to drop a star</span></p>
+      <button class="icon-btn" id="exitPlay" aria-label="Exit sandbox">✕</button>
+    </div>
+    <div class="play-bar">
+      <button type="button" data-act="disturb"><span>✷</span>Disturb</button>
+      <button type="button" data-act="add"><span>＋</span>Star</button>
+      <button type="button" data-act="scene"><span>↻</span>System</button>
+      <button type="button" data-act="universe"><span>◐</span>Universe</button>
+      <button type="button" data-act="snap"><span>◉</span>Snapshot</button>
+      <button type="button" data-share><span>↗</span>Share</button>
+    </div>
+  </div>
+
+  <!-- ============ UNIVERSE LAB (controls) ============ -->
+  <div class="lab-scrim" id="labScrim" hidden></div>
+  <aside class="lab" id="lab" role="dialog" aria-modal="false" aria-labelledby="labTitle" hidden>
+    <header class="lab-head">
+      <div><h2 id="labTitle">Universe lab</h2><p>Every setting changes the live simulation.</p></div>
+      <button class="icon-btn" id="labClose" aria-label="Close universe controls">✕</button>
+    </header>
+    <div class="lab-body">
+      <fieldset>
+        <legend>Universe</legend>
+        <div class="uni-grid" id="uniGrid"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Star colour</legend>
+        <div class="accent-row" id="accentRow"></div>
+      </fieldset>
+      <fieldset class="sliders">
+        <legend>Physics</legend>
+        <label><span>Gravity <output id="gOut">1.00×</output></span><input type="range" id="gIn" min="0.3" max="2.5" step="0.05" value="1"></label>
+        <label><span>Time <output id="sOut">1.00×</output></span><input type="range" id="sIn" min="0.1" max="3" step="0.05" value="1"></label>
+        <label><span>Trails <output id="tOut">long</output></span><input type="range" id="tIn" min="0.1" max="1" step="0.05" value="0.7"></label>
+        <label><span>Glow <output id="bOut">1.00</output></span><input type="range" id="bIn" min="0" max="2.5" step="0.05" value="1"></label>
+      </fieldset>
+      <fieldset>
+        <legend>System</legend>
+        <div class="seg" id="sceneSeg"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Motion</legend>
+        <div class="seg" role="group" aria-label="Motion">
+          <button type="button" data-set-motion="">Full</button>
+          <button type="button" data-set-motion="calm">Calm (pause)</button>
+        </div>
+      </fieldset>
+    </div>
+    <footer class="lab-foot">
+      <button type="button" class="btn btn-ghost btn-sm" data-act="snap">Snapshot</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-share>Share link</button>
+      <button type="button" class="btn btn-primary btn-sm" id="resetBtn">Reset</button>
+    </footer>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
+
+  <script type="module" src="main.js"></script>
+</body>
 </html>
