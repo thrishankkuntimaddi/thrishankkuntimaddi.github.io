@@ -828,19 +828,19 @@ const snd = (() => {
    the colours for the visitor's local time.
    --------------------------------------------------------- */
 const FALL = [ // in falling order. Every project is its own universe; t = how long we stay in it (ms): some linger, some flash past
-  { name: 'Oruinwan', line: 'One workspace for a team: chat, calls, tasks, notes and AI.', code: '83267', win: 0, t: 2300, world: 'paper', ed: 'morning', bits: ['chat', 'calls', 'tasks', 'notes', '@ai', 'React 19'] },
-  { name: 'SentinelFlight', line: 'Launch real rockets past real orbital debris, in 3D.', code: '359', win: 2, t: 1800, world: 'blueprint', ed: 'noon', bits: ['SGP4', 'Three.js', 'Δv', 'orbit', 'debris', 'AI copilot'] },
-  { name: 'Meditation', line: 'Breathing that quiets every device.', code: '2256', glyph: '◌', t: 300, world: 'news', ed: 'dusk', bits: ['breathe', 'in', 'out'] },
-  { name: 'Expense Tracker', line: 'A calm money app on web, Android and desktop.', code: '2274', win: 1, t: 1500, world: 'sketch', ed: 'dusk', bits: ['₹', 'budget', 'bills', 'chai 20', 'PWA', 'Tauri'] },
-  { name: 'ClearMyMind', line: 'Dump your thoughts, then clear them.', code: '25327', glyph: '✧', t: 260, world: 'pixel', ed: 'night', bits: ['clear', 'think'] },
-  { name: 'My Rovers', line: 'Home-built robot rovers.', code: '76837', glyph: '⛭', t: 300, world: 'blueprint', ed: 'morning', bits: ['ESP32', 'Mark 1', 'Wi-Fi'] },
-  { name: 'LearnViaNotes', line: '22 subjects and 150 coding problems. No sign-up.', code: '66837', win: 3, t: 1300, world: 'news', ed: 'night', bits: ['DSA', '150 problems', 'offline', 'streak', 'notes'] },
-  { name: 'Poelys', line: 'My product studio. Everything I build lives here.', code: '4663', glyph: '◎', t: 1050, world: 'paper', ed: 'dusk', bits: ['studio', 'poelys.com', 'still building'] },
-  { name: 'Interstellar', line: 'A 15-minute real-time 3D space journey.', code: '327', glyph: '✦', t: 720, world: 'pixel', ed: 'noon', bits: ['GLSL', 'TARS', 'Gargantua', 'dock'] },
-  { name: 'YorMenu', line: 'A restaurant platform, from table to kitchen to bill.', code: '6368', glyph: '☕', t: 520, world: 'sketch', ed: 'morning', bits: ['table 5', 'KOT', 'bill'] },
-  { name: 'Parla', line: 'Clear conversations, less friction.', code: '729', glyph: '❝', t: 400, world: 'blueprint', ed: 'night', bits: ['say it', 'clearly'] },
-  { name: 'Ms. Minutes', line: 'An AI desk companion with an animated face.', code: '8463', glyph: '◔', t: 320, world: 'pixel', ed: 'dusk', bits: ['tick', 'tock'] },
-  { name: 'This website', line: 'The one you are falling through.', code: '4373', glyph: '▚', t: 260, world: 'sketch', ed: 'noon', bits: ['you', 'are', 'here'] },
+  { name: 'Oruinwan', line: 'One workspace for a team: chat, calls, tasks, notes and AI.', code: '83267', win: 0, t: 4000, world: 'paper', ed: 'morning', bits: ['chat', 'calls', 'tasks', 'notes', '@ai', 'React 19'] },
+  { name: 'SentinelFlight', line: 'Launch real rockets past real orbital debris, in 3D.', code: '359', win: 2, t: 3200, world: 'blueprint', ed: 'noon', bits: ['SGP4', 'Three.js', 'Δv', 'orbit', 'debris', 'AI copilot'] },
+  { name: 'Meditation', line: 'Breathing that quiets every device.', code: '2256', glyph: '◌', t: 520, world: 'news', ed: 'dusk', bits: ['breathe', 'in', 'out'] },
+  { name: 'Expense Tracker', line: 'A calm money app on web, Android and desktop.', code: '2274', win: 1, t: 2700, world: 'sketch', ed: 'dusk', bits: ['₹', 'budget', 'bills', 'chai 20', 'PWA', 'Tauri'] },
+  { name: 'ClearMyMind', line: 'Dump your thoughts, then clear them.', code: '25327', glyph: '✧', t: 430, world: 'pixel', ed: 'night', bits: ['clear', 'think'] },
+  { name: 'My Rovers', line: 'Home-built robot rovers.', code: '76837', glyph: '⛭', t: 560, world: 'blueprint', ed: 'morning', bits: ['ESP32', 'Mark 1', 'Wi-Fi'] },
+  { name: 'LearnViaNotes', line: '22 subjects and 150 coding problems. No sign-up.', code: '66837', win: 3, t: 2300, world: 'news', ed: 'night', bits: ['DSA', '150 problems', 'offline', 'streak', 'notes'] },
+  { name: 'Poelys', line: 'My product studio. Everything I build lives here.', code: '4663', glyph: '◎', t: 1900, world: 'paper', ed: 'dusk', bits: ['studio', 'poelys.com', 'still building'] },
+  { name: 'Interstellar', line: 'A 15-minute real-time 3D space journey.', code: '327', glyph: '✦', t: 1400, world: 'pixel', ed: 'noon', bits: ['GLSL', 'TARS', 'Gargantua', 'dock'] },
+  { name: 'YorMenu', line: 'A restaurant platform, from table to kitchen to bill.', code: '6368', glyph: '☕', t: 1050, world: 'sketch', ed: 'morning', bits: ['table 5', 'KOT', 'bill'] },
+  { name: 'Parla', line: 'Clear conversations, less friction.', code: '729', glyph: '❝', t: 760, world: 'blueprint', ed: 'night', bits: ['say it', 'clearly'] },
+  { name: 'Ms. Minutes', line: 'An AI desk companion with an animated face.', code: '8463', glyph: '◔', t: 560, world: 'pixel', ed: 'dusk', bits: ['tick', 'tock'] },
+  { name: 'This website', line: 'The one you are falling through.', code: '4373', glyph: '▚', t: 400, world: 'sketch', ed: 'noon', bits: ['you', 'are', 'here'] },
 ];
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const fallEl = $('#fall'), fallStage = $('#fallStage'), fallTerm = $('#fallTerm');
@@ -948,7 +948,7 @@ async function quickJump(ev) {
     shards.appendChild(wrap); setTimeout(() => wrap.remove(), 900);
   };
   for (const [n, p] of FALL.entries()) {
-    const side = n % 2 ? 1 : -1, fast = p.t < 600;
+    const side = n % 2 ? 1 : -1, fast = p.t < 900;
     fallEl.dataset.edition = p.ed; fallEl.dataset.world = p.world;
     faller.dataset.world = p.world; faller.dataset.edition = p.ed;
     const scene = document.createElement('div');
