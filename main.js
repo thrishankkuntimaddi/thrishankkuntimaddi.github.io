@@ -856,7 +856,7 @@ function pipMatrix() { // Pip as a flickering grid of 0s and 1s
   }
   return rows.concat(['      ║          ║', '    ▄▄╝          ╚▄▄']).join('\n');
 }
-const CRASH = ['┌───────────┐', '│ ┌───────┐ │', '│ │       │ │', '│ └───────┘ │', '│   ┌───┐   │', '└───┴───┴───┘', '', 'A problem has been detected and Pip will', 'shut down to prevent damage.', '', 'collecting universes for crash dump...', 'saving your place...', 'dumping memory to disk...', 'erasing...'];
+const CRASH = [' ____________', '|  ________  |', '| |        | |', '| |________| |', '|    ____    |', '|___|____|___|', '', 'A problem has been detected and Pip will', 'shut down to prevent damage.', '', 'collecting universes for crash dump...', 'saving your place...', 'dumping memory to disk...', 'erasing...'];
 const PIP_ASCII = ['    .-""""""-.', '   /  O    O  \\', '  |     __     |', '   \\   \\__/   /', "    '-......-'", '      |    |', '     _|    |_'].join('\n');
 // A still copy of what is on screen (nav + current section), used as the picture on every piece of glass.
 function snapshotView() {
@@ -975,21 +975,21 @@ async function quickJump(ev) {
   // 3. the crash landing, on an old amber CRT: Pip flickers into pixels, then a grid of digits, the crash screen, erased, redrawn, power off
   burst(true); snd.boom(1); snd.glass();
   fallEl.className = 'fall crashing crt'; fallEl.dataset.world = 'paper';
-  faller.classList.add('still'); snd.hum(6.4);
-  for (let i = 0; i < 9; i++) { faller.dataset.world = i % 2 ? 'paper' : 'pixel'; if (i % 3 === 0) snd.crack(); await wait(80); }
+  faller.classList.add('still'); snd.hum(15);
+  for (let i = 0; i < 13; i++) { faller.dataset.world = i % 2 ? 'paper' : 'pixel'; if (i % 3 === 0) snd.crack(); await wait(120); }
   faller.hidden = true; faller.innerHTML = '';
-  for (let i = 0; i < 10; i++) { fallTerm.textContent = pipMatrix(); if (i % 2 === 0) snd.key(); await wait(85); }
-  fallTerm.textContent = ''; snd.beep(440, 0.25);
-  await typeOut(fallTerm, `${CRASH.slice(0, 6).join('\n')}\n\n`, 12, 12);
-  await typeOut(fallTerm, `${CRASH.slice(7, 9).join('\n')}\n\n`, 3, 13);
-  for (const line of CRASH.slice(10)) { await typeOut(fallTerm, `${line}\n`, 4, 12); await wait(110); }
-  fallTerm.textContent += '█'; await wait(450);
-  while (fallTerm.textContent.length > 1) { fallTerm.textContent = fallTerm.textContent.slice(0, -Math.ceil(fallTerm.textContent.length / 7)); await wait(38); }
-  for (let i = 0; i < 4; i++) { fallTerm.textContent = i % 2 ? ' ' : '█'; await wait(170); }
+  for (let i = 0; i < 18; i++) { fallTerm.textContent = pipMatrix(); if (i % 2 === 0) snd.key(); await wait(115); }
+  fallTerm.textContent = ''; snd.beep(440, 0.25); await wait(500);
+  await typeOut(fallTerm, `${CRASH.slice(0, 6).join('\n')}\n\n`, 3, 24); await wait(450);
+  await typeOut(fallTerm, `${CRASH.slice(7, 9).join('\n')}\n\n`, 1, 26); await wait(500);
+  for (const line of CRASH.slice(10)) { await typeOut(fallTerm, `${line}\n`, 1, 24); await wait(520); }
+  fallTerm.textContent += '█'; await wait(1400);
+  while (fallTerm.textContent.length > 1) { fallTerm.textContent = fallTerm.textContent.slice(0, -Math.ceil(fallTerm.textContent.length / 16)); if (Math.random() < 0.4) snd.key(); await wait(55); }
+  for (let i = 0; i < 7; i++) { fallTerm.textContent = i % 2 ? ' ' : '█'; await wait(330); }
   fallTerm.textContent = PIP_ASCII; snd.beep(660, 0.12); await wait(120); snd.beep(990, 0.18);
-  await wait(800);
+  await wait(2000);
   snd.powerDown();
-  await fallTerm.animate([{ transform: 'scale(1,1)', filter: 'brightness(1)' }, { transform: 'scale(1.1,.006)', filter: 'brightness(3)', offset: 0.55 }, { transform: 'scale(.004,.006)', filter: 'brightness(4)', offset: 0.85 }, { transform: 'scale(0,0)', filter: 'brightness(1)' }], { duration: 430, easing: 'ease-in', fill: 'forwards' }).finished;
+  await fallTerm.animate([{ transform: 'scale(1,1)', filter: 'brightness(1)' }, { transform: 'scale(1.1,.006)', filter: 'brightness(3)', offset: 0.55 }, { transform: 'scale(.004,.006)', filter: 'brightness(4)', offset: 0.85 }, { transform: 'scale(0,0)', filter: 'brightness(1)' }], { duration: 700, easing: 'ease-in', fill: 'forwards' }).finished;
   fallTerm.textContent = ''; fallTerm.getAnimations().forEach((a) => a.cancel());
   await wait(220);
 
