@@ -4,10 +4,10 @@
    visitor's choices in localStorage 'tk-prefs', which
    index.html, main.js and chapter.js read on load.
    ========================================================= */
-import { OCCASIONS } from './content.js?v=21';
-import { LOOP, NAMES, COPY } from './worlds.js?v=21';
-import { U as LOOP_SCENES } from './infinity.js?v=21';
-import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=21';
+import { OCCASIONS } from './content.js?v=22';
+import { LOOP, NAMES, COPY } from './worlds.js?v=22';
+import { U as LOOP_SCENES } from './infinity.js?v=22';
+import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=22';
 
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);

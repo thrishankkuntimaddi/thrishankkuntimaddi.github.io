@@ -8,8 +8,8 @@
    5. Traces: stickers on a wall + optional shared counts
    6. The 30-second version for people in a hurry
    ========================================================= */
-import { playTune, projectName } from './tunes.js?v=21';
-import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=21';
+import { playTune, projectName } from './tunes.js?v=22';
+import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=22';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const PIP_FACE = '<svg class="mini-pip" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><circle class="mp-body" cx="60" cy="62" r="44"/><ellipse class="mp-eye" cx="45" cy="56" rx="8" ry="11"/><ellipse class="mp-eye" cx="75" cy="56" rx="8" ry="11"/><circle class="mp-pupil" cx="46" cy="59" r="5"/><circle class="mp-pupil" cx="76" cy="59" r="5"/><path class="mp-mouth" d="M48 80q12 10 24 0"/></svg>';
@@ -41,9 +41,11 @@ export const SHADES = ['#ff8a65', '#6bb6ff', '#a78bfa', '#4fd1b0', '#ffd166', '#
 
 export function initChapter(ctx) {
   const { root, $, $$, calm, say, pip, visits, tourPause, snd, refreshTag, openResume } = ctx;
+  const SITE = ctx.SITE || { pip: {} };
   const params = new URLSearchParams(location.search);
   let prefs = {};
   try { prefs = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch { /* private mode */ }
+  if (ctx.PREFS) prefs = ctx.PREFS; // includes the owner's switches
   const ss = (k, v) => { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch { /* private mode */ } return null; };
 
   /* -------------------------------------------------------
@@ -54,6 +56,8 @@ export function initChapter(ctx) {
   const save = () => { try { localStorage.setItem('tk-mem', JSON.stringify(mem)); } catch { /* private mode */ } };
   const fresh = !ss('tk-session'); // a new visit, not a refresh
   ss('tk-session', '1');
+  // A line for Pip set in the Studio app (once per visit).
+  if (SITE.pip.greeting && SITE.pip.on !== false && fresh) setTimeout(() => say(SITE.pip.greeting, 6500), 2400);
   const latest = CHANGELOG[0].v;
   const returning = visits > 1 && (fresh || params.has('welcome'));
   if (fresh) { mem.prevSeen = mem.lastSeen || 0; mem.lastSeen = Date.now(); }
@@ -220,7 +224,7 @@ export function initChapter(ctx) {
   }
   // A "The story" button on each main project card, next to Open live and Code.
   $$('#work .project').forEach((art, i) => {
-    const id = STORY_IDS[i], acts = art.querySelector('.p-actions');
+    const id = art.dataset.pid ? (STORIES[art.dataset.pid] ? art.dataset.pid : null) : STORY_IDS[i], acts = art.querySelector('.p-actions');
     if (!id || !acts) return;
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'btn btn-paper'; b.dataset.story = id; b.textContent = 'The story';
@@ -336,6 +340,7 @@ export function initChapter(ctx) {
   const ymd = `${now.getFullYear()}-${md}`;
   const dayOfYear = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(now.getFullYear(), 0, 0)) / 864e5);
   let occ = OCCASIONS.find((o) => o.dates.some((d) => d === md || d === ymd || d === `day-${dayOfYear}`));
+  if (SITE.pip.occasion) occ = OCCASIONS.find((o) => o.id === SITE.pip.occasion) || occ; // set in the Studio app
   if (params.get('occasion')) occ = OCCASIONS.find((o) => o.id === params.get('occasion')) || occ;
   root.dataset.season = season;
   if (moon) root.dataset.moon = moon;

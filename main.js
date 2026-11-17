@@ -5,17 +5,26 @@
    two glitches change the colours and reveal a final scene, and the
    3D gravity scenes change with each section.
    ========================================================= */
-import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=21';
-import { setWorldBg } from './worldbg.js?v=21';
-import { playTune, PROJECTS } from './tunes.js?v=21';
+import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=22';
+import { setWorldBg } from './worldbg.js?v=22';
+import { playTune, PROJECTS } from './tunes.js?v=22';
+import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=1';
+import { loadContent, applyContent } from './lib/content-live.js?v=1';
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const osReduced = matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 // Visitor preferences from universes.html (Universes & settings). Missing = the automatic default.
+// The owner's switches from the Studio app (site/config) sit on top: they can pin a look or turn things off.
+const [siteCfg, siteContent] = await Promise.all([loadSite(), loadContent()]);
+applyContent(siteContent); // your projects, text, stories and Pip's answers, from the Studio app
+const SITE = effective(siteCfg);
+window.TK_SITE = SITE;
 let PREFS = {};
 try { PREFS = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch { /* private mode */ }
+PREFS = mergePrefs(PREFS, SITE);
+if (PREFS.edition && root.dataset.edition !== PREFS.edition && !/[?&]edition=/.test(location.search)) root.dataset.edition = PREFS.edition;
 const calm = () => osReduced.matches || PREFS.motion === 'calm';
 const isSmall = () => innerWidth < 980;
 
@@ -50,7 +59,7 @@ const hour = new Date().getHours();
 $('#greeting').textContent = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 22 ? 'Good evening' : 'Hello, night owl';
 /* Universes: 27 of them (worlds.js). Each has its own fonts, shapes and wording; the 22 from the
    endless loop also turn the page dark and draw their scene behind it (worldbg.js). */
-const WORLDS = ALL, WORLD_NAMES = NAMES;
+const WORLDS = SITE.universes?.length ? ALL.filter((w) => SITE.universes.includes(w) || w === 'paper') : ALL, WORLD_NAMES = NAMES;
 const tagText = () => `${WORLD_NAMES[root.dataset.world] || 'Paper'} universe · ${UNIVERSES[settings.universe].name.replace(' edition', '')}${root.dataset.sky ? ` · ${root.dataset.sky}` : ''}`;
 function applyCopy(world) {
   const c = COPY[world] || COPY.paper;
@@ -88,6 +97,8 @@ function nextWorld() {
   return w;
 }
 if (!WORLDS.includes(root.dataset.world)) root.dataset.world = 'paper';
+if (PREFS.world && WORLDS.includes(PREFS.world) && root.dataset.world !== PREFS.world && !/[?&]world=/.test(location.search)) { root.dataset.world = PREFS.world; root.classList.toggle('sketch', PREFS.world === 'sketch'); }
+if (PREFS.motion === 'calm') root.classList.add('calm');
 markWorld(root.dataset.world);
 applyCopy(root.dataset.world);
 const EDITION_ORDER = ['morning', 'noon', 'dusk', 'night'];
@@ -267,6 +278,7 @@ async function drawLiveResume() {
   }
 }
 async function liveDownload(openTab) {
+  window.tkTrack?.('resume', { detail: openTab ? 'open' : 'download' });
   const w = openTab ? window.open('', '_blank') : null;
   try {
     const R = await resumeLib();
@@ -597,6 +609,7 @@ const MORSE = { A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '
 $$('[data-morse]').forEach((el) => {
   let n = 0, html = '';
   for (const ch of el.dataset.morse) {
+    if (!MORSE[ch]) continue;
     html += '<span class="mo-letter">' + [...MORSE[ch]].map((sym) => `<i class="${sym === '-' ? 'dah' : 'dit'}" style="--n:${n++}"></i>`).join('') + '</span>';
   }
   el.style.setProperty('--len', n);
@@ -649,7 +662,7 @@ if (!calm()) postEl.hidden = true;
 function storyTick() {
   if (glitching) return;
   // After the quick jump, reaching the very bottom again opens the endless loop (infinity.js).
-  if (jumped && !looping && !falling && !tour.glide && !calm() && maxScroll() > 200 && scrollY >= maxScroll() - 3) { enterLoop(); return; }
+  if (jumped && !looping && SITE.motion.loop !== false && !falling && !tour.glide && !calm() && maxScroll() > 200 && scrollY >= maxScroll() - 3) { enterLoop(); return; }
   if (pendingNormal && !falling && scrollY > innerHeight * 0.55) { pendingNormal = false; glitch(1500, '', null, 'paper'); return; }
   const top = moreEl.getBoundingClientRect().top;
   if (!story.warned && top < innerHeight * 1.15) { story.warned = true; say('Uh oh…'); }
@@ -673,7 +686,7 @@ function storyTick() {
 if (/[?&]loop\b/.test(location.search) && !calm()) setTimeout(() => enterLoop(), 1500); // preview: open the loop straight away
 function enterLoop() {
   looping = true; tourPause(true);
-  import('./infinity.js?v=21').then((m) => m.enter({
+  import('./infinity.js?v=22').then((m) => m.enter({
     say, calm, PREFS,
     pipSvg: () => $('#pip svg')?.outerHTML || '',
     audio: () => { unlockSound(); return soundOn ? actx : null; },
@@ -1112,8 +1125,8 @@ async function quickJump(ev) {
   // 2. fall. Pip tumbles in the middle the whole way; the universes rush past and Pip is redrawn in each one's style
   const faller = $('#fallPip'), flash = $('#fallFlash'), windows = $$('.project .window');
   // Every universe shows on the way down: the projects in their own, the rest as quick flashes in between.
-  const [inf, chap] = await Promise.all([import('./infinity.js?v=21').catch(() => null), import('./chapter.js?v=21').catch(() => null)]);
-  if (inf && !document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=21'; l.dataset.inf = '1'; document.head.append(l); }
+  const [inf, chap] = await Promise.all([import('./infinity.js?v=22').catch(() => null), import('./chapter.js?v=22').catch(() => null)]);
+  if (inf && !document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=22'; l.dataset.inf = '1'; document.head.append(l); }
   const plan = fallPlan();
   faller.innerHTML = pip.querySelector('svg').outerHTML.replace('</svg>', `<g class="pip-wear">${chap?.PIP_WEAR || ''}</g>${inf?.EMO_SVG || ''}</svg>`);
   faller.hidden = false; faller.className = 'fall-pip';
@@ -1160,7 +1173,7 @@ async function quickJump(ev) {
       scene.innerHTML = `<div class="fs-rings">${'<i></i>'.repeat(6)}</div><p class="fs-name">${p.name}</p><p class="fs-name b">${p.name}</p>`
         + `<div class="fs-bits">${words.map((w, k) => `<i style="--a:${((k / words.length) * 360 + Math.random() * 25).toFixed(0)}deg;--d:${(-Math.random() * 1.1).toFixed(2)}s">${w}</i>`).join('')}</div>`
         + `<div class="fall-card ${side < 0 ? 'L' : 'R'}"><div class="card fall-inner">${preview}<div class="fall-text"><p class="p-num">:${p.code} · ${WORLD_NAMES[p.world]}</p><h3>${p.name}</h3><p>${p.line}</p></div></div></div>`;
-      playTune(actx$(), p.name, fast);
+      if (SITE.motion.tunes !== false) playTune(actx$(), p.name, fast);
     }
     fallStage.appendChild(scene);
     if (n && !p.flash) burst();
@@ -1206,7 +1219,7 @@ async function quickJump(ev) {
   snd.chime();
   await fallEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, easing: 'ease-out' }).finished;
   fallEl.hidden = true; fallEl.className = 'fall';
-  import('./dive.js?v=21').then((m) => m.startDive({ calm, say })).catch(() => {}); // the second scroll dives into each project
+  import('./dive.js?v=22').then((m) => m.startDive({ calm, say })).catch(() => {}); // the second scroll dives into each project
   falling = false; pendingNormal = true; jumped = true; tour.done = false; tour.held = false; tour.pos = 0; tour.resumeAt = performance.now() + 2500;
   say('Phew. Home again.', 3200);
 }
@@ -1217,8 +1230,8 @@ $('#jumpBtn').addEventListener('click', quickJump);
    Ask Pip, seasons, stickers and the 30-second version.
    Loaded separately, so the site above never depends on it.
    --------------------------------------------------------- */
-import('./chapter.js?v=21').then((m) => m.initChapter({
-  root, $, $$, calm, say, pip, visits, tourPause, snd, setMenu, audio: () => (soundOn ? actx : null),
+import('./chapter.js?v=22').then((m) => m.initChapter({
+  root, $, $$, calm, say, pip, visits, PREFS, SITE, tourPause, snd, setMenu, audio: () => (soundOn ? actx : null),
   refreshTag: () => { $('#editionText').textContent = tagText(); },
   openResume: () => $('[data-resume]')?.click(),
 })).catch((err) => console.warn('[chapter]', err));

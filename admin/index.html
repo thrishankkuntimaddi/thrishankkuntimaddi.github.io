@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Studio">
-  <link rel="stylesheet" href="app.css?v=1">
+  <link rel="stylesheet" href="app.css?v=2">
 </head>
 <body>
   <!-- Signed out / not the owner -->
@@ -27,15 +27,29 @@
     </div>
   </section>
 
+  <!-- App lock -->
+  <section class="gate lock" id="lock" hidden>
+    <div class="gate-card">
+      <span class="lock-ico" aria-hidden="true">🔒</span>
+      <h1>Studio is locked</h1>
+      <p>Confirm it’s you.</p>
+      <button class="btn primary" type="button">Unlock</button>
+    </div>
+  </section>
+
   <div class="app" id="app" hidden>
     <nav class="side" aria-label="Studio">
       <a class="side-brand" href="../" title="Open the site"><img src="icon.svg" alt="" width="28" height="28"><span>Studio</span></a>
       <button class="nav-btn" data-view="resume" type="button"><span class="ico">▤</span><span>Resume</span></button>
+      <button class="nav-btn" data-view="content" type="button"><span class="ico">❏</span><span>Content</span></button>
+      <button class="nav-btn" data-view="website" type="button"><span class="ico">◐</span><span>Website</span></button>
+      <button class="nav-btn" data-view="reports" type="button"><span class="ico">▦</span><span>Reports</span></button>
       <button class="nav-btn" data-view="inbox" type="button"><span class="ico">✉</span><span>Inbox</span><b class="badge" data-count="all" hidden></b></button>
-      <button class="nav-btn" data-view="feedback" type="button"><span class="ico">✎</span><span>Feedback</span><b class="badge" data-count="feedback" hidden></b></button>
-      <button class="nav-btn" data-view="compliment" type="button"><span class="ico">♥</span><span>Compliments</span><b class="badge" data-count="compliment" hidden></b></button>
-      <button class="nav-btn" data-view="help" type="button"><span class="ico">?</span><span>Help center</span><b class="badge" data-count="help" hidden></b></button>
-      <button class="nav-btn" data-view="about" type="button"><span class="ico">i</span><span>About</span></button>
+      <button class="nav-btn side-extra" data-view="feedback" type="button"><span class="ico">✎</span><span>Feedback</span><b class="badge" data-count="feedback" hidden></b></button>
+      <button class="nav-btn side-extra" data-view="compliment" type="button"><span class="ico">♥</span><span>Compliments</span><b class="badge" data-count="compliment" hidden></b></button>
+      <button class="nav-btn side-extra" data-view="help" type="button"><span class="ico">?</span><span>Help center</span><b class="badge" data-count="help" hidden></b></button>
+      <button class="nav-btn side-extra" data-view="about" type="button"><span class="ico">i</span><span>About</span></button>
+      <button class="nav-btn only-bar" id="moreBtn" type="button"><span class="ico">⋯</span><span>More</span><b class="badge" data-count="more" hidden></b></button>
       <div class="side-foot">
         <span class="who" id="who"></span>
         <button class="link" id="signOut" type="button">Sign out</button>
@@ -45,25 +59,66 @@
     <main class="main">
       <!-- ================= RESUME ================= -->
       <section class="view" data-view="resume">
-        <header class="top">
-          <div>
-            <h1>Resume</h1>
-            <p class="status" id="rzStatus">Loading…</p>
-          </div>
-          <div class="top-actions">
-            <button class="btn only-phone" id="rzTogglePreview" type="button">Preview</button>
-            <button class="btn" id="rzDownload" type="button">PDF ↓</button>
-            <button class="btn primary" id="rzPublish" type="button">Publish</button>
-          </div>
-        </header>
-        <div class="rz">
-          <div class="rz-edit" id="rzEdit"></div>
-          <aside class="rz-preview" id="rzPreviewWrap">
-            <div class="fit" id="rzFit"></div>
-            <div class="paper" id="rzPreview"></div>
-            <p class="hint">Exactly what visitors download. Links work in the PDF.</p>
-          </aside>
+        <div id="rzLib">
+          <header class="top">
+            <div><h1>My resumes</h1><p class="status" id="rzLibStatus">Loading…</p></div>
+            <div class="top-actions"><button class="btn primary" id="rzNew" type="button">+ New resume</button></div>
+          </header>
+          <ul class="lib" id="rzList"></ul>
+          <p class="legend lib-legend">Keep as many versions as you like (by role, company or date). The website shows only the one marked <b>On website</b>; “Put on website” switches it.</p>
         </div>
+        <div id="rzEditor" hidden>
+          <header class="top">
+            <div class="rz-name">
+              <button class="btn sm" id="rzBack" type="button">← All resumes</button>
+              <input id="rzTitle" class="rz-title" aria-label="Resume name" maxlength="80">
+              <input id="rzNote" class="rz-note" aria-label="Note" placeholder="Note (e.g. for Google, frontend roles)" maxlength="140">
+              <p class="status" id="rzStatus"></p>
+            </div>
+            <div class="top-actions">
+              <button class="btn only-phone" id="rzTogglePreview" type="button">Preview</button>
+              <button class="btn" id="rzDownload" type="button">PDF ↓</button>
+              <button class="btn primary" id="rzPublish" type="button">Put on website</button>
+            </div>
+          </header>
+          <div class="rz">
+            <div class="rz-edit" id="rzEdit"></div>
+            <aside class="rz-preview" id="rzPreviewWrap">
+              <div class="fit" id="rzFit"></div>
+              <div class="paper" id="rzPreview"></div>
+              <p class="hint">Exactly what gets downloaded. Links work in the PDF.</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CONTENT ================= -->
+      <section class="view" data-view="content" hidden>
+        <header class="top">
+          <div><h1>Content</h1><p class="status" id="ctStatus">Loading…</p></div>
+          <div class="top-actions"><a class="btn" href="https://thrishankkuntimaddi.web.app/" target="_blank" rel="noopener">Open site ↗</a><button class="btn primary" id="ctSave" type="button" disabled>Save</button></div>
+        </header>
+        <div class="chips" id="ctTabs"></div>
+        <div class="ct-body" id="ctBody"></div>
+      </section>
+
+      <!-- ================= WEBSITE ================= -->
+      <section class="view" data-view="website" hidden>
+        <header class="top">
+          <div><h1>Website</h1><p class="status" id="wsStatus">Loading…</p></div>
+          <div class="top-actions"><a class="btn" href="https://thrishankkuntimaddi.web.app/" target="_blank" rel="noopener">Open site ↗</a><button class="btn" id="wsReset" type="button">Reset</button><button class="btn primary" id="wsSave" type="button" disabled>Save</button></div>
+        </header>
+        <div class="ws-body" id="wsBody"></div>
+      </section>
+
+      <!-- ================= REPORTS ================= -->
+      <section class="view" data-view="reports" hidden>
+        <header class="top">
+          <div><h1>Reports</h1><p class="status" id="rpStatus"></p></div>
+          <div class="top-actions"><button class="btn" id="rpPrune" type="button">Clear &gt; 90 days</button><button class="btn" id="rpRefresh" type="button">Refresh</button></div>
+        </header>
+        <div class="chips" id="rpRanges"></div>
+        <div id="rpBody"></div>
       </section>
 
       <!-- ================= MESSAGES (inbox / feedback / compliments / help) ================= -->
@@ -111,7 +166,11 @@
           <p>The “Send a message” form on the site (footer, the Studio page, and Ask Pip) writes to <code>messages</code>. Visitors can only <em>create</em> a message of a fixed shape and size; they can’t read, change or delete any. You see them here instantly, sorted into Feedback, Compliments, Help center and plain Messages.</p>
 
           <h2>Security</h2>
+          <p id="lockSetting"></p>
           <ul>
+            <li>Only <b>thrishankkuntimaddi@gmail.com</b>, signed in with Google, gets in. Any other account is signed out at once, and the database refuses it anyway.</li>
+            <li>Changing anything also needs a sign-in from the last 30 days.</li>
+            <li>The app locks with your fingerprint / face / screen lock on open and after 5 minutes away; in the Android app, screenshots and the recent-apps preview are blocked.</li>
             <li>The Firebase web config in the code is public by design. Access is enforced by <code>firestore.rules</code> in the repo, deployed with <code>firebase deploy --only firestore:rules</code>.</li>
             <li>Owner = a signed-in Google account with the verified email thrishankkuntimaddi@gmail.com. Everyone else is read-only on the published resume and help answers.</li>
             <li>Messages have a hidden spam trap and a cooldown in the browser. If spam ever becomes a problem, turn on Firebase App Check (free) in the console.</li>
@@ -147,12 +206,22 @@
     </main>
   </div>
 
+  <dialog class="sheet" id="moreDlg">
+    <header><h2>More</h2><button class="btn" type="button" data-close>Close</button></header>
+    <div class="more-list">
+      <button class="nav-btn" data-go="feedback" type="button"><span class="ico">✎</span><span>Feedback</span><b class="badge" data-count="feedback" hidden></b></button>
+      <button class="nav-btn" data-go="compliment" type="button"><span class="ico">♥</span><span>Compliments</span><b class="badge" data-count="compliment" hidden></b></button>
+      <button class="nav-btn" data-go="help" type="button"><span class="ico">?</span><span>Help center</span><b class="badge" data-count="help" hidden></b></button>
+      <button class="nav-btn" data-go="about" type="button"><span class="ico">i</span><span>About</span></button>
+    </div>
+  </dialog>
+
   <dialog class="sheet" id="versionsDlg">
-    <header><h2>Published versions</h2><button class="btn" type="button" data-close>Close</button></header>
+    <header><h2>Website history</h2><button class="btn" type="button" data-close>Close</button></header>
     <ul class="versions" id="versionsList"></ul>
   </dialog>
 
   <p class="toast" id="toast" role="status" aria-live="polite"></p>
-  <script type="module" src="app.js?v=1"></script>
+  <script type="module" src="app.js?v=2"></script>
 </body>
 </html>

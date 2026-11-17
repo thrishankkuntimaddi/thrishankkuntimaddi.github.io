@@ -3,24 +3,44 @@ rules_version = '2';
 // messages, and everything else for the owner's verified Google account.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // The owner: only this Google account, verified, signed in with Google itself
+    // (not email link, phone, anonymous or a custom token).
     function isOwner() {
       return request.auth != null
         && request.auth.token.email == 'thrishankkuntimaddi@gmail.com'
-        && request.auth.token.email_verified == true;
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    // Changes also need a sign-in from the last 30 days (a stolen old session can't edit).
+    function isFreshOwner() {
+      return isOwner() && request.time < timestamp.value(request.auth.token.auth_time * 1000) + duration.value(30, 'd');
     }
     function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
 
     // Published resume and help-centre answers: anyone reads, owner writes.
     match /site/{doc} {
       allow read: if true;
-      allow write: if isOwner()
-        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
+      allow write: if isFreshOwner()
+        && request.resource.data.keys().hasOnly(['data', 'updatedAt', 'sourceId', 'title'])
         && str(request.resource.data.data, 2, 400000);
     }
 
     // Owner-only: drafts and published history.
-    match /private/{doc} { allow read, write: if isOwner(); }
-    match /versions/{id} { allow read, write: if isOwner(); }
+    match /private/{doc} { allow read: if isOwner(); allow write: if isFreshOwner(); }
+    match /versions/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
+    match /resumes/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
+
+    // Anonymous visit records for the owner's reports: create-only, fixed shape, no personal data.
+    match /visits/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['type', 'page', 'country', 'city', 'tz', 'device', 'os', 'browser', 'ref', 'lang', 'vid', 'returning', 'world', 'detail', 'at'])
+        && request.resource.data.type in ['visit', 'resume', 'kit', 'message']
+        && str(request.resource.data.page, 0, 20) && str(request.resource.data.country, 0, 120) && str(request.resource.data.city, 0, 120)
+        && str(request.resource.data.tz, 0, 120) && str(request.resource.data.device, 0, 20) && str(request.resource.data.os, 0, 20)
+        && str(request.resource.data.browser, 0, 20) && str(request.resource.data.ref, 0, 120) && str(request.resource.data.lang, 0, 20)
+        && str(request.resource.data.vid, 0, 20) && request.resource.data.returning is bool && str(request.resource.data.world, 0, 20)
+        && str(request.resource.data.detail, 0, 120) && request.resource.data.at == request.time;
+      allow read, delete: if isOwner();
+    }
 
     // Visitor messages: anyone may create a well-formed one; only the owner reads or changes them.
     match /messages/{id} {
@@ -33,8 +53,9 @@ service cloud.firestore {
         && request.resource.data.read == false
         && request.resource.data.starred == false
         && request.resource.data.createdAt == request.time;
-      allow read, delete: if isOwner();
-      allow update: if isOwner() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'starred', 'archived']);
+      allow read: if isOwner();
+      allow delete: if isFreshOwner();
+      allow update: if isFreshOwner() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'starred', 'archived']);
     }
   }
 }

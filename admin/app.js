@@ -6,6 +6,10 @@
 import { loadSDK, loadAuth, OWNER, KINDS } from '../lib/firebase.js?v=1';
 import { loadEngine, toSVG, download, toText, resumeFontCSS } from '../lib/resume.js?v=1';
 import { SEED } from '../lib/resume-seed.js?v=1';
+import { initWebsite } from './website.js?v=1';
+import { unlock, watchAway, lockOn, lockAvailable, setUpLock, removeLock } from './lock.js?v=1';
+import { initContent } from './content.js?v=1';
+import { initReports, showReports } from './reports.js?v=1';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -51,92 +55,256 @@ async function boot() {
   A.auth.getRedirectResult(A.a).catch((e) => toast(e.message));
   let known = false;
   setTimeout(() => { if (!known) { $('#signIn').hidden = false; $('#gateMsg').textContent = 'Edit your resume and read what visitors send you.'; } }, 4000);
-  A.auth.onAuthStateChanged(A.a, (user) => {
+  A.auth.onAuthStateChanged(A.a, async (user) => {
     known = true;
-    const ok = user && user.email === OWNER && user.emailVerified;
-    $('#gate').hidden = !!ok;
-    $('#app').hidden = !ok;
-    $('#signOutGate').hidden = !user || ok;
-    $('#signIn').hidden = !!(user && !ok);
-    if (!user) $('#gateMsg').textContent = 'Edit your resume and read what visitors send you.';
-    if (user && !ok) $('#gateMsg').textContent = `${user.email} isn’t the owner of this studio. Only ${OWNER} can sign in here.`;
-    if (ok) { $('#who').textContent = user.email; start(); }
+    const viaGoogle = user?.providerData?.some((p) => p.providerId === 'google.com');
+    const ok = user && user.email === OWNER && user.emailVerified && viaGoogle;
+    if (user && !ok) { // anyone else is signed straight back out; the database refuses them anyway
+      await A.auth.signOut(A.a).catch(() => {});
+      window.StudioNative?.signOut?.();
+      $('#gateMsg').textContent = 'This app is private. That account can’t use it.';
+      $('#signIn').hidden = false; $('#gate').hidden = false; $('#app').hidden = true;
+      return;
+    }
+    $('#signOutGate').hidden = true;
+    $('#signIn').hidden = !!user;
+    if (!user) { $('#gate').hidden = false; $('#app').hidden = true; $('#gateMsg').textContent = 'Private. Sign in with the owner’s Google account.'; return; }
+    $('#gate').hidden = true;
+    await unlock();                       // fingerprint / face / screen lock first
+    $('#app').hidden = false;
+    $('#who').textContent = user.email;
+    start();
+    watchAway();
+    offerLock();
   });
 }
+async function offerLock() {
+  if (lockOn() || DEMO) { drawLockSetting(); return; }
+  let asked = false; try { asked = localStorage.getItem('studio-lock-asked'); } catch { /* fine */ }
+  if (!asked && await lockAvailable()) {
+    try { localStorage.setItem('studio-lock-asked', '1'); } catch { /* fine */ }
+    if (confirm('Protect Studio on this device with fingerprint / face / screen lock?')) await setUpLock(OWNER).then(() => toast('App lock is on')).catch((e) => toast(e.message));
+  }
+  drawLockSetting();
+}
+function drawLockSetting() {
+  const el = $('#lockSetting'); if (!el) return;
+  const nativeLock = !!window.StudioNative?.biometric;
+  el.innerHTML = nativeLock ? 'App lock: <b>on</b> (this phone’s fingerprint / face / screen lock, always).'
+    : lockOn() ? 'App lock on this device: <b>on</b>. <button class="link" type="button" id="lockOff">Turn off</button>'
+      : 'App lock on this device: <b>off</b>. <button class="link" type="button" id="lockOnBtn">Turn on</button>';
+  $('#lockOff')?.addEventListener('click', () => { removeLock(); drawLockSetting(); });
+  $('#lockOnBtn')?.addEventListener('click', () => setUpLock(OWNER).then(() => { toast('App lock is on'); drawLockSetting(); }).catch((e) => toast(e.message)));
+}
 $('#signIn').addEventListener('click', async () => {
-  const p = new A.auth.GoogleAuthProvider();
-  p.setCustomParameters({ login_hint: OWNER, prompt: 'select_account' });
   try {
+    if (window.StudioNative?.googleIdToken) { // Android app: Google's own sign-in sheet, then Firebase
+      const token = await window.StudioNative.googleIdToken();
+      if (!token) return;
+      await A.auth.signInWithCredential(A.a, A.auth.GoogleAuthProvider.credential(token));
+      return;
+    }
+    const p = new A.auth.GoogleAuthProvider();
+    p.setCustomParameters({ login_hint: OWNER, prompt: 'select_account' });
     if (standalone) await A.auth.signInWithRedirect(A.a, p);
-    else await A.auth.signInWithPopup(A.a, p);
+    else await A.auth.signInWithPopup(A.a, p).catch((e) => { if (/popup/.test(e.code || '')) return A.auth.signInWithRedirect(A.a, p); throw e; });
   } catch (e) {
-    if (/popup/.test(e.code || '')) A.auth.signInWithRedirect(A.a, p);
-    else if (e.code === 'auth/unauthorized-domain') toast(`Add ${location.hostname} under Firebase → Authentication → Settings → Authorized domains`, 6000);
+    if (e.code === 'auth/unauthorized-domain') toast(`Add ${location.hostname} under Firebase → Authentication → Settings → Authorized domains`, 6000);
     else toast(e.message, 4000);
   }
 });
-const signOut = () => A.auth.signOut(A.a).then(() => location.reload());
+const signOut = () => { window.StudioNative?.signOut?.(); return A.auth.signOut(A.a).then(() => location.reload()); };
 $('#signOut').addEventListener('click', signOut);
 $('#signOutGate').addEventListener('click', signOut);
 
 let started = false;
 function start() {
   if (started) return; started = true;
-  const v = (location.hash.slice(1) || 'resume');
-  show(['resume', 'inbox', 'feedback', 'compliment', 'help', 'about'].includes(v) ? v : 'resume');
+  const v = (location.hash.slice(1).split('?')[0] || 'resume');
+  show(['resume', 'content', 'website', 'reports', 'inbox', 'feedback', 'compliment', 'help', 'about'].includes(v) ? v : 'resume');
   initResume();
   initMessages();
+  initWebsite({ F, toast, DEMO });
+  initContent({ F, toast, DEMO });
+  initReports({ F, toast, DEMO });
+  if (currentView === 'reports') showReports();
 }
 
 /* ================= Navigation ================= */
 let currentView = 'resume';
 function show(v) {
   currentView = v;
-  history.replaceState(null, '', `#${v}`);
+  if (!(v === 'resume' && location.hash.startsWith('#resume?'))) history.replaceState(null, '', `#${v}`);
   $$('.nav-btn').forEach((b) => { if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   const isMsg = ['inbox', 'feedback', 'compliment', 'help'].includes(v);
   $$('.view').forEach((s) => { s.hidden = !(s.dataset.view === v || (isMsg && s.dataset.view === 'messages')); });
   if (isMsg) { msgKind = v === 'inbox' ? 'all' : v; msgFilter = 'open'; drawMessages(); }
+  if (v === 'reports' && started) showReports();
+  if (['feedback', 'compliment', 'help', 'about'].includes(v)) $('#moreBtn').setAttribute('aria-current', 'page'); else $('#moreBtn').removeAttribute('aria-current');
   window.scrollTo(0, 0);
 }
-$$('.nav-btn').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
+$$('.side .nav-btn[data-view]').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
+$('#moreBtn').addEventListener('click', () => $('#moreDlg').showModal());
+$$('#moreDlg [data-go]').forEach((b) => b.addEventListener('click', () => { $('#moreDlg').close(); show(b.dataset.go); }));
 
-/* ================= Resume ================= */
-let draft = null;
-let published = null; // { at: Date, json }
+/* ================= Resume library =================
+   resumes/{id}   { title, note, data (JSON), createdAt, updatedAt }  owner only
+   site/resume    { data, title, sourceId, updatedAt }                 what the website shows
+   versions/{id}  every time something is put on the website           owner only */
+let draft = null;          // the open resume's data
+let current = null;        // { id, title, note, createdAt, updatedAt }
+let library = [];          // [{ id, title, note, createdAt, updatedAt, json }]
+let published = null;      // { at, json, sourceId, title }
 let dirty = false;
 let saveT = 0, prevT = 0;
-const draftRef = () => F.fs.doc(F.db, 'private', 'resumeDraft');
+const resumesCol = () => F.fs.collection(F.db, 'resumes');
+const resRef = (id) => F.fs.doc(F.db, 'resumes', id);
 const pubRef = () => F.fs.doc(F.db, 'site', 'resume');
+const fmtDate = (d) => (d ? d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—');
 
 async function initResume() {
-  setStatus('Loading…');
-  try {
-    const [d, p] = await Promise.all([F.fs.getDoc(draftRef()), F.fs.getDoc(pubRef())]);
-    if (p.exists()) published = { at: tsDate(p.data().updatedAt), json: p.data().data };
-    if (d.exists()) draft = JSON.parse(d.data().data);
-    else if (published) draft = JSON.parse(published.json);
-    else draft = clone(SEED);
-  } catch (e) {
-    let local = null; try { local = JSON.parse(localStorage.getItem('studio-draft')); } catch { /* none */ }
-    draft = local || clone(SEED);
-    if (!DEMO) toast(`Working offline: ${e.code || e.message}`, 4000);
+  $('#rzLibStatus').textContent = 'Loading…';
+  if (DEMO) {
+    const now = new Date();
+    library = [
+      { id: 'main', title: 'Main resume', note: 'SDE, the one on the website', createdAt: new Date(now - 864e6), updatedAt: now, json: JSON.stringify(SEED) },
+      { id: 'fe', title: 'Frontend roles', note: 'UI-heavy bullets first', createdAt: new Date(now - 2e8), updatedAt: new Date(now - 7e7), json: JSON.stringify(SEED) },
+    ];
+    published = { at: now, json: library[0].json, sourceId: 'main', title: 'Main resume' };
+    drawLibrary(); return;
   }
-  normalise(draft);
-  renderEditor();
-  refreshPreview(true);
-  updateStatus();
+  try {
+    const [p, list] = await Promise.all([F.fs.getDoc(pubRef()), F.fs.getDocs(F.fs.query(resumesCol(), F.fs.orderBy('updatedAt', 'desc')))]);
+    if (p.exists()) { const v = p.data(); published = { at: tsDate(v.updatedAt), json: v.data, sourceId: v.sourceId || '', title: v.title || '' }; }
+    library = list.docs.map(rowOf);
+    if (!library.length) await migrate();
+  } catch (e) {
+    $('#rzLibStatus').textContent = `Couldn’t load your resumes: ${e.code || e.message}`;
+    return;
+  }
+  drawLibrary();
+  const want = new URLSearchParams(location.hash.split('?')[1] || '').get('id');
+  if (want && library.some((r) => r.id === want)) openResume(want);
 }
+const rowOf = (d) => { const v = d.data(); return { id: d.id, title: v.title || 'Untitled', note: v.note || '', createdAt: tsDate(v.createdAt), updatedAt: tsDate(v.updatedAt), json: v.data }; };
+
+// First run: turn the old single draft (or the website version, or the seed) into "Main resume".
+async function migrate() {
+  let json = null;
+  try { const d = await F.fs.getDoc(F.fs.doc(F.db, 'private', 'resumeDraft')); if (d.exists()) json = d.data().data; } catch { /* none */ }
+  json ||= published?.json || JSON.stringify(SEED);
+  const ref = F.fs.doc(resumesCol());
+  const batch = F.fs.writeBatch(F.db);
+  batch.set(ref, { title: 'Main resume', note: '', data: json, createdAt: F.fs.serverTimestamp(), updatedAt: F.fs.serverTimestamp() });
+  if (published && !published.sourceId) {
+    batch.set(pubRef(), { data: published.json, title: 'Main resume', sourceId: ref.id, updatedAt: F.fs.serverTimestamp() });
+    published.sourceId = ref.id; published.title = 'Main resume';
+  }
+  await batch.commit();
+  library = [{ id: ref.id, title: 'Main resume', note: '', createdAt: new Date(), updatedAt: new Date(), json }];
+}
+
+function drawLibrary() {
+  const live = library.find((r) => r.id === published?.sourceId);
+  $('#rzLibStatus').textContent = `${library.length} resume${library.length === 1 ? '' : 's'} · ${live ? `“${live.title}” is on the website` : published ? 'the website shows an older version' : 'none on the website yet'}`;
+  $('#rzList').innerHTML = library.map((r) => {
+    const isLive = r.id === published?.sourceId;
+    const changed = isLive && published.json !== r.json;
+    return `<li class="lib-item${isLive ? ' live' : ''}" data-id="${r.id}">
+      <button class="lib-open" type="button" data-lib="open">
+        <span class="lib-title">${esc(r.title)}${isLive ? ` <b class="lib-badge">${changed ? 'On website · edited since' : 'On website'}</b>` : ''}</span>
+        ${r.note ? `<span class="lib-note">${esc(r.note)}</span>` : ''}
+        <span class="lib-meta">Created ${fmtDate(r.createdAt)} · Edited ${ago(r.updatedAt)}</span>
+      </button>
+      <span class="lib-actions">
+        <button class="btn sm" type="button" data-lib="pdf">PDF</button>
+        <button class="btn sm" type="button" data-lib="dup">Duplicate</button>
+        ${isLive && !changed ? '' : `<button class="btn sm" type="button" data-lib="publish">${isLive ? 'Update website' : 'Put on website'}</button>`}
+        ${isLive ? '' : '<button class="btn sm danger" type="button" data-lib="del">Delete</button>'}
+      </span>
+    </li>`;
+  }).join('') || '<li class="empty">No resumes yet.</li>';
+}
+
+async function createResume(title, json, note = '') {
+  if (DEMO) { const r = { id: uid(), title, note, createdAt: new Date(), updatedAt: new Date(), json }; library.unshift(r); return r.id; }
+  const ref = F.fs.doc(resumesCol());
+  await F.fs.setDoc(ref, { title, note, data: json, createdAt: F.fs.serverTimestamp(), updatedAt: F.fs.serverTimestamp() });
+  library.unshift({ id: ref.id, title, note, createdAt: new Date(), updatedAt: new Date(), json });
+  return ref.id;
+}
+async function putOnWebsite(r) {
+  const json = r.json;
+  const data = JSON.parse(json);
+  if (DEMO) { published = { at: new Date(), json, sourceId: r.id, title: r.title }; return; }
+  const batch = F.fs.writeBatch(F.db);
+  batch.set(pubRef(), { data: json, title: r.title, sourceId: r.id, updatedAt: F.fs.serverTimestamp() });
+  batch.set(F.fs.doc(F.fs.collection(F.db, 'versions')), { data: json, at: F.fs.serverTimestamp(), name: data.name || '', title: r.title, sourceId: r.id });
+  await batch.commit();
+  published = { at: new Date(), json, sourceId: r.id, title: r.title };
+}
+
+$('#rzNew').addEventListener('click', async () => {
+  const base = library.find((r) => r.id === published?.sourceId) || library[0];
+  const title = prompt('Name for the new resume (e.g. “Frontend roles”, “Google SDE II”):', `New resume ${fmtDate(new Date())}`);
+  if (title == null) return;
+  try {
+    const id = await createResume(title.trim() || 'Untitled', base ? base.json : JSON.stringify(SEED), base ? `Started from “${base.title}”` : '');
+    drawLibrary(); openResume(id);
+  } catch (e) { toast(e.code || e.message); }
+});
+$('#rzList').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-lib]'); const li = e.target.closest('[data-id]');
+  if (!b || !li) return;
+  const r = library.find((x) => x.id === li.dataset.id);
+  const a = b.dataset.lib;
+  try {
+    if (a === 'open') openResume(r.id);
+    else if (a === 'pdf') { await download(JSON.parse(r.json)); }
+    else if (a === 'dup') { const t = prompt('Name for the copy:', `${r.title} (copy)`); if (t == null) return; await createResume(t.trim() || `${r.title} (copy)`, r.json, `Copy of “${r.title}”`); drawLibrary(); toast('Copied'); }
+    else if (a === 'publish') { if (!confirm(`Show “${r.title}” on the website? Visitors will see and download this one.`)) return; await putOnWebsite(r); drawLibrary(); toast('The website shows it now.'); }
+    else if (a === 'del') {
+      if (!confirm(`Delete “${r.title}” for good? This can’t be undone.`)) return;
+      if (!DEMO) await F.fs.deleteDoc(resRef(r.id));
+      library = library.filter((x) => x.id !== r.id); drawLibrary(); toast('Deleted');
+    }
+  } catch (err) { toast(err.code || err.message, 4000); }
+});
+
+function openResume(id) {
+  const r = library.find((x) => x.id === id);
+  current = r; draft = JSON.parse(r.json); normalise(draft); dirty = false;
+  $('#rzLib').hidden = true; $('#rzEditor').hidden = false;
+  $('#rzTitle').value = r.title; $('#rzNote').value = r.note || '';
+  history.replaceState(null, '', `#resume?id=${id}`);
+  renderEditor(); refreshPreview(true); updateStatus();
+  window.scrollTo(0, 0);
+}
+function closeResume() {
+  if (dirty) saveDraft();
+  current = null; draft = null;
+  $('#rzEditor').hidden = true; $('#rzLib').hidden = false;
+  history.replaceState(null, '', '#resume');
+  drawLibrary();
+}
+$('#rzBack').addEventListener('click', closeResume);
+$('#rzTitle').addEventListener('input', (e) => { current.title = e.target.value; changed(); });
+$('#rzNote').addEventListener('input', (e) => { current.note = e.target.value; changed(); });
+
 function normalise(d) {
   d.contacts ||= []; d.sections ||= [];
   d.sections.forEach((s) => { s.id ||= uid(); s.items ||= s.type === 'text' ? undefined : []; });
 }
 function setStatus(t, warn) { const s = $('#rzStatus'); s.textContent = t; s.classList.toggle('warn', !!warn); }
 function updateStatus(extra = '') {
-  const same = published && published.json === JSON.stringify(draft);
-  const pub = published ? `Published ${ago(published.at)}` : 'Not published yet: the site shows the PDF in the repo';
-  setStatus(`${extra || (dirty ? 'Saving draft…' : 'Draft saved')} · ${same ? 'Live on the site ✓' : pub + (published ? ' · draft has unpublished changes' : '')}`);
-  $('#rzPublish').disabled = !!same;
+  if (!current) return;
+  const isLive = published?.sourceId === current.id;
+  const same = isLive && published.json === JSON.stringify(draft);
+  const where = same ? 'On the website ✓' : isLive ? 'On the website · has changes not shown yet' : 'Not on the website';
+  setStatus(`${extra || (dirty ? 'Saving…' : 'Saved')} · Created ${fmtDate(current.createdAt)} · ${where}`);
+  const btn = $('#rzPublish');
+  btn.textContent = isLive ? 'Update website' : 'Put on website';
+  btn.disabled = !!same;
 }
 function changed(structural = false) {
   dirty = true;
@@ -146,15 +314,19 @@ function changed(structural = false) {
   updateStatus();
 }
 async function saveDraft() {
+  if (!current) return;
   const json = JSON.stringify(draft);
-  try { localStorage.setItem('studio-draft', json); } catch { /* full */ }
+  current.json = json; current.updatedAt = new Date();
+  try { localStorage.setItem(`studio-resume-${current.id}`, json); } catch { /* full */ }
+  if (DEMO) { dirty = false; updateStatus(); return; }
   try {
-    await F.fs.setDoc(draftRef(), { data: json, updatedAt: F.fs.serverTimestamp() });
+    await F.fs.updateDoc(resRef(current.id), { data: json, title: current.title || 'Untitled', note: current.note || '', updatedAt: F.fs.serverTimestamp() });
     dirty = false; updateStatus();
-  } catch (e) { setStatus(`Draft kept on this device only (${e.code || e.message})`, true); }
+  } catch (e) { setStatus(`Kept on this device only (${e.code || e.message})`, true); }
 }
 let engineReady = false;
 async function refreshPreview(first) {
+  if (!draft) return;
   if (!engineReady) {
     try { await loadEngine(); await document.fonts.load('10px Carlito'); engineReady = true; } catch (e) { $('#rzPreview').innerHTML = `<p class="empty">${esc(e.message)}</p>`; return; }
   }
@@ -167,22 +339,16 @@ async function refreshPreview(first) {
 }
 
 $('#rzPublish').addEventListener('click', async () => {
-  const btn = $('#rzPublish');
-  if (!$('#rzFit').classList.contains('over') || confirm('The resume runs over one page. Publish anyway?')) {
-    btn.disabled = true;
-    const json = JSON.stringify(draft);
-    try {
-      const batch = F.fs.writeBatch(F.db);
-      batch.set(pubRef(), { data: json, updatedAt: F.fs.serverTimestamp() });
-      batch.set(draftRef(), { data: json, updatedAt: F.fs.serverTimestamp() });
-      batch.set(F.fs.doc(F.fs.collection(F.db, 'versions')), { data: json, at: F.fs.serverTimestamp(), name: draft.name || '' });
-      await batch.commit();
-      published = { at: new Date(), json }; dirty = false;
-      toast('Published. The site has the new resume now.');
-    } catch (e) { toast(`Couldn’t publish: ${e.code || e.message}`, 4000); }
-    updateStatus();
-  }
+  if ($('#rzFit').classList.contains('over') && !confirm('This resume runs over one page. Put it on the website anyway?')) return;
+  const btn = $('#rzPublish'); btn.disabled = true;
+  try {
+    clearTimeout(saveT); await saveDraft();
+    await putOnWebsite(current);
+    dirty = false; toast('The website shows this resume now.');
+  } catch (e) { toast(`Couldn’t update the website: ${e.code || e.message}`, 4000); }
+  updateStatus();
 });
+
 $('#rzDownload').addEventListener('click', () => download(draft).catch((e) => toast(e.message)));
 $('#rzTogglePreview').addEventListener('click', (e) => {
   const on = $('.rz').classList.toggle('show-preview');
@@ -225,11 +391,10 @@ function renderEditor() {
       <label class="f">Accent colour<input data-path="accent" type="color" value="${esc(d.accent || '#1A5276')}"></label>
     </div>
     <div class="adders">
-      <button class="btn sm" type="button" data-act="versions">Published versions…</button>
+      <button class="btn sm" type="button" data-act="versions">Website history…</button>
       <button class="btn sm" type="button" data-act="copy-text">Copy as plain text</button>
       <button class="btn sm" type="button" data-act="export">Export JSON</button>
       <button class="btn sm" type="button" data-act="import">Import JSON</button>
-      ${published ? '<button class="btn sm" type="button" data-act="revert">Discard draft changes</button>' : ''}
     </div>
     <p class="legend">Formatting in any text: <code>**bold**</code> · <code>*italic*</code> · <code>[text](https://link)</code></p>
   </div></details>`);
@@ -325,9 +490,6 @@ ed.addEventListener('click', (e) => {
       try { const j = JSON.parse(await f.files[0].text()); if (!j.sections) throw new Error('Not a resume file'); draft = j; normalise(draft); changed(true); toast('Imported into the draft'); } catch (err) { toast(err.message); }
     };
     f.click(); return;
-  } else if (a === 'revert') {
-    if (!confirm('Replace the draft with the published version?')) return;
-    draft = JSON.parse(published.json); normalise(draft);
   }
   changed(true);
 });
@@ -340,12 +502,12 @@ async function openVersions() {
     const q = F.fs.query(F.fs.collection(F.db, 'versions'), F.fs.orderBy('at', 'desc'), F.fs.limit(30));
     const snap = await F.fs.getDocs(q);
     const rows = snap.docs.map((doc) => ({ id: doc.id, at: tsDate(doc.data().at), data: doc.data().data }));
-    ul.innerHTML = rows.length ? rows.map((r, i) => `<li><span>${r.at ? r.at.toLocaleString() : '—'}${i === 0 ? ' · current' : ''}</span><span><button class="btn sm" type="button" data-pdf="${r.id}">PDF</button> <button class="btn sm" type="button" data-restore="${r.id}">Restore to draft</button></span></li>`).join('') : '<li>Nothing published yet.</li>';
+    ul.innerHTML = rows.length ? rows.map((r, i) => `<li><span>${r.at ? r.at.toLocaleString() : '—'}${i === 0 ? ' · current' : ''}</span><span><button class="btn sm" type="button" data-pdf="${r.id}">PDF</button> <button class="btn sm" type="button" data-restore="${r.id}">Copy into this resume</button></span></li>`).join('') : '<li>Nothing published yet.</li>';
     ul.onclick = (e) => {
       const id = e.target.dataset.restore || e.target.dataset.pdf; if (!id) return;
       const r = rows.find((x) => x.id === id); const data = JSON.parse(r.data);
       if (e.target.dataset.pdf) { download(data); return; }
-      draft = data; normalise(draft); changed(true); dlg.close(); toast('Restored into the draft. Publish to make it live.');
+      draft = data; normalise(draft); changed(true); dlg.close(); toast('Copied into this resume. Put it on the website when ready.');
     };
   } catch (e) { ul.innerHTML = `<li>${esc(e.message)}</li>`; }
 }
@@ -376,7 +538,7 @@ function initMessages() {
 function drawCounts() {
   const unread = messages.filter((m) => !m.read && !m.archived);
   $$('.badge[data-count]').forEach((b) => {
-    const n = b.dataset.count === 'all' ? unread.length : unread.filter((m) => m.kind === b.dataset.count).length;
+    const n = b.dataset.count === 'all' ? unread.length : b.dataset.count === 'more' ? unread.filter((m) => m.kind !== 'message').length : unread.filter((m) => m.kind === b.dataset.count).length;
     b.textContent = n; b.hidden = !n;
   });
   document.title = unread.length ? `(${unread.length}) Studio` : 'Studio — Thrishank Kuntimaddi';
@@ -474,5 +636,6 @@ $('#faqPublish').addEventListener('click', async () => {
 /* keep "x min ago" fresh */
 setInterval(() => { if (draft) updateStatus(); }, 60000);
 window.addEventListener('beforeunload', (e) => { if (dirty) { saveDraft(); e.preventDefault(); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden && dirty) saveDraft(); });
 
 boot();

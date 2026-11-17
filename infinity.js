@@ -9,8 +9,8 @@
    portfolio surface on the way. Quiet generated music.
    Loaded only when needed; drawn on one 2D canvas.
    ========================================================= */
-import { STORIES, EMAIL } from './content.js?v=21';
-import { PIP_WEAR } from './chapter.js?v=21';
+import { STORIES, EMAIL } from './content.js?v=22';
+import { PIP_WEAR } from './chapter.js?v=22';
 
 const TAU = Math.PI * 2;
 const rnd = (a = 1, b) => (b === undefined ? Math.random() * a : a + Math.random() * (b - a));
@@ -530,7 +530,7 @@ let active = false;
 export function enter(ctx) {
   if (active) return; active = true;
   const root = document.documentElement;
-  if (!document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=21'; l.dataset.inf = '1'; document.head.append(l); }
+  if (!document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=22'; l.dataset.inf = '1'; document.head.append(l); }
   const glitchOn = ctx.PREFS?.glitch !== false;
 
   const el = document.createElement('div');

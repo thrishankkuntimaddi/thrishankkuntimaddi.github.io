@@ -28,13 +28,21 @@
       } catch (err) {}
       var q = /[?&]edition=(morning|noon|dusk|night)/.exec(location.search);
       var pr = {}; try { pr = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch (err) {}
+      // The owner's settings from the Studio app (cached from the last visit; main.js refreshes them).
+      var site = {}; try { site = (JSON.parse(localStorage.getItem('tk-site')) || {}).data || {}; } catch (err) {}
+      var th = site.theme || {}, mo = site.motion || {};
+      if (!pr.edition && list.indexOf(th.edition) >= 0) pr.edition = th.edition;
+      if (!pr.world && th.world) pr.world = th.world;
+      if (mo.calm) pr.motion = 'calm';
       // Settings page choices (universes.html): a pinned edition or universe wins over the automatic one.
       d.dataset.edition = q ? q[1] : list.indexOf(pr.edition) >= 0 ? pr.edition : list[i];
       // The universe: normal Paper on the first open of a visit. Every refresh deals the next one from a shuffled
       // deck of all 27 (kept for this tab only), so none repeats until all have shown. Must match worlds.js.
       var base = ['paper', 'pixel', 'sketch', 'blueprint', 'news'];
       var loop = ['core', 'space', 'future', 'robots', 'rage', 'joy', 'sad', 'retro', 'music', 'paint', 'box', 'village', 'city', 'sky', 'water', 'fire', 'ice', 'brick', 'racer', 'noir', 'glitch', 'mars'];
-      var all = base.concat(loop), w = 'paper';
+      var all = base.concat(loop);
+      if (th.universes && th.universes.length) all = all.filter(function (x) { return x === 'paper' || th.universes.indexOf(x) >= 0; });
+      var w = all.indexOf(th.firstWorld) >= 0 ? th.firstWorld : 'paper';
       try {
         var cur = sessionStorage.getItem('tk-world');
         if (cur !== null) {
@@ -60,7 +68,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
 
   <script type="importmap">
     { "imports": {
@@ -110,7 +118,7 @@
             <span class="line" data-copy="h2">I design and build <em>interfaces</em></span>
             <span class="line" data-copy="h3">people enjoy using.</span>
           </h1>
-          <p class="hero-sub">
+          <p class="hero-sub" data-k="hero.p0">
             Frontend developer focused on UI/UX. I take products from the first sketch to a live release
             on web, Android and desktop. They all live at
             <a class="ink-link" href="https://poelys.com" target="_blank" rel="noopener">poelys.com</a>.
@@ -121,9 +129,9 @@
             <a href="resume/Thrishank-Kuntimaddi-Resume.pdf" class="btn btn-paper" data-resume data-resume-slot hidden>View resume</a>
           </div>
           <ul class="facts">
-            <li><b>6</b><span>live products</span></li>
-            <li><b>5</b><span>platforms from one UI codebase</span></li>
-            <li><b>1,091</b><span>commits on my biggest project</span></li>
+            <li data-k="hero.li0"><b>6</b><span>live products</span></li>
+            <li data-k="hero.li1"><b>5</b><span>platforms from one UI codebase</span></li>
+            <li data-k="hero.li2"><b>1,091</b><span>commits on my biggest project</span></li>
           </ul>
         </div>
 
@@ -160,7 +168,7 @@
         <header class="sec-head reveal">
           <span class="sec-num">01</span>
           <h2 data-copy="work">Projects</h2>
-          <p>Four products I designed and built end to end. All are live right now.</p>
+          <p data-k="work.p0">Four products I designed and built end to end. All are live right now.</p>
         </header>
 
         <article class="project" data-scene="lagrange">
@@ -299,12 +307,12 @@
         <header class="sec-head reveal">
           <span class="sec-num">02</span>
           <h2 data-copy="poelys">Poelys</h2>
-          <p>My product studio. It's the home where everything I build lives.</p>
+          <p data-k="poelys.p0">My product studio. It's the home where everything I build lives.</p>
         </header>
         <div class="poelys-grid">
           <div class="card poelys-card reveal">
-            <p class="poelys-big">One studio.<br><em>Six products</em> in orbit.</p>
-            <p class="p-what">I design, build and ship every product under one name, from team chat and finance to restaurants and space.</p>
+            <p class="poelys-big" data-k="poelys.p1">One studio.<br><em>Six products</em> in orbit.</p>
+            <p class="p-what" data-k="poelys.p2">I design, build and ship every product under one name, from team chat and finance to restaurants and space.</p>
             <ul class="poelys-links">
               <li><a href="https://oruinwan.poelys.com" target="_blank" rel="noopener"><b>oruinwan</b>.poelys.com<i>↗</i></a></li>
               <li><a href="https://sentinelflight.poelys.com" target="_blank" rel="noopener"><b>sentinelflight</b>.poelys.com<i>↗</i></a></li>
@@ -316,7 +324,7 @@
           <div class="window portal reveal" aria-hidden="true">
             <div class="win-bar"><i></i><i></i><i></i><span>POELYS.SYS</span><b>LIVE</b></div>
             <span class="orbit-label">poelys</span>
-            <p class="win-tag">Still building.<br>Always.</p>
+            <p class="win-tag" data-k="poelys.p3">Still building.<br>Always.</p>
           </div>
         </div>
 
@@ -344,7 +352,7 @@
         <header class="sec-head reveal">
           <span class="sec-num">03</span>
           <h2 data-copy="more">More work</h2>
-          <p>Smaller builds and things still on my desk.</p>
+          <p data-k="more.p0">Smaller builds and things still on my desk.</p>
         </header>
         <div class="pile">
           <a class="card mini reveal" href="https://yormenu.poelys.com/" target="_blank" rel="noopener">
@@ -394,43 +402,43 @@
         <header class="sec-head reveal">
           <span class="sec-num">04</span>
           <h2 data-copy="about">About me</h2>
-          <p>The short version.</p>
+          <p data-k="about.p0">The short version.</p>
         </header>
         <div class="about-grid">
           <div class="card about-card reveal">
-            <p class="about-lede">I'm a computer science engineer from Bengaluru, India, who fell for the screen in front of the user: how it looks, how it moves, and how it feels the hundredth time you open it.</p>
-            <p>I started in AI and computer vision. Now I design and build interfaces end to end, and I can build the backend behind them too, so an idea reaches people whole instead of as a mock-up.</p>
+            <p class="about-lede" data-k="about.p1">I'm a computer science engineer from Bengaluru, India, who fell for the screen in front of the user: how it looks, how it moves, and how it feels the hundredth time you open it.</p>
+            <p data-k="about.p2">I started in AI and computer vision. Now I design and build interfaces end to end, and I can build the backend behind them too, so an idea reaches people whole instead of as a mock-up.</p>
             <span class="stamp stamp-b" aria-hidden="true">Open to work</span>
           </div>
 
           <div class="card spec reveal">
-            <h3>Spec sheet</h3>
+            <h3 data-k="about.h30">Spec sheet</h3>
             <dl>
-              <div><dt>Frontend</dt><dd>React, TypeScript, Vite, modern CSS, Tailwind</dd></div>
-              <div><dt>Motion &amp; 3D</dt><dd>Three.js, WebGL, Canvas, CSS animation</dd></div>
-              <div><dt>UX craft</dt><dd>Design tokens, phone-first layout, accessibility, PWAs</dd></div>
-              <div><dt>Beyond UI</dt><dd>Node.js, Firebase, PostgreSQL, Python, Capacitor, Tauri</dd></div>
+              <div><dt data-k="about.dt0">Frontend</dt><dd data-k="about.dd0">React, TypeScript, Vite, modern CSS, Tailwind</dd></div>
+              <div><dt data-k="about.dt1">Motion &amp; 3D</dt><dd data-k="about.dd1">Three.js, WebGL, Canvas, CSS animation</dd></div>
+              <div><dt data-k="about.dt2">UX craft</dt><dd data-k="about.dd2">Design tokens, phone-first layout, accessibility, PWAs</dd></div>
+              <div><dt data-k="about.dt3">Beyond UI</dt><dd data-k="about.dd3">Node.js, Firebase, PostgreSQL, Python, Capacitor, Tauri</dd></div>
             </dl>
           </div>
 
           <div class="card list-card reveal">
-            <h3>Recognition</h3>
+            <h3 data-k="about.h31">Recognition</h3>
             <ul>
-              <li><b>First prize</b>Project expo, Young Scientists' Conference, IISF</li>
-              <li><b>Level 3</b>Smart India Hackathon 2023</li>
-              <li><b>Second prize</b>ImpactX 2024 Hackathon, sustainability track</li>
-              <li><b>Participant</b>Yukti Innovation Regional Meet 2023</li>
+              <li data-k="about.li0"><b>First prize</b>Project expo, Young Scientists' Conference, IISF</li>
+              <li data-k="about.li1"><b>Level 3</b>Smart India Hackathon 2023</li>
+              <li data-k="about.li2"><b>Second prize</b>ImpactX 2024 Hackathon, sustainability track</li>
+              <li data-k="about.li3"><b>Participant</b>Yukti Innovation Regional Meet 2023</li>
             </ul>
           </div>
 
           <div class="card list-card reveal">
-            <h3>Path</h3>
+            <h3 data-k="about.h32">Path</h3>
             <ul>
-              <li><b>Now</b>Building Oruinwan, my own product, to close a gap I saw in how teams work</li>
-              <li><b>2025 –</b>Running Poelys, my product studio</li>
-              <li><b>2023</b>Data Science &amp; Machine Learning internship</li>
-              <li><b>2022</b>AI with Python internship</li>
-              <li><b>2021 – 25</b>B.Tech, Computer Science (Data Science), MITS Madanapalle</li>
+              <li data-k="about.li4"><b>Now</b>Building Oruinwan, my own product, to close a gap I saw in how teams work</li>
+              <li data-k="about.li5"><b>2025 –</b>Running Poelys, my product studio</li>
+              <li data-k="about.li6"><b>2023</b>Data Science &amp; Machine Learning internship</li>
+              <li data-k="about.li7"><b>2022</b>AI with Python internship</li>
+              <li data-k="about.li8"><b>2021 – 25</b>B.Tech, Computer Science (Data Science), MITS Madanapalle</li>
             </ul>
           </div>
         </div>
@@ -444,7 +452,7 @@
         <div class="card contact-card reveal">
           <span class="sec-num">05</span>
           <h2 data-copy="contact">Let's build something <em>people love</em>.</h2>
-          <p>I'm open to frontend and UI roles, freelance work and collaborations.</p>
+          <p data-k="contact.p0">I'm open to frontend and UI roles, freelance work and collaborations.</p>
           <a class="email" href="mailto:thrishankkuntimaddi@gmail.com" id="emailLink">thrishankkuntimaddi@gmail.com</a>
           <div class="contact-actions">
             <a class="btn btn-gloss" href="mailto:thrishankkuntimaddi@gmail.com">Write to me</a>
@@ -453,10 +461,10 @@
             <a class="btn btn-paper" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume data-resume-slot hidden>Resume</a>
           </div>
           <ul class="socials">
-            <li><a href="https://poelys.com" target="_blank" rel="noopener">Poelys ↗</a></li>
-            <li><a href="https://github.com/thrishankkuntimaddi" target="_blank" rel="noopener">GitHub ↗</a></li>
-            <li><a href="https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
-            <li><a href="https://twitter.com/ThrishankT" target="_blank" rel="noopener">X ↗</a></li>
+            <li data-k="contact.li0"><a href="https://poelys.com" target="_blank" rel="noopener">Poelys ↗</a></li>
+            <li data-k="contact.li1"><a href="https://github.com/thrishankkuntimaddi" target="_blank" rel="noopener">GitHub ↗</a></li>
+            <li data-k="contact.li2"><a href="https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+            <li data-k="contact.li3"><a href="https://twitter.com/ThrishankT" target="_blank" rel="noopener">X ↗</a></li>
           </ul>
         </div>
       </div>
@@ -466,63 +474,63 @@
   <!-- ============ FINAL SCENE (revealed by the second glitch, at the end of the page) ============ -->
   <section id="post" class="section post" data-scene="chaos" data-frame="corner">
     <div class="wrap">
-      <h2 class="post-title">You made it to the end. <em>Here is my resume.</em></h2>
+      <h2 class="post-title" data-k="post.h20">You made it to the end. <em>Here is my resume.</em></h2>
       <div class="post-grid">
 
         <div class="card rv">
           <header class="rv-head">
-            <div><p class="rv-name">Thrishank Kuntimaddi</p><p class="rv-role">Frontend developer · Bengaluru, India</p></div>
+            <div><p class="rv-name" data-k="post.p0">Thrishank Kuntimaddi</p><p class="rv-role" data-k="post.p1">Frontend developer · Bengaluru, India</p></div>
             <a class="btn btn-gloss btn-sm" id="postDownload" href="resume/Thrishank-Kuntimaddi-Resume.pdf" download="Thrishank-Kuntimaddi-Resume.pdf">Download PDF ↓</a>
           </header>
           <div class="rv-tabs" role="tablist" aria-label="Resume sections"><button type="button" class="rv-tab" role="tab" data-tab="summary" aria-selected="true">Summary</button><button type="button" class="rv-tab" role="tab" data-tab="experience" aria-selected="false">Experience</button><button type="button" class="rv-tab" role="tab" data-tab="projects" aria-selected="false">Projects</button><button type="button" class="rv-tab" role="tab" data-tab="skills" aria-selected="false">Skills</button><button type="button" class="rv-tab" role="tab" data-tab="education" aria-selected="false">Education</button><button type="button" class="rv-tab" role="tab" data-tab="awards" aria-selected="false">Achievements</button></div>
           <div class="rv-bar" aria-hidden="true"><i id="rvBar"></i></div>
           <div class="rv-body">
             <div class="rv-panel" data-panel="summary">
-              <p class="rv-big">I design and build complete products, from the interface people touch to the real-time systems behind it.</p>
-              <p>Frontend-focused engineer with hands-on experience across the whole product lifecycle. I care about performance, security and how an interface feels the hundredth time you open it.</p>
-              <ul class="rv-facts"><li><b>6</b>live products</li><li><b>5</b>platforms, one UI codebase</li><li><b>8.41</b>GPA out of 10</li></ul>
+              <p class="rv-big" data-k="post.p2">I design and build complete products, from the interface people touch to the real-time systems behind it.</p>
+              <p data-k="post.p3">Frontend-focused engineer with hands-on experience across the whole product lifecycle. I care about performance, security and how an interface feels the hundredth time you open it.</p>
+              <ul class="rv-facts"><li data-k="post.li0"><b>6</b>live products</li><li data-k="post.li1"><b>5</b>platforms, one UI codebase</li><li data-k="post.li2"><b>8.41</b>GPA out of 10</li></ul>
             </div>
             <div class="rv-panel" data-panel="experience" hidden>
-              <p class="rv-h">Founder &amp; engineer · Oruinwan <span>Jun 2025 – Present</span></p>
-              <p class="rv-sub">My own product: one workspace for a team's chat, calls, tasks, notes and AI.</p>
+              <p class="rv-h" data-k="post.p4">Founder &amp; engineer · Oruinwan <span>Jun 2025 – Present</span></p>
+              <p class="rv-sub" data-k="post.p5">My own product: one workspace for a team's chat, calls, tasks, notes and AI.</p>
               <ul class="rv-list">
-                <li><b>Real-time messaging.</b> End-to-end encrypted WebSocket system, load-tested with 10K+ simulated sessions. Cut p95 latency from 850 ms to 45 ms.</li>
-                <li><b>Encryption.</b> X25519 key exchange with AES-256-GCM, designed so the server never sees plaintext.</li>
-                <li><b>Auth.</b> Rotating JWTs, multi-provider OAuth 2.0 and six-tier role-based access.</li>
-                <li><b>Task engine.</b> A seven-state workflow with audit logs, tested against 100K+ task records.</li>
-                <li><b>Platform.</b> 58 modules across a React 19 and Node.js monorepo.</li>
+                <li data-k="post.li3"><b>Real-time messaging.</b> End-to-end encrypted WebSocket system, load-tested with 10K+ simulated sessions. Cut p95 latency from 850 ms to 45 ms.</li>
+                <li data-k="post.li4"><b>Encryption.</b> X25519 key exchange with AES-256-GCM, designed so the server never sees plaintext.</li>
+                <li data-k="post.li5"><b>Auth.</b> Rotating JWTs, multi-provider OAuth 2.0 and six-tier role-based access.</li>
+                <li data-k="post.li6"><b>Task engine.</b> A seven-state workflow with audit logs, tested against 100K+ task records.</li>
+                <li data-k="post.li7"><b>Platform.</b> 58 modules across a React 19 and Node.js monorepo.</li>
               </ul>
             </div>
             <div class="rv-panel" data-panel="projects" hidden>
-              <p class="rv-h">SentinelFlight <span>2024 – 2025</span></p>
-              <p class="rv-sub">Space debris avoidance and trajectory optimisation, as a playable 3D game.</p>
-              <ul class="rv-list"><li>Reinforcement-learning agent that steers a satellite through debris fields.</li><li>Custom reward functions for collision risk and fuel; 90% fewer simulated collisions.</li></ul>
-              <p class="rv-h">Expense Tracker</p><p class="rv-sub">Personal finance on web, Android and desktop from one React codebase.</p>
-              <p class="rv-h">LearnViaNotes</p><p class="rv-sub">22 subjects and 150 coding problems, phone-first and offline-ready.</p>
-              <p class="rv-h">Also</p><p class="rv-sub">YorMenu, Interstellar, Ms. Minutes, Meditation, ClearMyMind, My Rovers.</p>
+              <p class="rv-h" data-k="post.p6">SentinelFlight <span>2024 – 2025</span></p>
+              <p class="rv-sub" data-k="post.p7">Space debris avoidance and trajectory optimisation, as a playable 3D game.</p>
+              <ul class="rv-list"><li data-k="post.li8">Reinforcement-learning agent that steers a satellite through debris fields.</li><li data-k="post.li9">Custom reward functions for collision risk and fuel; 90% fewer simulated collisions.</li></ul>
+              <p class="rv-h" data-k="post.p8">Expense Tracker</p><p class="rv-sub" data-k="post.p9">Personal finance on web, Android and desktop from one React codebase.</p>
+              <p class="rv-h" data-k="post.p10">LearnViaNotes</p><p class="rv-sub" data-k="post.p11">22 subjects and 150 coding problems, phone-first and offline-ready.</p>
+              <p class="rv-h" data-k="post.p12">Also</p><p class="rv-sub" data-k="post.p13">YorMenu, Interstellar, Ms. Minutes, Meditation, ClearMyMind, My Rovers.</p>
             </div>
             <div class="rv-panel" data-panel="skills" hidden>
               <dl class="rv-skills">
-                <div><dt>Frontend</dt><dd>React 19, TypeScript, Next.js, Tailwind, Vite, modern CSS</dd></div>
-                <div><dt>Motion &amp; 3D</dt><dd>Three.js, WebGL, Canvas, CSS animation</dd></div>
-                <div><dt>Backend</dt><dd>Node.js, Express, WebSockets, Redis, MongoDB, PostgreSQL</dd></div>
-                <div><dt>Security</dt><dd>AES-256-GCM, X25519, JWT, OAuth 2.0, SSO, 2FA</dd></div>
-                <div><dt>Platforms</dt><dd>PWA, Capacitor, Tauri, Docker, Vercel, CI/CD</dd></div>
-                <div><dt>Also</dt><dd>Python, PyTorch, Firebase, ESP32</dd></div>
+                <div><dt data-k="post.dt0">Frontend</dt><dd data-k="post.dd0">React 19, TypeScript, Next.js, Tailwind, Vite, modern CSS</dd></div>
+                <div><dt data-k="post.dt1">Motion &amp; 3D</dt><dd data-k="post.dd1">Three.js, WebGL, Canvas, CSS animation</dd></div>
+                <div><dt data-k="post.dt2">Backend</dt><dd data-k="post.dd2">Node.js, Express, WebSockets, Redis, MongoDB, PostgreSQL</dd></div>
+                <div><dt data-k="post.dt3">Security</dt><dd data-k="post.dd3">AES-256-GCM, X25519, JWT, OAuth 2.0, SSO, 2FA</dd></div>
+                <div><dt data-k="post.dt4">Platforms</dt><dd data-k="post.dd4">PWA, Capacitor, Tauri, Docker, Vercel, CI/CD</dd></div>
+                <div><dt data-k="post.dt5">Also</dt><dd data-k="post.dd5">Python, PyTorch, Firebase, ESP32</dd></div>
               </dl>
             </div>
             <div class="rv-panel" data-panel="education" hidden>
-              <p class="rv-h">B.Tech, Computer Science &amp; Engineering (Data Science) <span>Dec 2021 – May 2025</span></p>
-              <p class="rv-sub">Madanapalle Institute of Technology and Science (MITS)</p>
-              <p class="rv-big">GPA 8.41 / 10</p>
-              <p>Data structures and algorithms, system design, operating systems, computer networks and databases.</p>
+              <p class="rv-h" data-k="post.p14">B.Tech, Computer Science &amp; Engineering (Data Science) <span>Dec 2021 – May 2025</span></p>
+              <p class="rv-sub" data-k="post.p15">Madanapalle Institute of Technology and Science (MITS)</p>
+              <p class="rv-big" data-k="post.p16">GPA 8.41 / 10</p>
+              <p data-k="post.p17">Data structures and algorithms, system design, operating systems, computer networks and databases.</p>
             </div>
             <div class="rv-panel" data-panel="awards" hidden>
-              <p class="rv-h">First prize · IISF'23 Young Scientist Conference</p>
-              <p class="rv-sub">Indian International Science Festival 2023, national level, 150+ participants. For an autonomous flying copter for public safety.</p>
-              <p class="rv-h">Second prize · ImpactX 2024 Hackathon</p>
-              <p class="rv-sub">Sustainability track, 100+ teams, 24 hours. A full-stack carbon footprint calculator.</p>
-              <p class="rv-h">Level 3 · Smart India Hackathon 2023</p>
+              <p class="rv-h" data-k="post.p18">First prize · IISF'23 Young Scientist Conference</p>
+              <p class="rv-sub" data-k="post.p19">Indian International Science Festival 2023, national level, 150+ participants. For an autonomous flying copter for public safety.</p>
+              <p class="rv-h" data-k="post.p20">Second prize · ImpactX 2024 Hackathon</p>
+              <p class="rv-sub" data-k="post.p21">Sustainability track, 100+ teams, 24 hours. A full-stack carbon footprint calculator.</p>
+              <p class="rv-h" data-k="post.p22">Level 3 · Smart India Hackathon 2023</p>
             </div>
           </div>
           <footer class="rv-foot">
@@ -643,7 +651,8 @@
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=21"></script>
+  <script type="module" src="main.js?v=22"></script>
   <script type="module" src="lib/contact.js?v=1"></script>
+  <script type="module" src="lib/live.js?v=1"></script>
 </body>
 </html>
