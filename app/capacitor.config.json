@@ -1,0 +1,10 @@
+{
+  "appId": "com.thrishank.studio",
+  "appName": "Studio",
+  "webDir": "www",
+  "backgroundColor": "#f6f7f9",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "FirebaseAuthentication": { "skipNativeAuth": true, "providers": ["google.com"] }
+  }
+}

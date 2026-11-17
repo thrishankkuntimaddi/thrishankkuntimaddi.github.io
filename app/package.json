@@ -1,0 +1,20 @@
+{
+  "name": "studio-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Studio: the owner's Android app for the portfolio (resume, content, website controls, reports, inbox).",
+  "scripts": {
+    "www": "node scripts/build-www.mjs",
+    "sync": "npm run www && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor-firebase/authentication": "^8.6.0",
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capgo/capacitor-native-biometric": "^8.9.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.2",
+    "esbuild": "^0.25.0"
+  }
+}

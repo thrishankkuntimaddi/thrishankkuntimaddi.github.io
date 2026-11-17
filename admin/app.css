@@ -275,3 +275,6 @@ input, textarea, select { transition: border-color .2s, box-shadow .2s; }
 body.is-locked .app, body.is-away .app { filter: blur(14px); }
 .app { transition: filter .2s; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+.update-bar { display: block; padding: 10px 16px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); background: var(--accent); color: #fff; text-align: center; font-weight: 600; font-size: 14px; text-decoration: none; }
+/* Android app: room for the status bar */
+body { padding-top: env(safe-area-inset-top, 0px); }

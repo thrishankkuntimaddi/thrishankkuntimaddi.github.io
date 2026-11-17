@@ -76,6 +76,19 @@ All words for the stories, Ask Pip, the "what's new" note and the occasions are 
 
 The sticker wall then shows how many visitors poked Pip, reached the end and left a sticker, and the GoatCounter dashboard shows your visits. Only anonymous event names are sent (no cookies). With the code empty, nothing is sent anywhere.
 
+## The Studio app (owner only)
+
+Everything on the website is editable from the Studio (`/admin/` in a browser, or the Android app):
+- **Resume:** a library of resumes (name, note, created/edited dates); one is marked *On website*.
+- **Content:** main projects, more work and the Poelys orbit (add, edit, hide, reorder, remove; keypad codes are worked out from a word), every text block on the home page (`data-k` keys, see `tools/tag-text.py`), project stories, Ask Pip's answers and *What's new*. Saved to `site/content`, applied by `lib/content-live.js`.
+- **Website:** banner, fixed or shuffled universes, colours, animations, Pip (line, outfit) and scheduled automations. Saved to `site/config`, applied by `lib/site-config.js`.
+- **Reports:** anonymous visits (country from time zone, device, page, referrer) and resume/kit downloads, from `lib/live.js`.
+- **Inbox, Feedback, Compliments, Help center, About.**
+
+Protection: only thrishankkuntimaddi@gmail.com signed in with Google (checked in the app and in `firestore.rules`); edits need a sign-in from the last 30 days; fingerprint/face/screen-lock on open and after 5 minutes away; in the Android app, screenshots and backups are blocked.
+
+**Android app** (`app/`, Capacitor): the workflow `.github/workflows/studio-app.yml` builds a signed APK and publishes it on GitHub Releases when a `studio-v*` tag is pushed (raise `version` in `app/package.json` first). The signing key lives outside the repo (`~/Documents/Project Docs/MyPortfolio/`) and in two repository secrets.
+
 ## Firebase (free Spark plan)
 
 Project `myprofile-f29f5`. Firestore holds `site/resume` and `site/help` (public read, owner write), `private/resumeDraft` and `versions` (owner only) and `messages` (anyone can create a well-formed one; only the owner can read). Rules are in `firestore.rules`. To sign in to the Studio on the live site, `thrishankkuntimaddi.github.io` must be in Authentication → Settings → Authorized domains. Locally, `http://localhost:8080/admin/?demo` previews the app without signing in (nothing is saved).

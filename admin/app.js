@@ -128,6 +128,24 @@ function start() {
   initContent({ F, toast, DEMO });
   initReports({ F, toast, DEMO });
   if (currentView === 'reports') showReports();
+  checkAppUpdate();
+}
+
+/* In the Android app: tell me when a newer Studio is on GitHub Releases. */
+async function checkAppUpdate() {
+  const mine = window.StudioNative?.version; if (!mine) return;
+  try {
+    const list = await fetch('https://api.github.com/repos/thrishankkuntimaddi/thrishankkuntimaddi.github.io/releases?per_page=10').then((r) => r.json());
+    const rel = list.find((r) => /^studio-v/.test(r.tag_name)); if (!rel) return;
+    const latest = rel.tag_name.replace('studio-v', '');
+    const n = (v) => v.split('.').map(Number).reduce((a, x) => a * 1000 + x, 0);
+    if (n(latest) <= n(mine)) return;
+    const apk = rel.assets.find((a) => /\.apk$/.test(a.name));
+    const bar = document.createElement('a');
+    bar.className = 'update-bar'; bar.href = apk ? apk.browser_download_url : rel.html_url; bar.target = '_blank'; bar.rel = 'noopener';
+    bar.textContent = `Studio ${latest} is out (you have ${mine}). Tap to download.`;
+    document.body.prepend(bar);
+  } catch { /* offline */ }
 }
 
 /* ================= Navigation ================= */
