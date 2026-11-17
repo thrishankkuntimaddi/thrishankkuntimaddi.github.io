@@ -23,7 +23,7 @@
       var i = h >= 5 && h < 11 ? 0 : h >= 11 && h < 17 ? 1 : h >= 17 && h < 21 ? 2 : 3;
       try {
         var prev = parseInt(sessionStorage.getItem('tk-edition'), 10);
-        if (!isNaN(prev)) i = (prev + 1) % 4;
+        if (!isNaN(prev)) { i = (prev + 1) % 4; d.dataset.reload = '1'; } // a refresh arrives with a glitch
         sessionStorage.setItem('tk-edition', String(i));
       } catch (err) {}
       var q = /[?&]edition=(morning|noon|dusk|night)/.exec(location.search);
@@ -154,7 +154,8 @@
             <p class="win-tag">Three people.<br>One conversation.</p>
             <p class="note note-b">coded by hand, not a screenshot</p>
           </div>
-          <div class="card project-card reveal">
+          <div class="card project-card pc-chat reveal">
+            <p class="morse" data-morse="ORUINWAN" aria-hidden="true"></p>
             <p class="p-num">Project 01</p>
             <h3>Oruinwan</h3>
             <p class="p-what">A team workspace: chat, calls, tasks, notes and AI in one app instead of five.</p>
@@ -185,8 +186,9 @@
             </div>
             <p class="win-tag">Money in, money out.<br>Kept in balance.</p>
           </div>
-          <div class="card project-card reveal">
+          <div class="card project-card pc-ledger reveal">
             <span class="sticker" aria-hidden="true">v4.3</span>
+            <p class="morse" data-morse="EXPENSE" aria-hidden="true"></p>
             <p class="p-num">Project 02</p>
             <h3>Expense Tracker</h3>
             <p class="p-what">A calm personal finance app for expenses, bills, budgets and trip splits.</p>
@@ -214,7 +216,8 @@
             </div>
             <p class="win-tag">Navigate around<br>the hazards.</p>
           </div>
-          <div class="card project-card reveal">
+          <div class="card project-card pc-blueprint reveal">
+            <p class="morse" data-morse="SENTINEL" aria-hidden="true"></p>
             <p class="p-num">Project 03</p>
             <h3>SentinelFlight</h3>
             <p class="p-what">A 3D space game where you launch real rockets past real orbital debris.</p>
@@ -243,8 +246,9 @@
             </div>
             <p class="win-tag">One concept<br>at a time.</p>
           </div>
-          <div class="card project-card reveal">
+          <div class="card project-card pc-notebook reveal">
             <span class="sticker sticker-b" aria-hidden="true">free</span>
+            <p class="morse" data-morse="LEARN" aria-hidden="true"></p>
             <p class="p-num">Project 04</p>
             <h3>LearnViaNotes</h3>
             <p class="p-what">Interview prep notes: 22 subjects and 150 coding problems in four languages.</p>
@@ -292,15 +296,17 @@
         </div>
 
         <div class="worlds reveal">
-          <p class="readout" aria-hidden="true"><span>REF 2031-K</span><span>POELYS SECTOR</span><span>KNOWN UNIVERSES : 06</span><span>ALL SIGNALS LIVE</span><span>ORBITS STABLE</span></p>
+          <p class="readout" aria-hidden="true"><span>REF 2031-K</span><span>POELYS SECTOR</span><span>KNOWN UNIVERSES : 07</span><span>ALL SIGNALS LIVE</span><span>ORBITS STABLE</span></p>
           <ul>
-            <li><a href="https://oruinwan.poelys.com" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-18 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0001</i><b>Oruinwan</b></span></a></li>
-            <li><a href="https://expensetracker-in.web.app/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(12 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0002</i><b>Expense Tracker</b></span></a></li>
-            <li><a href="https://sentinelflight.poelys.com/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-6 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0003</i><b>SentinelFlight</b></span></a></li>
-            <li><a href="https://www.learnvianotes.in/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(20 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0004</i><b>LearnViaNotes</b></span></a></li>
-            <li><a href="https://yormenu.poelys.com/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-14 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0005</i><b>YorMenu</b></span></a></li>
-            <li><a href="https://app.parla.poelys.com/welcome" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(8 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0006</i><b>Parla</b></span></a></li>
+            <li><a href="https://oruinwan.poelys.com" target="_blank" rel="noopener" aria-label="Oruinwan, code 83267, decodes to TEAMS"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-18 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="83267" data-word="TEAMS">:83267</i><b>Oruinwan</b></span></a></li>
+            <li><a href="https://expensetracker-in.web.app/" target="_blank" rel="noopener" aria-label="Expense Tracker, code 2274, decodes to CASH"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(12 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="2274" data-word="CASH">:2274</i><b>Expense Tracker</b></span></a></li>
+            <li><a href="https://sentinelflight.poelys.com/" target="_blank" rel="noopener" aria-label="SentinelFlight, code 359, decodes to FLY"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-6 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="359" data-word="FLY">:359</i><b>SentinelFlight</b></span></a></li>
+            <li><a href="https://www.learnvianotes.in/" target="_blank" rel="noopener" aria-label="LearnViaNotes, code 66837, decodes to NOTES"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(20 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="66837" data-word="NOTES">:66837</i><b>LearnViaNotes</b></span></a></li>
+            <li><a href="https://yormenu.poelys.com/" target="_blank" rel="noopener" aria-label="YorMenu, code 6368, decodes to MENU"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-14 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="6368" data-word="MENU">:6368</i><b>YorMenu</b></span></a></li>
+            <li><a href="https://app.parla.poelys.com/welcome" target="_blank" rel="noopener" aria-label="Parla, code 729, decodes to SAY"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(8 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="729" data-word="SAY">:729</i><b>Parla</b></span></a></li>
+            <li><a href="https://thrishankkuntimaddi.github.io/interstellar/" target="_blank" rel="noopener" aria-label="Interstellar, code 327, decodes to FAR"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-10 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-7.8s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-7.8s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-7.8s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="327" data-word="FAR">:327</i><b>Interstellar</b></span></a></li>
           </ul>
+          <p class="worlds-key">Every number is a word typed on a phone keypad. Watch them decode.</p>
         </div>
       </div>
     </section>
@@ -347,12 +353,12 @@
             <p>Home-built robot rovers, driven from a tablet cockpit app I designed.</p>
             <span class="mini-stack">Android · ESP32 · Arduino</span>
           </a>
-          <div class="card mini mini-self reveal">
-            <span class="mini-tag live">You're here</span>
-            <h3>This website</h3>
-            <p>It tours itself, changes its colours on every visit, and runs real orbital physics.</p>
-            <span class="mini-stack">Three.js · CSS · Vanilla JS</span>
-          </div>
+          <a class="card mini reveal" href="https://thrishankkuntimaddi.github.io/interstellar/" target="_blank" rel="noopener">
+            <span class="mini-tag live">Live</span>
+            <h3>Interstellar</h3>
+            <p>A 15-minute real-time 3D space journey with a flyable ship and a talking copilot.</p>
+            <span class="mini-stack">Three.js · GLSL shaders · Web Speech</span>
+          </a>
         </div>
       </div>
     </section>
@@ -434,29 +440,84 @@
 
   <!-- ============ FINAL SCENE (revealed by the second glitch, at the end of the page) ============ -->
   <section id="post" class="section post sketch" data-scene="chaos" data-frame="corner">
-    <svg class="doodle d16 gut" aria-hidden="true" focusable="false"><use href="#d-rocket"/></svg><svg class="doodle d17 gut" aria-hidden="true" focusable="false"><use href="#d-saturn"/></svg>
     <div class="wrap">
       <p class="readout" aria-hidden="true"><span>SIGNAL RECOVERED</span><span>FINAL SCENE</span><span>RESUME UNLOCKED</span><span>REF 2031-K</span></p>
       <h2 class="post-title">You made it to the end. <em>Here is my resume.</em></h2>
       <div class="post-grid">
-        <div class="card resume-card">
-          <a class="resume-thumb" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume aria-label="Open my resume full size"><img id="postResume" alt="First page of Thrishank Kuntimaddi's resume" width="1314" height="1700"></a>
-          <div class="p-actions">
-            <a class="btn btn-gloss" id="postDownload" href="resume/Thrishank-Kuntimaddi-Resume.pdf" download="Thrishank-Kuntimaddi-Resume.pdf">Download PDF ↓</a>
-            <a class="btn btn-paper" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume>Read full size</a>
+
+        <div class="card rv">
+          <header class="rv-head">
+            <div><p class="rv-name">Thrishank Kuntimaddi</p><p class="rv-role">Frontend developer · Bengaluru, India</p></div>
+            <a class="btn btn-gloss btn-sm" id="postDownload" href="resume/Thrishank-Kuntimaddi-Resume.pdf" download="Thrishank-Kuntimaddi-Resume.pdf">Download PDF ↓</a>
+          </header>
+          <div class="rv-tabs" role="tablist" aria-label="Resume sections"><button type="button" class="rv-tab" role="tab" data-tab="summary" aria-selected="true">Summary</button><button type="button" class="rv-tab" role="tab" data-tab="experience" aria-selected="false">Experience</button><button type="button" class="rv-tab" role="tab" data-tab="projects" aria-selected="false">Projects</button><button type="button" class="rv-tab" role="tab" data-tab="skills" aria-selected="false">Skills</button><button type="button" class="rv-tab" role="tab" data-tab="education" aria-selected="false">Education</button><button type="button" class="rv-tab" role="tab" data-tab="awards" aria-selected="false">Achievements</button></div>
+          <div class="rv-bar" aria-hidden="true"><i id="rvBar"></i></div>
+          <div class="rv-body">
+            <div class="rv-panel" data-panel="summary">
+              <p class="rv-big">I design and build complete products, from the interface people touch to the real-time systems behind it.</p>
+              <p>Frontend-focused engineer with hands-on experience across the whole product lifecycle. I care about performance, security and how an interface feels the hundredth time you open it.</p>
+              <ul class="rv-facts"><li><b>6</b>live products</li><li><b>5</b>platforms, one UI codebase</li><li><b>8.41</b>GPA out of 10</li></ul>
+            </div>
+            <div class="rv-panel" data-panel="experience" hidden>
+              <p class="rv-h">Founder &amp; engineer · Oruinwan <span>Jun 2025 – Present</span></p>
+              <p class="rv-sub">My own product: one workspace for a team's chat, calls, tasks, notes and AI.</p>
+              <ul class="rv-list">
+                <li><b>Real-time messaging.</b> End-to-end encrypted WebSocket system, load-tested with 10K+ simulated sessions. Cut p95 latency from 850 ms to 45 ms.</li>
+                <li><b>Encryption.</b> X25519 key exchange with AES-256-GCM, designed so the server never sees plaintext.</li>
+                <li><b>Auth.</b> Rotating JWTs, multi-provider OAuth 2.0 and six-tier role-based access.</li>
+                <li><b>Task engine.</b> A seven-state workflow with audit logs, tested against 100K+ task records.</li>
+                <li><b>Platform.</b> 58 modules across a React 19 and Node.js monorepo.</li>
+              </ul>
+            </div>
+            <div class="rv-panel" data-panel="projects" hidden>
+              <p class="rv-h">SentinelFlight <span>2024 – 2025</span></p>
+              <p class="rv-sub">Space debris avoidance and trajectory optimisation, as a playable 3D game.</p>
+              <ul class="rv-list"><li>Reinforcement-learning agent that steers a satellite through debris fields.</li><li>Custom reward functions for collision risk and fuel; 90% fewer simulated collisions.</li></ul>
+              <p class="rv-h">Expense Tracker</p><p class="rv-sub">Personal finance on web, Android and desktop from one React codebase.</p>
+              <p class="rv-h">LearnViaNotes</p><p class="rv-sub">22 subjects and 150 coding problems, phone-first and offline-ready.</p>
+              <p class="rv-h">Also</p><p class="rv-sub">YorMenu, Interstellar, Ms. Minutes, Meditation, ClearMyMind, My Rovers.</p>
+            </div>
+            <div class="rv-panel" data-panel="skills" hidden>
+              <dl class="rv-skills">
+                <div><dt>Frontend</dt><dd>React 19, TypeScript, Next.js, Tailwind, Vite, modern CSS</dd></div>
+                <div><dt>Motion &amp; 3D</dt><dd>Three.js, WebGL, Canvas, CSS animation</dd></div>
+                <div><dt>Backend</dt><dd>Node.js, Express, WebSockets, Redis, MongoDB, PostgreSQL</dd></div>
+                <div><dt>Security</dt><dd>AES-256-GCM, X25519, JWT, OAuth 2.0, SSO, 2FA</dd></div>
+                <div><dt>Platforms</dt><dd>PWA, Capacitor, Tauri, Docker, Vercel, CI/CD</dd></div>
+                <div><dt>Also</dt><dd>Python, PyTorch, Firebase, ESP32</dd></div>
+              </dl>
+            </div>
+            <div class="rv-panel" data-panel="education" hidden>
+              <p class="rv-h">B.Tech, Computer Science &amp; Engineering (Data Science) <span>Dec 2021 – May 2025</span></p>
+              <p class="rv-sub">Madanapalle Institute of Technology and Science (MITS)</p>
+              <p class="rv-big">GPA 8.41 / 10</p>
+              <p>Data structures and algorithms, system design, operating systems, computer networks and databases.</p>
+            </div>
+            <div class="rv-panel" data-panel="awards" hidden>
+              <p class="rv-h">First prize · IISF'23 Young Scientist Conference</p>
+              <p class="rv-sub">Indian International Science Festival 2023, national level, 150+ participants. For an autonomous flying copter for public safety.</p>
+              <p class="rv-h">Second prize · ImpactX 2024 Hackathon</p>
+              <p class="rv-sub">Sustainability track, 100+ teams, 24 hours. A full-stack carbon footprint calculator.</p>
+              <p class="rv-h">Level 3 · Smart India Hackathon 2023</p>
+            </div>
           </div>
+          <footer class="rv-foot">
+            <a href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume>Original PDF</a>
+            <a href="mailto:thrishankkuntimaddi@gmail.com">Email</a>
+            <a href="https://github.com/thrishankkuntimaddi" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/" target="_blank" rel="noopener">LinkedIn</a>
+            <button type="button" data-act="replay">Replay tour ↻</button>
+          </footer>
         </div>
+
         <div class="card game-card">
-          <p class="p-num">Mini game</p>
-          <h3>Catch my skills</h3>
-          <p class="game-sub">The skills from my resume are falling. Pip is catching them. Move your mouse or finger over the game to take over, and dodge the bugs.</p>
-          <canvas id="game" aria-label="A small game: skills from the resume fall and a character catches them"></canvas>
-          <p class="game-hud"><span>Caught <b id="gScore">0</b> / 12</span><span>Bugs hit <b id="gBugs">0</b></span><span id="gMode">Pip is playing</span></p>
-          <ul class="chips caught" id="caught" aria-label="Skills caught so far"></ul>
-          <div class="p-actions">
-            <button class="btn btn-paper btn-sm" type="button" data-act="replay">Watch the tour again ↻</button>
-            <a class="btn btn-paper btn-sm" href="mailto:thrishankkuntimaddi@gmail.com">Say hello ✉</a>
-          </div>
+          <header class="game-head">
+            <div><p class="p-num" id="gRound">Round 1</p><h3 id="gPrompt">Catch my frontend stack</h3></div>
+            <p class="game-lives" id="gLives" aria-label="Lives left">♥♥♥</p>
+          </header>
+          <canvas id="game" aria-label="A game: words fall, and the ones that are true about Thrishank should be caught"></canvas>
+          <p class="game-hud"><span>Score <b id="gScore">0</b></span><span>Streak <b id="gStreak">0</b></span><span>Best <b id="gBest">0</b></span><span id="gMode">Pip is playing</span></p>
+          <p class="game-say" id="gSay">Catch the words that are true about me. Let the rest fall. Move over the game to play.</p>
         </div>
       </div>
     </div>
@@ -509,6 +570,11 @@
     <symbol id="d-planet" viewBox="0 0 160 150"><ellipse cx="80" cy="75" rx="70" ry="26" transform="rotate(20 80 75)" stroke-dasharray="4 7" opacity=".7"/><circle cx="80" cy="75" r="28" class="fill"/><path d="M60 66c8-6 14 2 22-2s10-10 18-6M58 82c10 2 12 8 22 6s14-4 20 2" opacity=".7"/><path d="M100 96a28 28 0 0 0 6-34c1 18-10 30-28 38 8 3 16 1 22-4z" fill="url(#hatch)" stroke="none"/><circle cx="142" cy="96" r="7" class="fill"/></symbol>
     <symbol id="d-sparkle" viewBox="0 0 44 44"><path d="M22 3q2 17 19 19-17 2-19 19-2-17-19-19 17-2 19-19z" class="fill"/></symbol>
     <symbol id="d-sat" viewBox="0 0 150 90"><rect x="58" y="30" width="34" height="28" rx="4" class="fill"/><rect x="10" y="33" width="42" height="22" class="fill"/><rect x="98" y="33" width="42" height="22" class="fill"/><path d="M24 33v22M38 33v22M112 33v22M126 33v22M10 44h42M98 44h42M52 44h6M92 44h6"/><path d="M75 30V14"/><circle cx="75" cy="10" r="4"/><path d="M66 70q9 8 18 0M60 78q15 12 30 0" opacity=".6"/></symbol>
+    <!-- A fixed, mild tear used when Pip flickers or gets angry -->
+    <filter id="glitchStill" x="-20%" y="-10%" width="140%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0001 0.22" numOctaves="1" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
     <filter id="glitchFx" x="-6%" y="-2%" width="112%" height="104%" color-interpolation-filters="sRGB">
       <feTurbulence id="gNoise" type="fractalNoise" baseFrequency="0.0001 0.08" numOctaves="1" seed="3" result="noise"/>
       <feColorMatrix in="noise" type="matrix" values="1 0 0 0 0  0 0 0 0 0.5  0 0 0 0 0  0 0 0 0 1" result="rows"/>
@@ -527,15 +593,16 @@
   <div class="glitch-layer" id="glitchLayer" hidden aria-hidden="true"><div id="glitchCover"></div><div id="glitchBars"></div><p id="glitchText">SIGNAL LOST</p></div>
 
   <!-- Pip: the site's guide. A poke switches the sound on; holding it peeks at the previous colour edition. -->
-  <button class="pip" id="pip" type="button" hidden aria-label="Pip, the site guide. Tap to switch sound on. Hold to peek at the previous colours.">
+  <button class="pip" id="pip" type="button" hidden aria-label="Pip, the site guide. Hold to peek at the previous colours.">
     <span class="pip-say" id="pipSay"></span>
-    <svg viewBox="0 0 120 132" aria-hidden="true" focusable="false">
-      <path class="pip-leg" d="M48 96v20M72 96v20"/><path class="pip-shoe" d="M36 120h14a4 4 0 0 0 0-8h-8zM84 120H70a4 4 0 0 1 0-8h8z"/>
-      <path class="pip-ring" d="M8 70c-6-14 22-30 54-34"/>
+    <svg viewBox="-6 0 132 132" aria-hidden="true" focusable="false">
+      <g class="pip-legs"><path class="pip-leg a" d="M48 96v20"/><path class="pip-leg b" d="M72 96v20"/><path class="pip-shoe" d="M36 120h14a4 4 0 0 0 0-8h-8zM84 120H70a4 4 0 0 1 0-8h8z"/></g>
+      <path class="pip-arm" d="M24 68q-16 6-13 22"/><circle class="pip-hand" cx="11" cy="92" r="6.5"/>
+      <g class="pip-wave"><path class="pip-arm" d="M96 66q18-4 17-24"/><circle class="pip-hand" cx="113" cy="40" r="6.5"/></g>
       <circle class="pip-body" cx="60" cy="60" r="38"/>
-      <path class="pip-ring" d="M98 44c22 4 18 22-6 32-26 12-66 12-84-6"/>
       <g class="pip-eyes"><ellipse cx="47" cy="54" rx="8" ry="11"/><ellipse cx="73" cy="54" rx="8" ry="11"/><circle class="pip-pupil" cx="49" cy="57" r="4"/><circle class="pip-pupil" cx="75" cy="57" r="4"/></g>
-      <path class="pip-mouth" d="M50 76q10 8 20 0"/>
+      <path class="pip-brow" d="M36 38l18 8M84 38l-18 8"/>
+      <path class="pip-mouth" d="M50 76q10 8 20 0"/><path class="pip-frown" d="M50 80q10-8 20 0"/>
     </svg>
   </button>
 

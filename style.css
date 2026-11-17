@@ -604,3 +604,112 @@ main { transform: translateX(var(--gx, 0)); }
 @keyframes chip-in { from { opacity: 0; transform: scale(.5); } }
 @media (max-width: 980px) { .post-grid { grid-template-columns: 1fr; } .resume-thumb img { max-height: 56vh; } .game-hud #gMode { margin-left: 0; } }
 @media (max-width: 560px) { .pip { width: 58px; right: 10px; bottom: 70px; } .pip-say { font-size: 11px; } }
+
+/* =========================================================
+   Round 3: Pip with hands, Morse lines, card variety,
+   keypad plaques, resume viewer and the rounds game
+   ========================================================= */
+/* Pip */
+.pip { width: 78px; --walk: min(24vw, 360px); animation: pip-in .7s var(--spring) 1.6s both, pip-bob 3.2s ease-in-out 2.4s infinite alternate, pip-walk 30s ease-in-out 5s infinite; }
+@keyframes pip-walk { 0%, 8% { transform: translateX(0); } 42%, 58% { transform: translateX(calc(-1 * var(--walk))); } 92%, 100% { transform: translateX(0); } }
+.pip-arm { stroke-width: 3; } .pip-hand { fill: #fff; stroke-width: 2.6; }
+.pip-wave { transform-box: view-box; transform-origin: 96px 66px; animation: wave 2.6s ease-in-out infinite; }
+@keyframes wave { 0%, 60%, 100% { transform: rotate(0); } 70%, 90% { transform: rotate(-16deg); } 80% { transform: rotate(10deg); } }
+.pip-leg { transform-box: fill-box; transform-origin: 50% 0; animation: step .5s ease-in-out infinite alternate; }
+.pip-leg.b { animation-direction: alternate-reverse; }
+@keyframes step { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+.pip-brow, .pip-frown { display: none; }
+.pip.flick svg { animation: pip-flick .7s steps(2) 1; }
+@keyframes pip-flick { 0%, 100% { filter: url(#sketch); transform: none; } 20% { filter: url(#glitchStill); transform: translateX(-5px) skewX(-8deg); } 50% { filter: url(#glitchStill) hue-rotate(120deg); transform: translateX(6px) skewX(6deg); } 80% { filter: url(#glitchStill); transform: translateX(-2px); } }
+.pip.angry .pip-brow, .pip.angry .pip-frown { display: block; } .pip.angry .pip-mouth { display: none; }
+.pip.angry .pip-body { fill: #ff8fa3; }
+.pip.angry svg { animation: pip-rage .12s steps(2) infinite; filter: url(#glitchStill); }
+@keyframes pip-rage { 50% { transform: translate(3px, -1px) skewX(4deg); } }
+
+/* Morse line on project cards */
+.morse { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 9px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1.5px dashed var(--line-2); --unit: 110ms; }
+.morse b { width: 9px; height: 9px; border-radius: 50%; background: var(--accent-deep); animation: lamp calc(var(--unit) * 2) steps(2) infinite; }
+@keyframes lamp { 50% { opacity: .2; } }
+.mo-letter { display: inline-flex; gap: 3px; align-items: center; }
+.morse i { height: 5px; width: 5px; border-radius: 3px; background: var(--line-2); animation: sig calc(var(--unit) * (var(--len) + 8)) linear infinite; animation-delay: calc(var(--unit) * var(--n)); }
+.morse i.dah { width: 15px; }
+@keyframes sig { 0% { background: var(--accent-deep); transform: scaleY(1.9); } 9%, 100% { background: var(--line-2); transform: none; } }
+.morse em { margin-left: auto; font-family: var(--mono); font-style: normal; font-weight: 700; font-size: 10.5px; letter-spacing: .22em; color: var(--muted); }
+
+/* Each project card has its own paper */
+.pc-chat { background: radial-gradient(color-mix(in srgb, var(--accent) 26%, transparent) 1.3px, transparent 1.6px) 0 0 / 16px 16px, var(--card); border-radius: 26px 26px 26px 6px; }
+.pc-ledger { background: repeating-linear-gradient(0deg, transparent 0 27px, color-mix(in srgb, var(--accent-2) 30%, transparent) 27px 28px), var(--card); border-radius: 6px; --tilt: -.7deg; }
+.pc-ledger::before { content: ""; position: absolute; left: 0; right: 0; top: -9px; height: 18px; background: radial-gradient(circle at 9px 9px, var(--paper) 6px, transparent 6.5px) 0 0 / 22px 18px repeat-x; }
+.pc-blueprint { background: linear-gradient(color-mix(in srgb, var(--accent-2) 20%, transparent) 1px, transparent 1px) 0 0 / 100% 22px, linear-gradient(90deg, color-mix(in srgb, var(--accent-2) 20%, transparent) 1px, transparent 1px) 0 0 / 22px 100%, var(--card); border-radius: 4px; border-style: dashed; }
+.pc-blueprint h3 { font-family: var(--mono); font-weight: 700; letter-spacing: -.03em; font-size: clamp(24px, 2.8vw, 36px); text-transform: uppercase; }
+.pc-notebook { background: linear-gradient(90deg, transparent 0 38px, color-mix(in srgb, #ff6b81 55%, transparent) 38px 39.5px, transparent 39.5px), repeating-linear-gradient(0deg, transparent 0 29px, color-mix(in srgb, var(--ink) 12%, transparent) 29px 30px), var(--card); padding-left: 58px; border-radius: 4px 18px 18px 4px; --tilt: .6deg; }
+.pc-notebook h3 { font-family: var(--hand); font-weight: 700; font-size: clamp(38px, 4.2vw, 54px); }
+
+/* Keypad plaques */
+.worlds ul { grid-template-columns: repeat(7, 1fr); }
+.plaque i { display: inline-block; min-width: 7ch; text-align: center; transition: color .3s; }
+.plaque i.decoded { color: var(--accent-deep); letter-spacing: .2em; }
+.worlds-key { margin-top: 18px; text-align: center; font-family: var(--hand); font-size: 21px; color: var(--muted); }
+
+/* Final scene fits one screen */
+.post { min-height: calc(100vh - 68px); padding: 18px 0 20px; display: flex; align-items: stretch; }
+.post > .wrap { width: 100%; display: flex; flex-direction: column; }
+.post .post-title { margin-top: 12px; font-size: clamp(22px, 2.5vw, 34px); }
+.post-grid { flex: 1; grid-template-columns: 1fr 1fr; gap: clamp(18px, 3vw, 40px); align-items: stretch; margin-top: 14px; min-height: 470px; height: calc(100vh - 68px - 150px); }
+.rv, .game-card { display: flex; flex-direction: column; min-height: 0; padding: clamp(16px, 2vw, 24px); }
+.rv-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rv-name { font-family: var(--display); font-weight: 600; font-size: clamp(22px, 2.3vw, 30px); line-height: 1.1; letter-spacing: -.02em; }
+.rv-role { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+.rv-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.rv-tab { padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line-2); background: #fff; font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: .03em; color: var(--muted); cursor: pointer; transition: transform .25s var(--spring), background .2s, color .2s; }
+.rv-tab:hover { transform: translateY(-2px); color: var(--ink); }
+.rv-tab[aria-selected="true"] { background: var(--accent); color: var(--ink); border-color: var(--ink); }
+.rv-bar { height: 3px; margin-top: 10px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.rv-bar i { display: block; height: 100%; background: var(--accent-deep); transform-origin: 0 50%; transform: scaleX(0); }
+@keyframes rvbar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.rv-body { flex: 1; min-height: 0; overflow-y: auto; margin-top: 14px; padding-right: 4px; overscroll-behavior: contain; }
+.rv-panel { animation: panel .45s var(--ease); font-size: 15.5px; color: var(--muted); }
+@keyframes panel { from { opacity: 0; transform: translateY(10px); } }
+.rv-panel > p + p { margin-top: 10px; }
+.rv-big { font-family: var(--display); font-size: clamp(20px, 2vw, 26px); line-height: 1.3; color: var(--ink); letter-spacing: -.01em; }
+.rv-h { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; font-weight: 600; font-size: 16.5px; color: var(--ink); margin-top: 14px; }
+.rv-h:first-child { margin-top: 0; }
+.rv-h span { flex: none; font-family: var(--mono); font-weight: 400; font-size: 11px; color: var(--muted); }
+.rv-sub { margin-top: 3px !important; font-size: 14.5px; }
+.rv-list { margin-top: 10px; display: grid; gap: 8px; }
+.rv-list li { position: relative; padding-left: 18px; font-size: 14.5px; line-height: 1.45; }
+.rv-list li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 8px; height: 2px; background: var(--accent-deep); }
+.rv-list b { color: var(--ink); }
+.rv-facts { display: flex; gap: 22px; margin-top: 18px; }
+.rv-facts li { font-size: 12.5px; max-width: 13ch; } .rv-facts b { display: block; font-family: var(--display); font-weight: 500; font-size: 32px; line-height: 1; color: var(--ink); }
+.rv-skills div { display: grid; grid-template-columns: 96px 1fr; gap: 12px; padding: 9px 0; border-top: 1.5px dashed var(--line-2); font-size: 14.5px; }
+.rv-skills div:first-child { border-top: 0; padding-top: 0; }
+.rv-skills dt { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink); padding-top: 3px; }
+.rv-foot { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; padding-top: 12px; border-top: 1.5px dashed var(--line-2); font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; }
+.rv-foot a, .rv-foot button { color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; }
+.rv-foot a:hover, .rv-foot button:hover { color: var(--accent-deep); }
+.rv-foot button { margin-left: auto; }
+
+.game-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.game-card h3 { font-size: clamp(22px, 2.3vw, 30px); margin-top: 2px; }
+.game-lives { font-size: 20px; letter-spacing: 3px; color: #e5486d; white-space: nowrap; }
+#game { flex: 1; min-height: 190px; height: auto; margin-top: 12px; cursor: ew-resize; }
+.game-hud #gMode { margin-left: auto; }
+.game-say { margin-top: 6px; min-height: 1.5em; font-family: var(--hand); font-size: 20px; line-height: 1.2; color: var(--accent-deep); }
+
+@media (max-width: 980px) {
+  .worlds ul { grid-template-columns: repeat(4, 1fr); }
+  .post { display: block; } .post-grid { height: auto; min-height: 0; grid-template-columns: 1fr; }
+  .rv-body { max-height: 46vh; } #game { flex: none; height: 360px; }
+  .pc-notebook { padding-left: 50px; }
+}
+@media (max-width: 560px) {
+  .pip { width: 60px; --walk: 34vw; }
+  .morse em { display: none; }
+  .rv-head { flex-wrap: wrap; } .rv-skills div { grid-template-columns: 1fr; gap: 2px; }
+  .plaque i { min-width: 0; }
+}
+@media (max-height: 760px) and (min-width: 981px) { .post-grid { height: 520px; } }
+
+/* In the final scene Pip stands still in the corner, out of the way */
+.at-final .pip { width: 54px; right: 6px; bottom: 4px; animation: pip-bob 3.2s ease-in-out infinite alternate; }

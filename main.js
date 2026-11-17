@@ -113,6 +113,8 @@ function tourUI(now) {
   else { txt = `You have control · tour resumes in ${Math.max(1, Math.ceil((tour.resumeAt - now) / 1000))}s`; ico = '▶'; }
   if (tourTxt.textContent !== txt) tourTxt.textContent = txt;
   if (tourIco.textContent !== ico) tourIco.textContent = ico;
+  tourEl.style.display = tour.done ? 'none' : ''; // the final scene has its own replay link
+  root.classList.toggle('at-final', tour.done);
   const m = maxScroll();
   tourBar.style.transform = `scaleX(${m ? Math.min(1, scrollY / m) : 0})`;
 }
@@ -148,7 +150,7 @@ if (!calm()) {
       const g = tour.glide, p = Math.min(1, (now - g.t0) / g.ms), e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
       scrollTo(0, g.y0 + (g.y1 - g.y0) * e);
       if (p >= 1) { tour.glide = null; tour.resumeAt = now + IDLE_MS; g.then?.(); }
-    } else if (glitching) { tour.pos = scrollY; tour.speed = 0; // hold still while the picture breaks up
+    } else if (glitching && holdTour) { tour.pos = scrollY; tour.speed = 0; // hold still only for the final glitch
     } else if (tour.on) {
       if (Math.abs(scrollY - tour.pos) > 4) tourPause(false); // scrollbar drag or any other outside scroll
       else {
@@ -293,8 +295,7 @@ function glitch(ms, label, midpoint) {
     fx.layer.hidden = false;
     fx.text.textContent = label || '';
     targets.forEach((t) => { t.style.filter = 'url(#glitchFx)'; });
-    const t0 = performance.now();
-    let fired = false, lastStep = 0;
+    let fired = false, lastStep = 0, elapsed = 0, prevNow = performance.now();
     const colours = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)', 'var(--ink)'];
     const fire = () => {
       fired = true;
@@ -302,7 +303,8 @@ function glitch(ms, label, midpoint) {
       if (extra) { extra.style.filter = 'url(#glitchFx)'; targets.push(extra); }
     };
     const step = (now) => {
-      const p = (now - t0) / ms;
+      elapsed += Math.min(Math.max(now - prevNow, 0), 100); prevNow = now; // count drawn time only, so a slow frame cannot skip the effect
+      const p = elapsed / ms;
       if (p >= 1) {
         if (!fired) fire();
         targets.forEach((t) => { t.style.filter = ''; });
@@ -341,27 +343,40 @@ function glitch(ms, label, midpoint) {
 }
 
 /* ---------------------------------------------------------
-   Pip, the guide. A poke switches the sound on; holding Pip
-   peeks at the previous colour edition.
+   Pip, the guide. Pip wanders, waves and flickers so that
+   people poke it out of curiosity (any touch also enables
+   sound, which is never mentioned). Holding Pip peeks at the
+   previous colour edition. Pip glitches when a game mistake
+   is made.
    --------------------------------------------------------- */
 const pip = $('#pip'), pipSay = $('#pipSay');
-let sayT = 0;
-function say(text, ms = 5200) {
+let sayT = 0, angryT = 0;
+function say(text, ms = 4200) {
   pipSay.textContent = text;
   pip.classList.add('talk');
   clearTimeout(sayT);
   sayT = setTimeout(() => pip.classList.remove('talk'), ms);
 }
+function pipAngry(ms = 1500) {
+  pip.classList.add('angry');
+  clearTimeout(angryT);
+  angryT = setTimeout(() => pip.classList.remove('angry'), ms);
+}
 if (!calm()) {
   pip.hidden = false;
-  setTimeout(() => say('Psst. Poke me!', 7000), 2200);
   let holdT = 0, held = false, pokes = 0;
-  const lines = ['Sound on ♪ Keep watching.', 'Hold me down to peek at the last universe.', 'I only work here.', 'Boop.'];
+  const lines = ['Hehe.', 'That tickles.', 'Again!', 'Okay, okay.', 'Boop.', 'Hold me down and see.'];
+  setTimeout(() => say('Hi!', 2600), 2800);
+  setInterval(() => { // lure: flicker and call out until someone pokes
+    if (pokes || glitching || document.hidden || !postEl.hidden) return;
+    pip.classList.remove('flick'); void pip.offsetWidth; pip.classList.add('flick');
+    say(['Psst.', 'Hey.', '?', 'Over here.'][(Math.random() * 4) | 0], 2400);
+  }, 11000);
   pip.addEventListener('pointerdown', () => {
     held = false;
-    holdT = setTimeout(() => { held = true; if (startPeek()) say('The last universe…', 60000); else say('Nothing to peek at yet. Keep watching.'); }, 320);
+    holdT = setTimeout(() => { held = true; if (startPeek()) say('The last universe…', 60000); else say('Nothing behind us yet.'); }, 320);
   });
-  const release = () => { clearTimeout(holdT); if (peeking) { stopPeek(); say('And back to now.', 1800); } };
+  const release = () => { clearTimeout(holdT); if (peeking) { stopPeek(); say('And back.', 1600); } };
   ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => pip.addEventListener(ev, release));
   pip.addEventListener('contextmenu', (e) => e.preventDefault());
   pip.addEventListener('click', () => {
@@ -369,40 +384,74 @@ if (!calm()) {
     unlockSound();
     blip(520 + (pokes % 4) * 110);
     pip.classList.remove('hop'); void pip.offsetWidth; pip.classList.add('hop');
-    say(lines[pokes++ % lines.length]);
+    say(lines[pokes++ % lines.length], 2600);
   });
 }
 
 /* ---------------------------------------------------------
-   The two glitches. 1: when the tour reaches "More work", the
-   colours change. 2: at the very end, they change again and
-   the final scene (resume + game) is revealed in place.
+   Small automatic details: Morse lines on the project cards
+   and keypad codes under the globes that decode themselves.
+   --------------------------------------------------------- */
+const MORSE = { A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..' };
+$$('[data-morse]').forEach((el) => {
+  let n = 0, html = '';
+  for (const ch of el.dataset.morse) {
+    html += '<span class="mo-letter">' + [...MORSE[ch]].map((sym) => `<i class="${sym === '-' ? 'dah' : 'dit'}" style="--n:${n++}"></i>`).join('') + '</span>';
+  }
+  el.style.setProperty('--len', n);
+  el.innerHTML = `<b></b>${html}<em>${el.dataset.morse}</em>`;
+});
+if (!calm()) {
+  const plaques = $$('.plaque i[data-code]');
+  const scramble = (el, to, numeric) => {
+    const pool = numeric ? '0123456789' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let f = 0;
+    const t = setInterval(() => {
+      f++;
+      el.textContent = (numeric ? ':' : '') + [...to].map((c, i) => (i < f / 2 ? c : pool[(Math.random() * pool.length) | 0])).join('');
+      if (f / 2 >= to.length) clearInterval(t);
+    }, 55);
+  };
+  let turn = 0;
+  setInterval(() => {
+    if (document.hidden || !plaques.length) return;
+    const el = plaques[turn++ % plaques.length];
+    if (el.getBoundingClientRect().bottom < 0 || el.getBoundingClientRect().top > innerHeight) return;
+    el.classList.add('decoded'); scramble(el, el.dataset.word, false);
+    setTimeout(() => { el.classList.remove('decoded'); scramble(el, el.dataset.code, true); }, 3200);
+  }, 900);
+}
+
+/* ---------------------------------------------------------
+   The two glitches. 1: as the tour passes "More work" the
+   colours change while the page keeps moving. 2: at the very
+   end they change again and the final scene is revealed.
    --------------------------------------------------------- */
 const postEl = $('#post');
 const moreEl = $('#more');
 const story = { warned: false, first: calm(), finale: calm() };
 const finale = { get fired() { return story.finale; } };
+let holdTour = false;
 if (!calm()) postEl.hidden = true;
 function storyTick() {
   if (glitching) return;
   const top = moreEl.getBoundingClientRect().top;
-  if (!story.warned && top < innerHeight * 1.15) { story.warned = true; say('Uh oh. Something is off up ahead…'); }
+  if (!story.warned && top < innerHeight * 1.15) { story.warned = true; say('Uh oh…'); }
   if (!story.first && top < innerHeight * 0.5 && top > -moreEl.offsetHeight) {
     story.first = true;
     glitch(2400, 'SIGNAL LOST', () => { prevEdition = settings.universe; nextEdition(); })
-      .then(() => say('New universe! Hold me down to peek at the old one.', 7000));
+      .then(() => say('Whoa. Hold me down to see the old one.', 6000));
   } else if (!story.finale && !tour.glide && maxScroll() > 200 && scrollY >= maxScroll() - 3) {
-    story.finale = true;
+    story.finale = true; holdTour = true;
     glitch(3000, 'FINAL SCENE', () => {
       prevEdition = settings.universe; nextEdition();
       postEl.hidden = false;
-      $('#postResume').src = `resume/preview.jpg${resumeV}`;
       scrollTo(0, postEl.getBoundingClientRect().top + scrollY - 68); // swapped in behind the static, so nobody sees a jump
       return postEl;
     }).then(() => {
-      tour.on = false; tour.done = true; tour.speed = 0;
+      holdTour = false; tour.on = false; tour.done = true; tour.speed = 0;
       game.start();
-      say('That is the whole tour. Catch some skills!', 7000);
+      say('Your turn. Catch what is true about him.', 6000);
     });
   }
 }
@@ -411,83 +460,158 @@ document.addEventListener('click', (e) => {
 });
 
 /* ---------------------------------------------------------
-   Final-scene game: the skills from the resume fall and Pip
-   catches them. It plays itself; moving a mouse or finger
-   over it takes over, and it goes back to auto when left alone.
+   Resume viewer: real sections in readable type. It steps
+   through them by itself; clicking a tab takes over.
+   --------------------------------------------------------- */
+const resumeView = (() => {
+  const tabs = $$('.rv-tab'), panels = $$('.rv-panel'), bar = $('#rvBar');
+  let cur = 0, lastUser = -1e9;
+  const STEP = 8000;
+  function show(i, user) {
+    cur = i;
+    tabs.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)));
+    panels.forEach((p, k) => { p.hidden = k !== i; });
+    if (user) lastUser = performance.now();
+    bar.style.animation = 'none'; void bar.offsetWidth;
+    bar.style.animation = user || calm() ? 'none' : `rvbar ${STEP}ms linear`;
+  }
+  tabs.forEach((b, i) => b.addEventListener('click', () => show(i, true)));
+  if (!calm()) setInterval(() => { if (!postEl.hidden && !document.hidden && performance.now() - lastUser > 25000) show((cur + 1) % tabs.length); }, STEP);
+  return { show(id) { const i = tabs.findIndex((b) => b.dataset.tab === id); if (i >= 0 && performance.now() - lastUser > 25000) show(i); } };
+})();
+
+/* ---------------------------------------------------------
+   Final-scene game. Each round asks a question; true and
+   false words about me fall, all looking the same. Catch the
+   true ones for points and streaks; a false one costs a life
+   and makes Pip glitch. Pip plays until a visitor steers.
    --------------------------------------------------------- */
 const game = (() => {
   const cv = $('#game'), g = cv.getContext('2d');
-  const SKILLS = ['React', 'TypeScript', 'Three.js', 'CSS', 'Node.js', 'Firebase', 'Python', 'WebGL', 'Tailwind', 'Vite', 'PWA', 'Accessibility'];
-  const caught = new Set();
-  let W = 0, H = 0, items = [], px = 0, target = 0, lastUser = -1e9, spawnIn = 0.4, k = 0, score = 0, bugs = 0, last = 0, shake = 0, raf = 0, running = false, frame = 0, col = {};
+  const ROUNDS = [
+    { q: 'Catch my frontend stack', tab: 'skills', yes: ['React', 'TypeScript', 'Three.js', 'Tailwind', 'Vite', 'CSS', 'WebGL', 'Next.js', 'PWA'], no: ['Flash', 'jQuery UI', 'WordPress', 'Unity', 'PHP', 'Angular'] },
+    { q: 'Catch what I built', tab: 'projects', yes: ['Oruinwan', 'Expense Tracker', 'SentinelFlight', 'LearnViaNotes', 'YorMenu', 'Interstellar', 'Ms. Minutes', 'Meditation'], no: ['Photoshop', 'Minecraft', 'WhatsApp', 'Excel', 'Spotify', 'Tetris'] },
+    { q: 'Catch what powers my products', tab: 'experience', yes: ['WebSockets', 'Redis', 'Node.js', 'E2E encryption', 'OAuth 2.0', 'MongoDB', 'PostgreSQL', 'JWT'], no: ['COBOL', 'Fortran', 'Fax machine', 'Blockchain', 'Floppy disk', 'SAP'] },
+    { q: 'Catch what is true about me', tab: 'awards', yes: ['IISF first prize', 'B.Tech 2025', 'Bengaluru', 'GPA 8.41', 'Poelys studio', 'ImpactX 2nd', 'Builds Oruinwan'], no: ['PhD', 'Lives in London', 'MBA', '20 years exp', 'Hates CSS'] },
+  ];
+  const ROUND_SECS = 20;
+  let W = 0, H = 0, items = [], floats = [], px = 0, target = 0, lastUser = -1e9, auto = true, spawnIn = 0.5, last = 0, raf = 0, running = false, frame = 0, col = {};
+  let round = 0, played = 0, roundT = ROUND_SECS, banner = 0, score = 0, streak = 0, lives = 3, over = 0, angry = 0, shake = 0;
+  let best = 0; try { best = parseInt(localStorage.getItem('tk-best'), 10) || 0; } catch { /* private mode */ }
   const css = (n) => getComputedStyle(root).getPropertyValue(n).trim();
-  const readCols = () => { col = { ink: css('--ink'), muted: css('--muted'), a: css('--accent'), a2: css('--accent-2'), a3: css('--accent-3'), tint: css('--tint') }; };
+  const readCols = () => { col = { ink: css('--ink'), muted: css('--muted'), a: css('--accent'), a2: css('--accent-2'), a3: css('--accent-3'), deep: css('--accent-deep') }; };
+  const hud = () => {
+    $('#gScore').textContent = score; $('#gStreak').textContent = streak; $('#gBest').textContent = best;
+    $('#gLives').textContent = '♥'.repeat(lives) + '♡'.repeat(3 - lives);
+  };
+  function setRound(i) {
+    round = i % ROUNDS.length; roundT = ROUND_SECS; banner = 1.7; items = [];
+    $('#gRound').textContent = `Round ${played + 1}`;
+    $('#gPrompt').textContent = ROUNDS[round].q;
+    resumeView.show(ROUNDS[round].tab);
+  }
+  function reset(msg) {
+    score = 0; streak = 0; lives = 3; over = 0; played = 0; floats = [];
+    setRound(0); hud();
+    if (msg) $('#gSay').textContent = msg;
+  }
   function resize() {
     const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
     W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (!px) px = target = W / 2;
   }
   function spawn() {
-    const bug = Math.random() < 0.2, label = bug ? 'BUG' : SKILLS[k++ % SKILLS.length];
-    g.font = '600 13px "Space Mono", monospace';
-    const w = g.measureText(label).width + 24;
-    items.push({ x: w / 2 + 8 + Math.random() * (W - w - 16), y: -18, vy: 62 + Math.random() * 46, label, bug, w });
+    const R = ROUNDS[round], yes = Math.random() < 0.6, pool = (yes ? R.yes : R.no).filter((l) => !items.some((it) => it.label === l));
+    if (!pool.length) return;
+    const label = pool[(Math.random() * pool.length) | 0];
+    g.font = '700 13px "Space Mono", monospace';
+    const w = Math.min(g.measureText(label).width + 26, W - 16);
+    items.push({ x: w / 2 + 8 + Math.random() * Math.max(1, W - w - 16), y: -18, vy: (58 + Math.random() * 40) * (1 + Math.min(played, 8) * 0.09), label, yes, w });
   }
   function hit(it) {
-    if (it.bug) { bugs++; shake = 0.35; blip(160, 160); $('#gBugs').textContent = bugs; return; }
-    score++; blip(700 + (caught.size % 6) * 70, 70);
-    if (!caught.has(it.label)) {
-      caught.add(it.label);
-      const li = document.createElement('li'); li.textContent = `✓ ${it.label}`; $('#caught').appendChild(li);
-      $('#gScore').textContent = caught.size;
-      if (caught.size === SKILLS.length) { $('#postDownload').classList.add('won'); say('All 12 caught. Now take the resume!', 8000); }
+    if (it.yes) {
+      streak++; const pts = 10 + Math.min(streak - 1, 10) * 2; score += pts;
+      floats.push({ x: it.x, y: H - 86, t: 1, text: `+${pts}`, ok: true });
+      blip(620 + Math.min(streak, 8) * 60, 70);
+      $('#gSay').textContent = `✓ ${it.label} is right.`;
+    } else {
+      lives--; streak = 0; shake = 0.4; angry = 1.5; if (!auto) pipAngry(1500);
+      floats.push({ x: it.x, y: H - 86, t: 1, text: '✕', ok: false });
+      blip(150, 200);
+      $('#gSay').textContent = `✕ ${it.label} is not me.`;
+      if (lives <= 0) { over = 3.5; $('#gSay').textContent = `Game over. You scored ${score}.`; }
     }
+    if (score > best && !auto) { best = score; try { localStorage.setItem('tk-best', String(best)); } catch { /* private mode */ } }
+    hud();
   }
   function roundRect(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  function drawPip(x, y, now) {
+    const mad = angry > 0, jx = mad ? (Math.random() - 0.5) * 6 : 0;
+    const body = (dx, fill, alpha) => { g.globalAlpha = alpha; g.beginPath(); g.arc(x + dx + jx, y, 18, 0, Math.PI * 2); g.fillStyle = fill; g.fill(); g.globalAlpha = 1; };
+    g.strokeStyle = col.ink; g.lineWidth = 2; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(x - 30, y - 24); g.quadraticCurveTo(x, y - 6, x + 30, y - 24); g.stroke(); // basket
+    g.beginPath(); g.moveTo(x - 16, y - 6); g.lineTo(x - 28, y - 22); g.moveTo(x + 16, y - 6); g.lineTo(x + 28, y - 22); g.stroke(); // arms
+    if (mad) { body(-5, '#ff5f7a', 0.55); body(5, '#5fd0ff', 0.55); }
+    body(0, mad ? '#ffb3c0' : col.a, 1); g.beginPath(); g.arc(x + jx, y, 18, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = '#fff'; g.beginPath(); g.ellipse(x - 6 + jx, y - 3, 4, 5.5, 0, 0, Math.PI * 2); g.ellipse(x + 6 + jx, y - 3, 4, 5.5, 0, 0, Math.PI * 2); g.fill();
+    const look = Math.max(-1.5, Math.min(1.5, (target - px) / 30));
+    g.fillStyle = col.ink; g.beginPath(); g.arc(x - 6 + look + jx, y - 2, 2, 0, Math.PI * 2); g.arc(x + 6 + look + jx, y - 2, 2, 0, Math.PI * 2); g.fill();
+    if (mad) { g.beginPath(); g.moveTo(x - 12 + jx, y - 12); g.lineTo(x - 3 + jx, y - 8); g.moveTo(x + 12 + jx, y - 12); g.lineTo(x + 3 + jx, y - 8); g.stroke(); }
+    g.beginPath(); g.moveTo(x - 6, y + 18); g.lineTo(x - 6, y + 24 + Math.sin(now / 90) * 1.5); g.moveTo(x + 6, y + 18); g.lineTo(x + 6, y + 24 - Math.sin(now / 90) * 1.5); g.stroke();
+  }
   function loop(now) {
     if (!running) return;
     const dt = Math.max(0, Math.min((now - last) / 1000, 0.05)); last = now;
     if (frame++ % 45 === 0) readCols();
-    const auto = now - lastUser > 2500;
-    const mode = caught.size === SKILLS.length ? 'All 12 caught. Now you know my stack.' : auto ? 'Pip is playing' : 'You are playing';
+    const wasAuto = auto; auto = now - lastUser > 6000;
+    if (wasAuto !== auto) reset(auto ? 'Pip took over again. Move over the game to play.' : 'You are playing. Catch only what is true about me.');
+    const mode = auto ? 'Pip is playing' : 'You are playing';
     if ($('#gMode').textContent !== mode) $('#gMode').textContent = mode;
-    spawnIn -= dt; if (spawnIn <= 0) { spawn(); spawnIn = 0.75 + Math.random() * 0.5; }
-    if (auto) {
-      const want = items.filter((it) => !it.bug && it.y < H - 62).sort((a, b) => b.y - a.y)[0];
-      if (want) target = want.x;
-      const danger = items.find((it) => it.bug && it.y > H - 170 && it.y < H - 40 && Math.abs(it.x - px) < 56);
-      if (danger) target = px + (px < danger.x ? -90 : 90);
+
+    if (over > 0) { over -= dt; if (over <= 0) reset(auto ? null : 'New game. Go!'); }
+    else {
+      banner = Math.max(0, banner - dt);
+      roundT -= dt; if (roundT <= 0) { played++; setRound(round + 1); }
+      spawnIn -= dt; if (spawnIn <= 0 && banner <= 0.4) { spawn(); spawnIn = Math.max(0.45, 0.95 - played * 0.05) + Math.random() * 0.4; }
+      if (auto) {
+        const want = items.filter((it) => it.yes && it.y < H - 70).sort((a, b) => b.y - a.y)[0];
+        if (want) target = want.x;
+        const danger = items.find((it) => !it.yes && it.y > H - 190 && it.y < H - 44 && Math.abs(it.x - px) < 34 + it.w / 2);
+        if (danger) target = danger.x + (px < danger.x ? -1 : 1) * (60 + danger.w / 2);
+      }
+      target = Math.max(26, Math.min(W - 26, target));
+      px += (target - px) * (1 - Math.exp(-dt * (auto ? 6 : 18)));
+      for (const it of items) {
+        it.y += it.vy * dt;
+        if (!it.done && it.y > H - 80 && it.y < H - 46 && Math.abs(it.x - px) < 26 + it.w / 3) { it.done = true; hit(it); }
+      }
+      items = items.filter((it) => !it.done && it.y < H + 30);
     }
-    target = Math.max(28, Math.min(W - 28, target));
-    px += (target - px) * (1 - Math.exp(-dt * (auto ? 5 : 16)));
-    for (const it of items) {
-      it.y += it.vy * dt;
-      if (!it.done && it.y > H - 74 && it.y < H - 40 && Math.abs(it.x - px) < 30 + it.w / 4) { it.done = true; hit(it); }
-    }
-    items = items.filter((it) => !it.done && it.y < H + 30);
-    shake = Math.max(0, shake - dt);
+    shake = Math.max(0, shake - dt); angry = Math.max(0, angry - dt);
+    floats.forEach((f) => { f.t -= dt * 1.1; f.y -= 34 * dt; }); floats = floats.filter((f) => f.t > 0);
 
     g.clearRect(0, 0, W, H);
     g.save();
-    if (shake) g.translate((Math.random() - 0.5) * 10 * shake * 3, 0);
+    if (shake) g.translate((Math.random() - 0.5) * 30 * shake, 0);
+    g.fillStyle = col.a; g.globalAlpha = 0.35; g.fillRect(0, 0, W * Math.max(0, roundT / ROUND_SECS), 4); g.globalAlpha = 1; // time left in the round
     g.strokeStyle = col.ink; g.lineWidth = 1.5; g.setLineDash([5, 6]);
-    g.beginPath(); g.moveTo(8, H - 12); g.lineTo(W - 8, H - 12); g.stroke(); g.setLineDash([]);
-    g.font = '600 13px "Space Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.beginPath(); g.moveTo(8, H - 10); g.lineTo(W - 8, H - 10); g.stroke(); g.setLineDash([]);
+    g.font = '700 13px "Space Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
     for (const it of items) {
-      roundRect(it.x - it.w / 2, it.y - 13, it.w, 26, 13);
-      g.fillStyle = it.bug ? '#ffd9df' : '#fff'; g.fill();
-      g.strokeStyle = it.bug ? '#d6456b' : col.ink; g.lineWidth = 1.6; g.stroke();
-      g.fillStyle = it.bug ? '#b02a4f' : col.ink; g.fillText(it.label, it.x, it.y + 1);
+      roundRect(it.x - it.w / 2, it.y - 14, it.w, 28, 14);
+      g.fillStyle = '#fff'; g.fill(); g.strokeStyle = col.ink; g.lineWidth = 1.7; g.stroke();
+      g.fillStyle = col.ink; g.fillText(it.label, it.x, it.y + 1, it.w - 14);
     }
-    // Pip with a basket
-    const y = H - 38 + Math.sin(now / 260) * 2;
-    g.strokeStyle = col.ink; g.lineWidth = 2;
-    g.beginPath(); g.moveTo(px - 30, y - 22); g.quadraticCurveTo(px, y - 4, px + 30, y - 22); g.stroke(); // basket
-    g.beginPath(); g.ellipse(px, y + 4, 30, 8, -0.25, 0, Math.PI * 2); g.strokeStyle = col.a2; g.stroke();
-    g.beginPath(); g.arc(px, y, 18, 0, Math.PI * 2); g.fillStyle = col.a; g.fill(); g.strokeStyle = col.ink; g.stroke();
-    g.fillStyle = '#fff'; g.beginPath(); g.ellipse(px - 6, y - 3, 4, 5.5, 0, 0, Math.PI * 2); g.ellipse(px + 6, y - 3, 4, 5.5, 0, 0, Math.PI * 2); g.fill();
-    const look = Math.max(-1.5, Math.min(1.5, (target - px) / 30));
-    g.fillStyle = col.ink; g.beginPath(); g.arc(px - 6 + look, y - 2, 2, 0, Math.PI * 2); g.arc(px + 6 + look, y - 2, 2, 0, Math.PI * 2); g.fill();
+    drawPip(px, H - 40 + Math.sin(now / 260) * 2, now);
+    g.font = '700 18px "Space Mono", monospace';
+    for (const f of floats) { g.globalAlpha = Math.min(1, f.t * 1.6); g.fillStyle = f.ok ? '#1f9d6b' : '#d6456b'; g.fillText(f.text, f.x, f.y); }
+    g.globalAlpha = 1;
+    if (banner > 0 || over > 0) {
+      g.globalAlpha = over > 0 ? 0.92 : Math.min(0.92, banner * 1.4); g.fillStyle = '#fff'; g.fillRect(0, H / 2 - 44, W, 88);
+      g.fillStyle = col.ink; g.font = '700 12px "Space Mono", monospace'; g.fillText(over > 0 ? 'GAME OVER' : `ROUND ${played + 1}`, W / 2, H / 2 - 18);
+      g.font = `500 ${W < 380 ? 19 : 24}px "Fraunces", serif`; g.fillText(over > 0 ? `Score ${score}` : ROUNDS[round].q, W / 2, H / 2 + 12, W - 24);
+      g.globalAlpha = 1;
+    }
     g.restore();
     raf = requestAnimationFrame(loop);
   }
@@ -498,14 +622,14 @@ const game = (() => {
   let visible = false, wanted = false;
   const sync = () => {
     const should = wanted && visible && !document.hidden;
-    if (should && !running) { running = true; resize(); readCols(); last = performance.now(); raf = requestAnimationFrame(loop); }
+    if (should && !running) { running = true; resize(); readCols(); hud(); last = performance.now(); raf = requestAnimationFrame(loop); }
     if (!should && running) { running = false; cancelAnimationFrame(raf); }
   };
   if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => { visible = en.isIntersecting; sync(); }).observe(cv); else visible = true;
   document.addEventListener('visibilitychange', sync);
-  return { start() { wanted = true; sync(); } };
+  return { start() { wanted = true; setRound(0); sync(); } };
 })();
-if (calm()) { $('#postResume').src = 'resume/preview.jpg'; game.start(); }
+if (calm()) game.start();
 
 /* =========================================================
    The 3D universe (visuals only). The page works without it.
@@ -526,6 +650,9 @@ try {
   console.warn('[universe] running without WebGL:', err?.message || err);
   root.classList.add('no-webgl');
 }
+
+// A refresh arrives glitching, then settles. It starts once the 3D scene is ready, so the effect is not cut short.
+if (root.dataset.reload && !calm()) requestAnimationFrame(() => glitch(1700, 'RELOADING'));
 
 /* =========================================================
    Engine implementation
