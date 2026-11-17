@@ -28,6 +28,12 @@
       } catch (err) {}
       var q = /[?&]edition=(morning|noon|dusk|night)/.exec(location.search);
       d.dataset.edition = q ? q[1] : list[i];
+      var wl = ['paper', 'pixel', 'sketch', 'blueprint', 'news'], w = 0;
+      // The universe (fonts, shapes, wording): Paper on first open, the next one on every refresh.
+      try { var pw = parseInt(sessionStorage.getItem('tk-world'), 10); if (!isNaN(pw)) w = (pw + 1) % 5; sessionStorage.setItem('tk-world', String(w)); } catch (err) {}
+      var qw = /[?&]world=(paper|pixel|sketch|blueprint|news)/.exec(location.search);
+      d.dataset.world = qw ? qw[1] : wl[w];
+      if (d.dataset.world === 'sketch') d.classList.add('sketch');
       d.classList.add('js');
     })();
   </script>
@@ -35,8 +41,8 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=10">
 
   <script type="importmap">
     { "imports": {
@@ -82,8 +88,8 @@
           <p class="edition-tag"><span class="dot"></span> <span id="editionText">Coral edition</span> · <span id="visitText">Visit №1</span></p>
           <h1 class="hero-title">
             <span class="line"><span id="greeting">Hello</span>, I'm Thrishank.</span>
-            <span class="line">I design and build <em>interfaces</em></span>
-            <span class="line">people enjoy using.</span>
+            <span class="line" data-copy="h2">I design and build <em>interfaces</em></span>
+            <span class="line" data-copy="h3">people enjoy using.</span>
           </h1>
           <p class="hero-sub">
             Frontend developer focused on UI/UX. I take products from the first sketch to a live release
@@ -91,7 +97,7 @@
             <a class="ink-link" href="https://poelys.com" target="_blank" rel="noopener">poelys.com</a>.
           </p>
           <div class="hero-actions">
-            <a href="#work" class="btn btn-gloss">See my projects <span aria-hidden="true">↓</span></a>
+            <a href="#work" class="btn btn-gloss" data-copy="cta">See my projects <span aria-hidden="true">↓</span></a>
             <a href="mailto:thrishankkuntimaddi@gmail.com" class="btn btn-paper">Email me</a>
             <a href="resume/Thrishank-Kuntimaddi-Resume.pdf" class="btn btn-paper" data-resume data-resume-slot hidden>View resume</a>
           </div>
@@ -134,7 +140,7 @@
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">01</span>
-          <h2>Projects</h2>
+          <h2 data-copy="work">Projects</h2>
           <p>Four products I designed and built end to end. All are live right now.</p>
         </header>
 
@@ -273,7 +279,7 @@
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">02</span>
-          <h2>Poelys</h2>
+          <h2 data-copy="poelys">Poelys</h2>
           <p>My product studio. It's the home where everything I build lives.</p>
         </header>
         <div class="poelys-grid">
@@ -306,7 +312,6 @@
             <li><a href="https://app.parla.poelys.com/welcome" target="_blank" rel="noopener" aria-label="Parla, code 729, decodes to SAY"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(8 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="729" data-word="SAY">:729</i><b>Parla</b></span></a></li>
             <li><a href="https://thrishankkuntimaddi.github.io/interstellar/" target="_blank" rel="noopener" aria-label="Interstellar, code 327, decodes to FAR"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-10 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-7.8s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-7.8s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-7.8s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i data-code="327" data-word="FAR">:327</i><b>Interstellar</b></span></a></li>
           </ul>
-          <p class="worlds-key">Every number is a word typed on a phone keypad. Watch them decode.</p>
         </div>
       </div>
     </section>
@@ -319,42 +324,42 @@
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">03</span>
-          <h2>More work</h2>
+          <h2 data-copy="more">More work</h2>
           <p>Smaller builds and things still on my desk.</p>
         </header>
         <div class="pile">
           <a class="card mini reveal" href="https://yormenu.poelys.com/" target="_blank" rel="noopener">
-            <span class="mini-tag live">Live</span>
+            <span class="mini-top"><span class="mini-tag live">Live</span><i class="mini-code" data-code="6368" data-word="MENU">:6368</i></span>
             <h3>YorMenu</h3>
             <p>A restaurant platform with a separate screen for waiters, kitchen, billing and guests.</p>
             <span class="mini-stack">React · TypeScript · Firebase</span>
           </a>
           <a class="card mini reveal" href="https://github.com/thrishankkuntimaddi/MsMinutes" target="_blank" rel="noopener">
-            <span class="mini-tag">In progress</span>
+            <span class="mini-top"><span class="mini-tag">In progress</span><i class="mini-code" data-code="8463" data-word="TIME">:8463</i></span>
             <h3>Ms. Minutes</h3>
             <p>An AI desk companion with an animated face, spring physics and lip-sync.</p>
             <span class="mini-stack">TypeScript · Claude API · ESP32</span>
           </a>
           <a class="card mini reveal" href="https://thrishankkuntimaddi.github.io/Meditation/" target="_blank" rel="noopener">
-            <span class="mini-tag live">Live</span>
+            <span class="mini-top"><span class="mini-tag live">Live</span><i class="mini-code" data-code="2256" data-word="CALM">:2256</i></span>
             <h3>Meditation</h3>
             <p>A quiet breathing app that silences your other devices while you practise.</p>
             <span class="mini-stack">React · Tailwind · Capacitor · Tauri</span>
           </a>
           <a class="card mini reveal" href="https://thrishankkuntimaddi.github.io/clearmyMind" target="_blank" rel="noopener">
-            <span class="mini-tag live">Live</span>
+            <span class="mini-top"><span class="mini-tag live">Live</span><i class="mini-code" data-code="25327" data-word="CLEAR">:25327</i></span>
             <h3>ClearMyMind</h3>
             <p>One smart bar to dump your thoughts, sort them, then clear them all away.</p>
             <span class="mini-stack">React 19 · Vite · Firebase</span>
           </a>
           <a class="card mini reveal" href="https://github.com/thrishankkuntimaddi/my-rovers" target="_blank" rel="noopener">
-            <span class="mini-tag">Hardware</span>
+            <span class="mini-top"><span class="mini-tag">Hardware</span><i class="mini-code" data-code="76837" data-word="ROVER">:76837</i></span>
             <h3>My Rovers</h3>
             <p>Home-built robot rovers, driven from a tablet cockpit app I designed.</p>
             <span class="mini-stack">Android · ESP32 · Arduino</span>
           </a>
           <a class="card mini reveal" href="https://thrishankkuntimaddi.github.io/interstellar/" target="_blank" rel="noopener">
-            <span class="mini-tag live">Live</span>
+            <span class="mini-top"><span class="mini-tag live">Live</span><i class="mini-code" data-code="327" data-word="FAR">:327</i></span>
             <h3>Interstellar</h3>
             <p>A 15-minute real-time 3D space journey with a flyable ship and a talking copilot.</p>
             <span class="mini-stack">Three.js · GLSL shaders · Web Speech</span>
@@ -369,7 +374,7 @@
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">04</span>
-          <h2>About me</h2>
+          <h2 data-copy="about">About me</h2>
           <p>The short version.</p>
         </header>
         <div class="about-grid">
@@ -419,7 +424,7 @@
       <div class="wrap">
         <div class="card contact-card reveal">
           <span class="sec-num">05</span>
-          <h2>Let's build something <em>people love</em>.</h2>
+          <h2 data-copy="contact">Let's build something <em>people love</em>.</h2>
           <p>I'm open to frontend and UI roles, freelance work and collaborations.</p>
           <a class="email" href="mailto:thrishankkuntimaddi@gmail.com" id="emailLink">thrishankkuntimaddi@gmail.com</a>
           <div class="contact-actions">
@@ -439,9 +444,8 @@
   </main>
 
   <!-- ============ FINAL SCENE (revealed by the second glitch, at the end of the page) ============ -->
-  <section id="post" class="section post sketch" data-scene="chaos" data-frame="corner">
+  <section id="post" class="section post" data-scene="chaos" data-frame="corner">
     <div class="wrap">
-      <p class="readout" aria-hidden="true"><span>SIGNAL RECOVERED</span><span>FINAL SCENE</span><span>RESUME UNLOCKED</span><span>REF 2031-K</span></p>
       <h2 class="post-title">You made it to the end. <em>Here is my resume.</em></h2>
       <div class="post-grid">
 
@@ -513,10 +517,10 @@
         <div class="card game-card">
           <header class="game-head">
             <div><p class="p-num" id="gRound">Round 1</p><h3 id="gPrompt">Catch my frontend stack</h3></div>
-            <p class="game-lives" id="gLives" aria-label="Lives left">♥♥♥</p>
+            <div class="game-side"><p class="game-lives" id="gLives" aria-label="Lives left">♥♥♥♥♥</p><p class="game-tabs"><button type="button" data-game="catch" aria-pressed="true">Catch</button><button type="button" data-game="run" aria-pressed="false">Run</button></p></div>
           </header>
           <canvas id="game" aria-label="A game: words fall, and the ones that are true about Thrishank should be caught"></canvas>
-          <p class="game-hud"><span>Score <b id="gScore">0</b></span><span>Streak <b id="gStreak">0</b></span><span>Best <b id="gBest">0</b></span><span id="gMode">Pip is playing</span></p>
+          <p class="game-hud"><span>Score <b id="gScore">0</b></span><span><span id="gStatL">Streak</span> <b id="gStreak">0</b></span><span>Best <b id="gBest">0</b></span><span id="gMode">Pip is playing</span></p>
           <p class="game-say" id="gSay">Catch the words that are true about me. Let the rest fall. Move over the game to play.</p>
         </div>
       </div>
@@ -592,6 +596,10 @@
   <div class="strips" id="strips" hidden aria-hidden="true"></div>
   <div class="glitch-layer" id="glitchLayer" hidden aria-hidden="true"><div id="glitchCover"></div><div id="glitchBars"></div><p id="glitchText">SIGNAL LOST</p></div>
 
+  <!-- Quick jump: appears in the final scene. It shatters the screen and falls back to the top through every project. -->
+  <button class="jump" id="jumpBtn" type="button"><span class="jump-face" aria-hidden="true">◉‿◉</span><b>Quick jump?</b><span>Fall back to the top through every universe</span></button>
+  <div class="fall" id="fall" hidden aria-hidden="true"><div class="fall-streaks"></div><svg class="fall-cracks" id="fallCracks" preserveAspectRatio="none"></svg><div class="fall-shards" id="fallShards"></div><div class="fall-stage" id="fallStage"></div><pre class="fall-term" id="fallTerm"></pre></div>
+
   <!-- Pip: the site's guide. A poke switches the sound on; holding it peeks at the previous colour edition. -->
   <button class="pip" id="pip" type="button" hidden aria-label="Pip, the site guide. Hold to peek at the previous colours.">
     <span class="pip-say" id="pipSay"></span>
@@ -600,13 +608,14 @@
       <path class="pip-arm" d="M24 68q-16 6-13 22"/><circle class="pip-hand" cx="11" cy="92" r="6.5"/>
       <g class="pip-wave"><path class="pip-arm" d="M96 66q18-4 17-24"/><circle class="pip-hand" cx="113" cy="40" r="6.5"/></g>
       <circle class="pip-body" cx="60" cy="60" r="38"/>
-      <g class="pip-eyes"><ellipse cx="47" cy="54" rx="8" ry="11"/><ellipse cx="73" cy="54" rx="8" ry="11"/><circle class="pip-pupil" cx="49" cy="57" r="4"/><circle class="pip-pupil" cx="75" cy="57" r="4"/></g>
+      <g class="pip-eyes"><ellipse cx="47" cy="54" rx="8" ry="11"/><ellipse class="r" cx="73" cy="54" rx="8" ry="11"/><g class="pip-pupils"><circle class="pip-pupil" cx="49" cy="57" r="4"/><circle class="pip-pupil r" cx="75" cy="57" r="4"/></g></g>
+      <path class="pip-happy" d="M39 57q8-11 16 0M65 57q8-11 16 0"/><path class="pip-winkeye" d="M65 57q8-9 16 0"/>
       <path class="pip-brow" d="M36 38l18 8M84 38l-18 8"/>
-      <path class="pip-mouth" d="M50 76q10 8 20 0"/><path class="pip-frown" d="M50 80q10-8 20 0"/>
+      <path class="pip-mouth" d="M50 76q10 8 20 0"/><path class="pip-frown" d="M50 80q10-8 20 0"/><ellipse class="pip-o" cx="60" cy="79" rx="5" ry="6.5"/><path class="pip-grin" d="M46 73q14 17 28 0z"/>
     </svg>
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=8"></script>
+  <script type="module" src="main.js?v=10"></script>
 </body>
 </html>
