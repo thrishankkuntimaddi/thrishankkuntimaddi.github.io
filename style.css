@@ -389,17 +389,21 @@ a.mini:hover, .mini:hover { transform: rotate(0deg) translate(-3px, -3px); box-s
 /* =========================================================
    Resume dialog
    ========================================================= */
-dialog.resume { width: min(820px, 94vw); max-height: 92dvh; padding: 0; color: var(--ink); background: var(--paper); border: 1.5px solid var(--line-2); border-radius: var(--r); box-shadow: 10px 10px 0 var(--shadow); overflow: hidden; }
+dialog.resume { width: fit-content; max-width: 96vw; max-height: 96dvh; padding: 0; color: var(--ink); background: var(--paper); border: 1.5px solid var(--line-2); border-radius: var(--r); box-shadow: 10px 10px 0 var(--shadow); overflow: hidden; }
 dialog.resume[open] { display: flex; flex-direction: column; animation: dlg-in .45s var(--spring); }
 dialog.resume::backdrop { background: color-mix(in srgb, var(--paper) 78%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 @keyframes dlg-in { from { opacity: 0; transform: translateY(24px) scale(.97) rotate(-1deg); } }
-.resume-head, .resume-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: #fff; }
+.resume-head, .resume-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; background: #fff; }
 .resume-head { border-bottom: 1.5px dashed var(--line-2); }
 .resume-foot { border-top: 1.5px dashed var(--line-2); justify-content: flex-start; flex-wrap: wrap; }
-.resume-head h2 { font-family: var(--display); font-weight: 500; font-size: 28px; line-height: 1.1; }
+.resume-head h2 { font-family: var(--display); font-weight: 500; font-size: 22px; line-height: 1.1; }
 .resume-head p { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 2px; }
-.resume-body { overflow-y: auto; padding: 18px; overscroll-behavior: contain; }
-.resume-body img { width: 100%; background: #fff; border: 1.5px solid var(--line); border-radius: 10px; box-shadow: 5px 5px 0 var(--shadow); }
+/* The whole page fits the screen by default; clicking the page zooms in to reading size. */
+.resume-body { overflow: auto; padding: 12px 16px; overscroll-behavior: contain; display: flex; justify-content: center; }
+.resume-body img { width: auto; max-width: 100%; max-height: calc(96dvh - 150px); background: #fff; border: 1.5px solid var(--line); border-radius: 8px; cursor: zoom-in; }
+dialog.resume.zoom { width: min(1000px, 96vw); }
+dialog.resume.zoom .resume-body img { width: 100%; max-height: none; cursor: zoom-out; }
+.resume-hint { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 [hidden] { display: none !important; }
 
 @media (max-width: 980px) {

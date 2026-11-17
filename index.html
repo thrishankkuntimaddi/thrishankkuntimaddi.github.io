@@ -15,13 +15,18 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://thrishankkuntimaddi.github.io/assets/og.jpg">
 
-  <!-- The edition (a light colour palette) is chosen automatically from the visitor's local time, before first paint -->
+  <!-- The edition (a light colour palette) changes automatically on every page load, before first paint -->
   <script>
     (function () {
-      var d = document.documentElement, h = new Date().getHours();
-      var e = h >= 5 && h < 11 ? 'morning' : h >= 11 && h < 17 ? 'noon' : h >= 17 && h < 21 ? 'dusk' : 'night';
+      var d = document.documentElement, list = ['morning', 'noon', 'dusk', 'night'], i = 0;
+      // A different edition on every load: step to the next one each time, starting from a random one.
+      try {
+        var prev = parseInt(localStorage.getItem('tk-edition'), 10);
+        i = isNaN(prev) ? Math.floor(Math.random() * 4) : (prev + 1) % 4;
+        localStorage.setItem('tk-edition', String(i));
+      } catch (err) { i = Math.floor(Math.random() * 4); }
       var q = /[?&]edition=(morning|noon|dusk|night)/.exec(location.search);
-      d.dataset.edition = q ? q[1] : e;
+      d.dataset.edition = q ? q[1] : list[i];
       d.classList.add('js');
     })();
   </script>
@@ -72,7 +77,7 @@
     <section class="hero" id="hero" data-scene="figure8">
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <p class="edition-tag"><span class="dot"></span> <span id="editionText">Morning edition</span> · <span id="visitText">Visit №1</span></p>
+          <p class="edition-tag"><span class="dot"></span> <span id="editionText">Coral edition</span> · <span id="visitText">Visit №1</span></p>
           <h1 class="hero-title">
             <span class="line"><span id="greeting">Hello</span>, I'm Thrishank.</span>
             <span class="line">I design and build <em>interfaces</em></span>
@@ -327,7 +332,7 @@
           <div class="card mini mini-self reveal">
             <span class="mini-tag live">You're here</span>
             <h3>This website</h3>
-            <p>It tours itself, picks its colours from your local time, and runs real orbital physics.</p>
+            <p>It tours itself, changes its colours on every visit, and runs real orbital physics.</p>
             <span class="mini-stack">Three.js · CSS · Vanilla JS</span>
           </div>
         </div>
@@ -425,8 +430,9 @@
     </header>
     <div class="resume-body"><img id="resumeImg" alt="Preview of the first page of Thrishank Kuntimaddi's resume" width="1314" height="1700"></div>
     <footer class="resume-foot">
-      <a class="btn btn-gloss" id="resumeDownload" href="resume/Thrishank-Kuntimaddi-Resume.pdf" download="Thrishank-Kuntimaddi-Resume.pdf">Download PDF ↓</a>
-      <a class="btn btn-paper" id="resumeOpen" href="resume/Thrishank-Kuntimaddi-Resume.pdf" target="_blank" rel="noopener">Open in new tab ↗</a>
+      <a class="btn btn-gloss btn-sm" id="resumeDownload" href="resume/Thrishank-Kuntimaddi-Resume.pdf" download="Thrishank-Kuntimaddi-Resume.pdf">Download PDF ↓</a>
+      <a class="btn btn-paper btn-sm" id="resumeOpen" href="resume/Thrishank-Kuntimaddi-Resume.pdf" target="_blank" rel="noopener">Open in new tab ↗</a>
+      <span class="resume-hint" id="resumeHint">Click the page to zoom in</span>
     </footer>
   </dialog>
 

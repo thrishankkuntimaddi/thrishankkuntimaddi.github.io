@@ -1,7 +1,7 @@
 /* =========================================================
    Thrishank Kuntimaddi: portfolio
-   Everything here is automatic: the colour edition follows
-   the visitor's local time, the page tours itself, and the
+   Everything here is automatic: the colour edition changes
+   on every page load, the page tours itself, and the
    3D gravity scenes change with each section.
    ========================================================= */
 const root = document.documentElement;
@@ -18,10 +18,10 @@ const isSmall = () => innerWidth < 980;
 const INK = ['#ff7a59', '#3b9bff', '#8f6bff', '#19b894', '#f2a51a', '#ff5fa2'];
 const rotate = (arr, n) => arr.slice(n).concat(arr.slice(0, n));
 const UNIVERSES = {
-  morning: { name: 'Morning edition', greet: 'Good morning',   bg: '#fbf8f2', stars: rotate(INK, 0), dust: '#c9bfb4', planet: '#3b9bff', bloom: 0, light: true },
-  noon:    { name: 'Noon edition',    greet: 'Good afternoon', bg: '#f6fafe', stars: rotate(INK, 1), dust: '#b7c6d8', planet: '#ff7a59', bloom: 0, light: true },
-  dusk:    { name: 'Dusk edition',    greet: 'Good evening',   bg: '#fbf7fd', stars: rotate(INK, 2), dust: '#c9bcd9', planet: '#ff5fa2', bloom: 0, light: true },
-  night:   { name: 'Night edition',   greet: 'Hello, night owl', bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#b4cfc7', planet: '#8f6bff', bloom: 0, light: true },
+  morning: { name: 'Coral edition', bg: '#fbf8f2', stars: rotate(INK, 0), dust: '#c9bfb4', planet: '#3b9bff', bloom: 0, light: true },
+  noon:    { name: 'Sky edition',   bg: '#f6fafe', stars: rotate(INK, 1), dust: '#b7c6d8', planet: '#ff7a59', bloom: 0, light: true },
+  dusk:    { name: 'Lilac edition', bg: '#fbf7fd', stars: rotate(INK, 2), dust: '#c9bcd9', planet: '#ff5fa2', bloom: 0, light: true },
+  night:   { name: 'Mint edition',  bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#b4cfc7', planet: '#8f6bff', bloom: 0, light: true },
 };
 const edition = UNIVERSES[root.dataset.edition] ? root.dataset.edition : 'morning';
 const settings = { universe: edition, accent: '', g: 1, speed: 1, trail: 0.8, glow: 1 };
@@ -38,7 +38,8 @@ const syncLabUI = () => {};
    --------------------------------------------------------- */
 let visits = 1;
 try { visits = (parseInt(localStorage.getItem('tk-visits'), 10) || 0) + 1; localStorage.setItem('tk-visits', String(visits)); } catch { /* private mode */ }
-$('#greeting').textContent = UNIVERSES[edition].greet;
+const hour = new Date().getHours();
+$('#greeting').textContent = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 22 ? 'Good evening' : 'Hello, night owl';
 $('#editionText').textContent = UNIVERSES[edition].name;
 $('#visitText').textContent = `Visit №${visits}`;
 $('meta[name="theme-color"]').content = UNIVERSES[edition].bg;
@@ -178,6 +179,11 @@ document.addEventListener('click', (e) => {
   resumeDlg.showModal();
 });
 $('#resumeClose').addEventListener('click', () => resumeDlg.close());
+$('#resumeImg').addEventListener('click', () => {
+  const zoomed = resumeDlg.classList.toggle('zoom');
+  $('#resumeHint').textContent = zoomed ? 'Click the page to fit the screen' : 'Click the page to zoom in';
+});
+resumeDlg.addEventListener('close', () => { resumeDlg.classList.remove('zoom'); $('#resumeHint').textContent = 'Click the page to zoom in'; });
 resumeDlg.addEventListener('click', (e) => { if (e.target === resumeDlg) resumeDlg.close(); }); // click outside closes
 
 // In-page links glide smoothly instead of jumping.
