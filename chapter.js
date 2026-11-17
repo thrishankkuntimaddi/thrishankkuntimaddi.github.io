@@ -50,6 +50,11 @@ export function initChapter(ctx) {
     s.dataset.goatcounter = `https://${GOATCOUNTER}.goatcounter.com/count`;
     s.onload = () => { queue.splice(0).forEach((n) => window.goatcounter?.count?.({ path: n, title: n, event: true })); };
     document.head.append(s);
+  }
+  let countsLoaded = false;
+  function loadCounts() { // only when they will be shown: at the final scene or on the first poke
+    if (countsLoaded || !GOATCOUNTER || !/^[a-z0-9-]+$/.test(GOATCOUNTER)) return;
+    countsLoaded = true;
     Object.keys(stats).forEach((k) => {
       fetch(`https://${GOATCOUNTER}.goatcounter.com/counter/${encodeURIComponent(k)}.json`).then((r) => (r.ok ? r.json() : null)).then((j) => {
         const n = parseInt(String(j?.count || '0').replace(/[^0-9]/g, ''), 10) || 0;
@@ -72,7 +77,7 @@ export function initChapter(ctx) {
     mem.pokes++; save(); showLevel();
     if (level() > before) setTimeout(() => say(LEVELS[level() - 1][1], 3200), 2700);
     else if (!pokedThisVisit && stats.poke > 1) setTimeout(() => say(`You and ${(stats.poke - 1).toLocaleString()} others have poked me.`, 3200), 2700);
-    if (!pokedThisVisit) { pokedThisVisit = true; count('poke'); }
+    if (!pokedThisVisit) { pokedThisVisit = true; count('poke'); loadCounts(); }
     renderWallNote();
   });
 
@@ -91,7 +96,7 @@ export function initChapter(ctx) {
   const onFinal = () => {
     if (post.hidden) return;
     if (!mem.end) { mem.end = true; save(); }
-    count('end');
+    count('end'); loadCounts();
     let best = 0; try { best = parseInt(localStorage.getItem('tk-best'), 10) || 0; } catch { /* private mode */ }
     if (best > 0) setTimeout(() => say(`Your best is ${best}. Beat it?`, 4200), 4200);
   };

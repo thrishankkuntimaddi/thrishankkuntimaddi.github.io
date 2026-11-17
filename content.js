@@ -10,7 +10,7 @@
 
 // Your GoatCounter code, e.g. 'thrishank' for thrishank.goatcounter.com.
 // Leave it empty and the shared counters stay hidden and nothing is sent anywhere.
-export const GOATCOUNTER = '';
+export const GOATCOUNTER = 'thrishank';
 
 export const EMAIL = 'thrishankkuntimaddi@gmail.com';
 
