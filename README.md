@@ -19,6 +19,7 @@ A light, pencil-sketch portfolio with retro space styling that runs itself.
 - **Seasons, moon and occasions:** leaves, snow, petals or fireflies drift over the hero by season (hemisphere guessed from the time zone, no location asked). Full and new moons show in the label, and on Diwali, Holi, Eid, Christmas and others the greeting changes and Pip dresses up. Preview with `?season=winter&occasion=diwali&moon=full`.
 - **Sticker wall:** at the very end, visitors leave stickers that stay for their next visit.
 - **The 30-second version:** a link under the hero buttons for people in a hurry.
+- **Universes & settings (`universes.html`, linked in the footer):** live previews of every universe, colour edition, season, occasion outfit and Pip level, plus switches for calm mode, glitches, sound, the auto-tour, Pip and seasonal effects, and pinning a favourite universe or colour. Saved in the visitor's browser (`tk-prefs`) and read by the main site on load.
 - Works on phones, respects reduced motion (no tour, no animation), and still shows all content without WebGL.
 
 ## Stack
@@ -29,6 +30,7 @@ Plain HTML, CSS and JavaScript (ES modules) with no build step. Three.js 0.160 i
 index.html   page and content
 style.css    edition tokens, cards, glass windows, stickers, auto-tour pill
 main.js      editions, auto-tour, reveals + the WebGL engine
+universes.js the Universes & settings page
 chapter.js   memory, stories, Ask Pip, seasons, sticker wall, 30-second version
 content.js   the words for chapter.js (easy to edit)
 assets/      me.jpg, og.jpg (social preview), favicon.svg
