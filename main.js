@@ -405,32 +405,43 @@ if (!calm()) {
   setTimeout(() => pip.classList.add('in'), 2600); // entrance done; walking and bobbing take over
   let holdT = 0, held = false, pokes = 0, at = 0, walkT = 0, acts = 0;
   const FACES = ['happy', 'wow', 'left', 'right', 'sleepy', 'wink'];
-  const lines = ['Hehe.', 'That tickles.', 'Again!', 'Okay, okay.', 'Boop.', 'Hold me down and see.'];
+  const lines = ['You got me.', 'Okay, I will stay here.', 'That tickles.', 'Boop.', 'Hold me down and see.', 'Hehe.'];
   const face = (name) => { FACES.forEach((f) => pip.classList.remove(`ex-${f}`)); if (name) pip.classList.add(`ex-${name}`); };
   setTimeout(() => { face('happy'); say('Hi!', 2600); }, 2800);
-  setInterval(() => { // every few seconds: walk somewhere, or pull a face
+  const GESTURES = ['wave', 'up', 'hips', 'point', 'shrug'];
+  const gesture = (name) => { GESTURES.forEach((g) => pip.classList.remove(`g-${g}`)); pip.classList.add(`g-${name}`); };
+  const stopWalking = () => { // freeze exactly where Pip is standing
+    const here = innerWidth - pip.getBoundingClientRect().right - (innerWidth <= 560 ? 10 : 18);
+    at = -Math.max(0, here);
+    pip.style.setProperty('--pt', '0s'); pip.style.setProperty('--px', `${at.toFixed(0)}px`);
+    clearTimeout(walkT); pip.classList.remove('walking'); pip.style.setProperty('--face', '1');
+  };
+  setInterval(() => { // Pip wanders the whole width of the window on foot. Once poked, Pip stays put and only pulls faces and moves its hands.
     if (document.hidden || glitching || peeking || pip.classList.contains('walking') || root.classList.contains('at-final')) return;
     acts++;
-    if (Math.random() < 0.45) {
-      const to = -Math.random() * Math.min(innerWidth * 0.32, 420), d = Math.abs(to - at);
-      if (d > 40) {
+    if (!pokes && Math.random() < 0.72) {
+      const span = Math.max(60, innerWidth - pip.offsetWidth - 40);
+      const to = -Math.random() * span, d = Math.abs(to - at);
+      if (d > 60) {
+        const secs = d / 95;
         face(to < at ? 'left' : 'right');
         pip.style.setProperty('--face', to < at ? '-1' : '1');
-        pip.style.setProperty('--pt', `${(d / 62).toFixed(2)}s`);
+        pip.style.setProperty('--pt', `${secs.toFixed(2)}s`);
         pip.style.setProperty('--px', `${to.toFixed(0)}px`);
         pip.classList.add('walking');
         clearTimeout(walkT);
-        walkT = setTimeout(() => { pip.classList.remove('walking'); pip.style.setProperty('--face', '1'); face(''); }, (d / 62) * 1000);
+        walkT = setTimeout(() => { pip.classList.remove('walking'); pip.style.setProperty('--face', '1'); face(''); }, secs * 1000);
         at = to;
         return;
       }
     }
-    face(Math.random() < 0.25 ? '' : FACES[(Math.random() * FACES.length) | 0]);
-    if (!pokes && acts % 4 === 0) { // lure: flicker and call out until someone pokes
+    face(Math.random() < 0.2 ? '' : FACES[(Math.random() * FACES.length) | 0]);
+    if (pokes) gesture(GESTURES[(Math.random() * GESTURES.length) | 0]);
+    else if (acts % 5 === 0) { // lure: flicker and call out until someone pokes
       pip.classList.remove('flick'); void pip.offsetWidth; pip.classList.add('flick');
-      say(['Psst.', 'Hey.', '?', 'Over here.'][(Math.random() * 4) | 0], 2400);
+      say(['Psst.', 'Hey.', '?', 'Catch me.'][(Math.random() * 4) | 0], 2400);
     }
-  }, 2600);
+  }, 2200);
   pip.addEventListener('pointerdown', () => {
     held = false;
     holdT = setTimeout(() => { held = true; face('wow'); if (startPeek()) say('The last one…', 60000); else say('Nothing behind us yet.'); }, 320);
@@ -441,8 +452,10 @@ if (!calm()) {
   pip.addEventListener('click', () => {
     if (held) { held = false; return; }
     unlockSound();
+    stopWalking();
     blip(520 + (pokes % 4) * 110);
     face(['happy', 'wow', 'wink'][pokes % 3]);
+    gesture(GESTURES[pokes % GESTURES.length]);
     pip.classList.remove('hop'); void pip.offsetWidth; pip.classList.add('hop');
     say(lines[pokes++ % lines.length], 2600);
   });

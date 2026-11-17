@@ -996,3 +996,19 @@ main { transform: translateX(var(--gx, 0)); }
 .pip svg, .fall-pip svg { stroke-width: 3.4; }
 .ex-wink .pip-cut.r { display: none; }
 .fall.crt .fall-term { font-size: clamp(14px, 2.5vw, 28px); }
+
+/* Pip walks on its legs, and has hand gestures once it has been caught */
+.pip-leg { transform-box: fill-box; transform-origin: 50% 0; }
+.pip.walking .pip-leg { animation: stride .34s ease-in-out infinite alternate; } .pip.walking .pip-leg.b { animation-direction: alternate-reverse; }
+@keyframes stride { from { transform: rotate(-30deg) translateY(-1px); } to { transform: rotate(30deg) translateY(1px); } }
+.pip.in.walking { animation: pip-stride .17s ease-in-out infinite alternate; }
+.pip.walking .pip-armL { animation: swing .34s ease-in-out infinite alternate; } .pip.walking .pip-wave { animation: swing .34s ease-in-out infinite alternate-reverse; }
+@keyframes swing { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+.pip-armL { transform-box: view-box; transform-origin: 24px 68px; transition: transform .45s var(--spring); }
+.pip-wave { transition: transform .45s var(--spring); }
+.g-up .pip-armL { transform: rotate(125deg); } .g-up .pip-wave { animation: none; transform: rotate(-12deg); }
+.g-hips .pip-armL { transform: rotate(-22deg) scale(.82); } .g-hips .pip-wave { animation: none; transform: rotate(118deg) scale(.82); }
+.g-point .pip-wave { animation: none; transform: rotate(52deg); } .g-point .pip-armL { transform: rotate(10deg); }
+.g-shrug .pip-armL { transform: rotate(70deg); } .g-shrug .pip-wave { animation: none; transform: rotate(38deg); }
+.g-wave .pip-wave { animation: wave 1.1s ease-in-out infinite; }
+.pip { cursor: pointer; }
