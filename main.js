@@ -408,9 +408,9 @@ if (!calm()) {
     let f = 0;
     const t = setInterval(() => {
       f++;
-      el.textContent = (numeric ? ':' : '') + [...to].map((c, i) => (i < f / 2 ? c : pool[(Math.random() * pool.length) | 0])).join('');
-      if (f / 2 >= to.length) clearInterval(t);
-    }, 55);
+      el.textContent = (numeric ? ':' : '') + [...to].map((c, i) => (i < f / 3 ? c : pool[(Math.random() * pool.length) | 0])).join('');
+      if (f / 3 >= to.length) clearInterval(t);
+    }, 95); // one letter settles about every 0.3 s, slow enough to follow
   };
   let turn = 0;
   setInterval(() => {
@@ -418,8 +418,8 @@ if (!calm()) {
     const el = plaques[turn++ % plaques.length];
     if (el.getBoundingClientRect().bottom < 0 || el.getBoundingClientRect().top > innerHeight) return;
     el.classList.add('decoded'); scramble(el, el.dataset.word, false);
-    setTimeout(() => { el.classList.remove('decoded'); scramble(el, el.dataset.code, true); }, 3200);
-  }, 900);
+    setTimeout(() => { el.classList.remove('decoded'); scramble(el, el.dataset.code, true); }, 6500); // the word stays readable for about 5 s
+  }, 2600);
 }
 
 /* ---------------------------------------------------------

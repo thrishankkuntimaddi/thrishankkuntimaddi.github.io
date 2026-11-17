@@ -648,7 +648,8 @@ main { transform: translateX(var(--gx, 0)); }
 /* Keypad plaques */
 .worlds ul { grid-template-columns: repeat(7, 1fr); }
 .plaque i { display: inline-block; min-width: 7ch; text-align: center; transition: color .3s; }
-.plaque i.decoded { color: var(--accent-deep); letter-spacing: .2em; }
+.plaque i { padding: 1px 4px; border-radius: 5px; transition: color .3s, background .4s; }
+.plaque i.decoded { color: var(--ink); background: var(--accent-3); letter-spacing: .2em; }
 .worlds-key { margin-top: 18px; text-align: center; font-family: var(--hand); font-size: 21px; color: var(--muted); }
 
 /* Final scene fits one screen */
