@@ -82,7 +82,9 @@ Everything on the website is editable from the Studio (`/admin/` in a browser, o
 - **Resume:** a library of resumes (name, note, created/edited dates); one is marked *On website*.
 - **Content:** main projects, more work and the Poelys orbit (add, edit, hide, reorder, remove; keypad codes are worked out from a word), every text block on the home page (`data-k` keys, see `tools/tag-text.py`), project stories, Ask Pip's answers and *What's new*. Saved to `site/content`, applied by `lib/content-live.js`.
 - **Website:** banner, fixed or shuffled universes, colours, animations, Pip (line, outfit) and scheduled automations. Saved to `site/config`, applied by `lib/site-config.js`.
-- **Reports:** anonymous visits (country from time zone, device, page, referrer) and resume/kit downloads, from `lib/live.js`.
+- **Reports:** anonymous visits (approximate city/region/network via get.geojs.io, IP never stored; device, screen, page, referrer, time spent, scroll depth) and resume/kit downloads, from `lib/live.js`. Overview, Visits (tap for details) and People tabs.
+- **Resume PDF upload:** a ready-made PDF can be put on the website instead of the built one (`lib/resume-pdf.js`; stored in Firestore in ≤380 KB base64 parts, no Storage).
+- **Sign out everywhere:** `private/security.revokedBefore`, checked by `firestore.rules`.
 - **Inbox, Feedback, Compliments, Help center, About.**
 
 Protection: only thrishankkuntimaddi@gmail.com signed in with Google (checked in the app and in `firestore.rules`); edits need a sign-in from the last 30 days; fingerprint/face/screen-lock on open and after 5 minutes away; in the Android app, screenshots and backups are blocked.

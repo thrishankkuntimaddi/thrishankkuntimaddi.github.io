@@ -8,7 +8,7 @@
 import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=22';
 import { setWorldBg } from './worldbg.js?v=22';
 import { playTune, PROJECTS } from './tunes.js?v=22';
-import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=1';
+import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=2';
 import { loadContent, applyContent } from './lib/content-live.js?v=1';
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
@@ -239,6 +239,11 @@ const RESUME = 'resume/Thrishank-Kuntimaddi-Resume.pdf';
 let resumeV = '';
 let liveResume = null;
 const resumeLib = () => import('./lib/resume.js?v=1');
+const pdfLib = () => import('./lib/resume-pdf.js?v=1');
+// An uploaded PDF resume: its parts are in site/resumePdf{n}.
+let pdfBytesP = null;
+const uploadedPdf = () => (pdfBytesP ||= Promise.all([import('./lib/firebase.js?v=1'), pdfLib()]).then(([fb, P]) =>
+  Promise.all([...Array(liveResume.parts)].map((_, n) => fb.readPublic(`resumePdf${n}`).then((r) => r.data))).then((parts) => P.b64ToBytes(parts.join('')))));
 const showResumeSlots = (date) => {
   $('#resumeDate').textContent = `Updated ${date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`;
   $$('[data-resume-slot]').forEach((el) => { el.hidden = false; });
@@ -251,7 +256,7 @@ const staticResume = () => fetch('resume/meta.json', { cache: 'no-store' }).then
   showResumeSlots(new Date(`${m.updated}T00:00:00`));
 });
 import('./lib/firebase.js?v=1').then((m) => m.readPublic('resume')).then(({ data, updatedAt }) => {
-  if (!data || !data.sections) throw new Error('no live resume');
+  if (!data || !(data.sections || (data.kind === 'pdf' && data.parts))) throw new Error('no live resume');
   liveResume = data;
   showResumeSlots(new Date(updatedAt));
 }).catch(() => staticResume().catch(() => {}));
@@ -267,6 +272,10 @@ async function drawLiveResume() {
   box.hidden = false;
   box.textContent = 'Drawing the latest version…';
   try {
+    if (liveResume.kind === 'pdf') {
+      const [P, bytes] = await Promise.all([pdfLib(), uploadedPdf()]);
+      box.textContent = ''; await P.renderInto(box, bytes); return;
+    }
     const R = await resumeLib();
     if (!document.getElementById('rz-fonts')) {
       const st = document.createElement('style'); st.id = 'rz-fonts'; st.textContent = R.resumeFontCSS(); document.head.appendChild(st);
@@ -281,6 +290,12 @@ async function liveDownload(openTab) {
   window.tkTrack?.('resume', { detail: openTab ? 'open' : 'download' });
   const w = openTab ? window.open('', '_blank') : null;
   try {
+    if (liveResume.kind === 'pdf') {
+      const [P, bytes] = await Promise.all([pdfLib(), uploadedPdf()]);
+      const blob = P.bytesToBlob(bytes);
+      if (openTab) w.location = URL.createObjectURL(blob); else P.saveBlob(blob, 'Thrishank-Kuntimaddi-Resume.pdf');
+      return;
+    }
     const R = await resumeLib();
     await R.loadEngine();
     if (openTab) { const { blob } = R.toPDF(liveResume); w.location = URL.createObjectURL(blob); } else await R.download(liveResume);

@@ -9,7 +9,14 @@ service cloud.firestore {
       return request.auth != null
         && request.auth.token.email == 'thrishankkuntimaddi@gmail.com'
         && request.auth.token.email_verified == true
-        && request.auth.token.firebase.sign_in_provider == 'google.com';
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && notRevoked();
+    }
+    // "Sign out everywhere": any sign-in older than private/security.revokedBefore is refused,
+    // on every device, including ones that never registered under Account & devices.
+    function notRevoked() {
+      let sec = /databases/$(database)/documents/private/security;
+      return !exists(sec) || request.auth.token.auth_time > get(sec).data.revokedBefore.toMillis() / 1000;
     }
     // Changes also need a sign-in from the last 30 days (a stolen old session can't edit).
     function isFreshOwner() {
@@ -26,20 +33,31 @@ service cloud.firestore {
     }
 
     // Owner-only: drafts and published history.
-    match /private/{doc} { allow read: if isOwner(); allow write: if isFreshOwner(); }
+    match /private/{doc} { allow read: if isOwner(); allow write: if isFreshOwner() && doc != 'security'; }
+    match /private/security {
+      allow write: if isFreshOwner() && request.resource.data.keys().hasOnly(['revokedBefore', 'by'])
+        && request.resource.data.revokedBefore == request.time;
+    }
     match /versions/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
     match /devices/{id} { allow read: if isOwner(); allow write: if isOwner(); }
     match /resumes/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
+    match /resumeFiles/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
 
     // Anonymous visit records for the owner's reports: create-only, fixed shape, no personal data.
     match /visits/{id} {
-      allow create: if request.resource.data.keys().hasOnly(['type', 'page', 'country', 'city', 'tz', 'device', 'os', 'browser', 'ref', 'lang', 'vid', 'returning', 'world', 'detail', 'at'])
-        && request.resource.data.type in ['visit', 'resume', 'kit', 'message']
+      allow create: if request.resource.data.keys().hasOnly(['type', 'page', 'country', 'city', 'tz', 'device', 'os', 'browser', 'ref', 'lang', 'vid', 'returning', 'world', 'detail', 'at',
+          'region', 'isp', 'lat', 'lon', 'geo', 'screen', 'secs', 'scroll'])
+        && request.resource.data.type in ['visit', 'resume', 'kit', 'message', 'leave']
         && str(request.resource.data.page, 0, 20) && str(request.resource.data.country, 0, 120) && str(request.resource.data.city, 0, 120)
         && str(request.resource.data.tz, 0, 120) && str(request.resource.data.device, 0, 20) && str(request.resource.data.os, 0, 20)
         && str(request.resource.data.browser, 0, 20) && str(request.resource.data.ref, 0, 120) && str(request.resource.data.lang, 0, 20)
         && str(request.resource.data.vid, 0, 20) && request.resource.data.returning is bool && str(request.resource.data.world, 0, 20)
-        && str(request.resource.data.detail, 0, 120) && request.resource.data.at == request.time;
+        && str(request.resource.data.detail, 0, 120) && request.resource.data.at == request.time
+        && str(request.resource.data.get('region', ''), 0, 120) && str(request.resource.data.get('isp', ''), 0, 120)
+        && str(request.resource.data.get('lat', ''), 0, 12) && str(request.resource.data.get('lon', ''), 0, 12)
+        && str(request.resource.data.get('geo', ''), 0, 4) && str(request.resource.data.get('screen', ''), 0, 20)
+        && request.resource.data.get('secs', 0) is int && request.resource.data.get('secs', 0) >= 0 && request.resource.data.get('secs', 0) <= 86400
+        && request.resource.data.get('scroll', 0) is int && request.resource.data.get('scroll', 0) >= 0 && request.resource.data.get('scroll', 0) <= 100;
       allow read, delete: if isOwner();
     }
 

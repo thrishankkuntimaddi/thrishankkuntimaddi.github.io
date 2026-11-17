@@ -7,10 +7,11 @@ import { loadSDK, loadAuth, OWNER, KINDS } from '../lib/firebase.js?v=1';
 import { loadEngine, toSVG, download, toText, resumeFontCSS } from '../lib/resume.js?v=1';
 import { SEED } from '../lib/resume-seed.js?v=1';
 import { initWebsite } from './website.js?v=1';
-import { initDevices, forgetThisDevice } from './devices.js?v=1';
+import { initDevices, forgetThisDevice } from './devices.js?v=2';
 import { unlock, watchAway, lockOn, lockAvailable, setUpLock, removeLock } from './lock.js?v=1';
 import { initContent } from './content.js?v=1';
-import { initReports, showReports } from './reports.js?v=1';
+import { initReports, showReports } from './reports.js?v=2';
+import { isPdf, fileToB64, split, b64ToBytes, bytesToBlob, pageCount, renderInto, saveBlob, MAX_BYTES } from '../lib/resume-pdf.js?v=1';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -117,12 +118,12 @@ $('#signIn').addEventListener('click', async () => {
 });
 const signOut = async () => { await forgetThisDevice(); window.StudioNative?.signOut?.(); return A.auth.signOut(A.a).then(() => location.reload()); };
 // Signed out from another device: wipe what this device keeps and go back to the sign-in screen.
-async function revoked() {
+async function revoked(msg) {
   try { Object.keys(localStorage).filter((k) => /^(studio-|mp-lock)/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch { /* fine */ }
   window.StudioNative?.signOut?.();
   await A.auth.signOut(A.a).catch(() => {});
   $('#app').hidden = true; $('#gate').hidden = false; $('#signIn').hidden = false;
-  $('#gateMsg').textContent = 'This device was signed out from your account settings. Sign in again to use it.';
+  $('#gateMsg').textContent = typeof msg === 'string' ? msg : 'This device was signed out from your account settings. Sign in again to use it.';
 }
 $('#signOut').addEventListener('click', signOut);
 $('#signOutGate').addEventListener('click', signOut);
@@ -173,6 +174,8 @@ function show(v) {
 }
 $$('.side .nav-btn[data-view]').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
 $('#moreBtn').addEventListener('click', () => $('#moreDlg').showModal());
+$('#acctBtn').addEventListener('click', () => show('account'));
+$('#moreSignOut').addEventListener('click', () => { if (confirm('Sign out of myProfile on this device?')) signOut(); });
 $$('#moreDlg [data-go]').forEach((b) => b.addEventListener('click', () => { $('#moreDlg').close(); show(b.dataset.go); }));
 
 /* ================= Resume library =================
@@ -238,6 +241,23 @@ function drawLibrary() {
   $('#rzList').innerHTML = library.map((r) => {
     const isLive = r.id === published?.sourceId;
     const changed = isLive && published.json !== r.json;
+    const meta = pdfMeta(r);
+    if (meta) {
+      return `<li class="lib-item${isLive ? ' live' : ''}" data-id="${r.id}">
+      <button class="lib-open" type="button" data-lib="view">
+        <span class="lib-title">${esc(r.title)} <b class="lib-badge pdf">PDF</b>${isLive ? ` <b class="lib-badge">${changed ? 'On website · replaced since' : 'On website'}</b>` : ''}</span>
+        ${r.note ? `<span class="lib-note">${esc(r.note)}</span>` : ''}
+        <span class="lib-meta">${esc(meta.name)} · ${meta.pages ? `${meta.pages} page${meta.pages === 1 ? '' : 's'} · ` : ''}${Math.round(meta.size / 1024)} KB · Uploaded ${fmtDate(r.createdAt)}</span>
+      </button>
+      <span class="lib-actions">
+        <button class="btn sm" type="button" data-lib="view">View</button>
+        <button class="btn sm" type="button" data-lib="pdf">Download</button>
+        <button class="btn sm" type="button" data-lib="replace">Replace</button>
+        ${isLive && !changed ? '' : `<button class="btn sm" type="button" data-lib="publish">${isLive ? 'Update website' : 'Put on website'}</button>`}
+        ${isLive ? '' : '<button class="btn sm danger" type="button" data-lib="del">Delete</button>'}
+      </span>
+    </li>`;
+    }
     return `<li class="lib-item${isLive ? ' live' : ''}" data-id="${r.id}">
       <button class="lib-open" type="button" data-lib="open">
         <span class="lib-title">${esc(r.title)}${isLive ? ` <b class="lib-badge">${changed ? 'On website · edited since' : 'On website'}</b>` : ''}</span>
@@ -266,6 +286,10 @@ async function putOnWebsite(r) {
   const data = JSON.parse(json);
   if (DEMO) { published = { at: new Date(), json, sourceId: r.id, title: r.title }; return; }
   const batch = F.fs.writeBatch(F.db);
+  if (isPdf(data)) { // copy the file's parts where the website can read them
+    const parts = await pdfParts(r);
+    parts.forEach((p, n) => batch.set(F.fs.doc(F.db, 'site', `resumePdf${n}`), { data: JSON.stringify(p), title: r.title, sourceId: r.id, updatedAt: F.fs.serverTimestamp() }));
+  }
   batch.set(pubRef(), { data: json, title: r.title, sourceId: r.id, updatedAt: F.fs.serverTimestamp() });
   batch.set(F.fs.doc(F.fs.collection(F.db, 'versions')), { data: json, at: F.fs.serverTimestamp(), name: data.name || '', title: r.title, sourceId: r.id });
   await batch.commit();
@@ -273,7 +297,8 @@ async function putOnWebsite(r) {
 }
 
 $('#rzNew').addEventListener('click', async () => {
-  const base = library.find((r) => r.id === published?.sourceId) || library[0];
+  const editable = library.filter((r) => !pdfMeta(r));
+  const base = editable.find((r) => r.id === published?.sourceId) || editable[0];
   const title = prompt('Name for the new resume (e.g. “Frontend roles”, “Google SDE II”):', `New resume ${fmtDate(new Date())}`);
   if (title == null) return;
   try {
@@ -287,6 +312,7 @@ $('#rzList').addEventListener('click', async (e) => {
   const r = library.find((x) => x.id === li.dataset.id);
   const a = b.dataset.lib;
   try {
+    if (pdfMeta(r)) { await pdfAction(a, r); return; }
     if (a === 'open') openResume(r.id);
     else if (a === 'pdf') { await download(JSON.parse(r.json)); }
     else if (a === 'dup') { const t = prompt('Name for the copy:', `${r.title} (copy)`); if (t == null) return; await createResume(t.trim() || `${r.title} (copy)`, r.json, `Copy of “${r.title}”`); drawLibrary(); toast('Copied'); }
@@ -297,6 +323,94 @@ $('#rzList').addEventListener('click', async (e) => {
       library = library.filter((x) => x.id !== r.id); drawLibrary(); toast('Deleted');
     }
   } catch (err) { toast(err.code || err.message, 4000); }
+});
+
+/* ---------- Uploaded PDF resumes ----------
+   resumes/{id}.data = {"kind":"pdf",name,size,parts,pages}; the file in resumeFiles/{id}_{n}. */
+const pdfMeta = (r) => { try { const d = JSON.parse(r.json); return isPdf(d) ? d : null; } catch { return null; } };
+const pdfCache = new Map();
+async function pdfParts(r) {
+  const m = pdfMeta(r);
+  const key = `${r.id}:${r.json}`;
+  if (pdfCache.has(key)) return pdfCache.get(key);
+  if (DEMO) throw new Error('Not available in the demo');
+  const snaps = await Promise.all([...Array(m.parts)].map((_, n) => F.fs.getDoc(F.fs.doc(F.db, 'resumeFiles', `${r.id}_${n}`))));
+  const parts = snaps.map((x) => x.data()?.data || '');
+  if (parts.some((p) => !p)) throw new Error('Part of this PDF is missing. Upload it again.');
+  pdfCache.set(key, parts);
+  return parts;
+}
+const pdfBytes = async (r) => b64ToBytes((await pdfParts(r)).join(''));
+async function readPdfFile(file) {
+  if (!file) return null;
+  if (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) { toast('Choose a PDF file'); return null; }
+  if (file.size > MAX_BYTES) { toast(`That PDF is ${Math.round(file.size / 1024)} KB. The limit is ${Math.round(MAX_BYTES / 1024)} KB (export it again with smaller images).`, 5000); return null; }
+  const b64 = await fileToB64(file);
+  let pages = 0; try { pages = await pageCount(b64ToBytes(b64)); } catch { /* still fine */ }
+  const parts = split(b64);
+  return { parts, meta: { kind: 'pdf', name: file.name.slice(0, 100), size: file.size, parts: parts.length, pages, at: Date.now() } };
+}
+async function savePdf(id, f, base) {
+  const json = JSON.stringify(f.meta);
+  if (!DEMO) {
+    const batch = F.fs.writeBatch(F.db);
+    f.parts.forEach((p, n) => batch.set(F.fs.doc(F.db, 'resumeFiles', `${id}_${n}`), { data: p, updatedAt: F.fs.serverTimestamp() }));
+    batch.set(resRef(id), { ...base, data: json, updatedAt: F.fs.serverTimestamp(), ...(base.createdAt === undefined && base.note !== undefined ? { createdAt: F.fs.serverTimestamp() } : {}) }, { merge: true });
+    await batch.commit();
+  }
+  pdfCache.set(`${id}:${json}`, f.parts);
+  return json;
+}
+const pickPdf = () => new Promise((res) => {
+  const i = $('#rzFile'); i.value = '';
+  i.onchange = () => res(i.files[0] || null);
+  i.click();
+});
+$('#rzUpload').addEventListener('click', async () => {
+  const file = await pickPdf(); if (!file) return;
+  toast('Reading the PDF…');
+  try {
+    const f = await readPdfFile(file); if (!f) return;
+    if (f.meta.pages > 1 && !confirm(`This PDF has ${f.meta.pages} pages. Keep it anyway?`)) return;
+    const title = prompt('Name for this resume:', file.name.replace(/\.pdf$/i, '')); if (title == null) return;
+    const id = DEMO ? uid() : F.fs.doc(resumesCol()).id;
+    const json = await savePdf(id, f, { title: title.trim() || 'Uploaded resume', note: '' });
+    library.unshift({ id, title: title.trim() || 'Uploaded resume', note: '', createdAt: new Date(), updatedAt: new Date(), json });
+    drawLibrary(); toast('Uploaded. Tap “Put on website” to show it to visitors.', 3500);
+  } catch (e) { toast(e.code || e.message, 4000); }
+});
+async function pdfAction(a, r) {
+  const m = pdfMeta(r);
+  if (a === 'view' || a === 'open') {
+    const dlg = $('#pdfDlg'); const box = $('#pdfView');
+    $('#pdfTitle').textContent = r.title; box.innerHTML = '<p class="empty">Loading…</p>'; dlg.showModal();
+    dlg.dataset.id = r.id;
+    try { await renderInto(box, await pdfBytes(r)); } catch (e) { box.innerHTML = `<p class="empty">${esc(e.message)}</p>`; }
+  } else if (a === 'pdf') saveBlob(bytesToBlob(await pdfBytes(r)), m.name);
+  else if (a === 'replace') {
+    const file = await pickPdf(); if (!file) return;
+    const f = await readPdfFile(file); if (!f) return;
+    r.json = await savePdf(r.id, f, { title: r.title });
+    r.updatedAt = new Date(); drawLibrary();
+    toast(r.id === published?.sourceId ? 'Replaced. Tap “Update website” to show the new file.' : 'Replaced', 3500);
+  } else if (a === 'publish') {
+    if (!confirm(`Show “${r.title}” on the website? Visitors will see and download this PDF.`)) return;
+    await putOnWebsite(r); drawLibrary(); $('#pdfDlg').open && $('#pdfDlg').close(); toast('The website shows it now.');
+  } else if (a === 'del') {
+    if (!confirm(`Delete “${r.title}” for good? This can’t be undone.`)) return;
+    if (!DEMO) {
+      const batch = F.fs.writeBatch(F.db);
+      batch.delete(resRef(r.id));
+      for (let n = 0; n < m.parts; n++) batch.delete(F.fs.doc(F.db, 'resumeFiles', `${r.id}_${n}`));
+      await batch.commit();
+    }
+    library = library.filter((x) => x.id !== r.id); drawLibrary(); toast('Deleted');
+  }
+}
+$('#pdfDlg').addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-pdfdlg]'); if (!b) return;
+  const r = library.find((x) => x.id === $('#pdfDlg').dataset.id); if (!r) return;
+  try { await pdfAction(b.dataset.pdfdlg, r); } catch (err) { toast(err.code || err.message, 4000); }
 });
 
 function openResume(id) {
@@ -529,8 +643,8 @@ async function openVersions() {
   try {
     const q = F.fs.query(F.fs.collection(F.db, 'versions'), F.fs.orderBy('at', 'desc'), F.fs.limit(30));
     const snap = await F.fs.getDocs(q);
-    const rows = snap.docs.map((doc) => ({ id: doc.id, at: tsDate(doc.data().at), data: doc.data().data }));
-    ul.innerHTML = rows.length ? rows.map((r, i) => `<li><span>${r.at ? r.at.toLocaleString() : '—'}${i === 0 ? ' · current' : ''}</span><span><button class="btn sm" type="button" data-pdf="${r.id}">PDF</button> <button class="btn sm" type="button" data-restore="${r.id}">Copy into this resume</button></span></li>`).join('') : '<li>Nothing published yet.</li>';
+    const rows = snap.docs.map((doc) => ({ id: doc.id, at: tsDate(doc.data().at), data: doc.data().data, title: doc.data().title || '' }));
+    ul.innerHTML = rows.length ? rows.map((r, i) => isPdf(JSON.parse(r.data || 'null')) ? `<li><span>${r.at ? r.at.toLocaleString() : '—'}${i === 0 ? ' · current' : ''}</span><span class="legend">Uploaded PDF · ${esc(r.title)}</span></li>` : `<li><span>${r.at ? r.at.toLocaleString() : '—'}${i === 0 ? ' · current' : ''}</span><span><button class="btn sm" type="button" data-pdf="${r.id}">PDF</button> <button class="btn sm" type="button" data-restore="${r.id}">Copy into this resume</button></span></li>`).join('') : '<li>Nothing published yet.</li>';
     ul.onclick = (e) => {
       const id = e.target.dataset.restore || e.target.dataset.pdf; if (!id) return;
       const r = rows.find((x) => x.id === id); const data = JSON.parse(r.data);

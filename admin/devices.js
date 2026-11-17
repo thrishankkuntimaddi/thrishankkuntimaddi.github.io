@@ -45,6 +45,13 @@ export async function initDevices(ctx) {
   if (DEMO) { draw([{ id: me, ...d, lastSeen: new Date(), createdAt: new Date(Date.now() - 9e8) }, { id: 'x', name: 'Pixel 8', form: 'Phone', os: 'Android 16', browser: 'myProfile app', lastSeen: new Date(Date.now() - 3e6), createdAt: new Date(Date.now() - 2e9) }, { id: 'y', name: 'macOS desktop', form: 'Desktop', os: 'macOS', browser: 'Chrome', lastSeen: new Date(Date.now() - 4e8), createdAt: new Date(Date.now() - 3e9), signedOut: true }]); return; }
   const ref = F.fs.doc(F.db, 'devices', me);
   const signedInAt = Date.parse(ctx.user?.metadata?.lastSignInTime || '') || Date.now();
+  // "Sign out everywhere" (enforced by the database rules for every older sign-in)
+  try {
+    const sec = await F.fs.getDoc(F.fs.doc(F.db, 'private', 'security'));
+    const before = tsDate(sec.data()?.revokedBefore)?.getTime() || 0;
+    if (before && signedInAt <= before) { onRevoked(); return; }
+    drawSecurity(before);
+  } catch (e) { if (e.code === 'permission-denied') { onRevoked(); return; } }
   try {
     const snap = await F.fs.getDoc(ref);
     const v = snap.exists() ? snap.data() : null;
@@ -104,6 +111,26 @@ document.addEventListener('click', async (e) => {
     } catch (err) { toast(err.code || err.message); }
   }
 });
+function drawSecurity(before) {
+  const el = $('#everyStatus'); if (!el) return;
+  el.textContent = before ? `Last used ${new Date(before).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}.` : 'Never used.';
+}
+// Sign out everywhere: every device (listed or not, old app versions too) is refused by the
+// database until it signs in with Google again. This device signs in again straight after.
+document.addEventListener('click', async (e) => {
+  if (!e.target.closest('#devEverywhere')) return;
+  if (!confirm('Sign out everywhere?\n\nEvery phone, tablet and browser signed in to myProfile (including ones not listed here) loses access at once. You’ll sign in again on this device right after.')) return;
+  if (DEMO) { toast('Signed out everywhere (demo)'); return; }
+  try {
+    const batch = F.fs.writeBatch(F.db);
+    list.filter((r) => !r.signedOut).forEach((r) => batch.update(F.fs.doc(F.db, 'devices', r.id), { signedOut: true, signedOutAt: F.fs.serverTimestamp() }));
+    batch.set(F.fs.doc(F.db, 'private', 'security'), { revokedBefore: F.fs.serverTimestamp(), by: describe().name });
+    await batch.commit();
+    toast('Signed out everywhere');
+    onRevoked('Signed out everywhere. Sign in again to keep using myProfile on this device.');
+  } catch (err) { toast(err.code === 'permission-denied' ? 'Sign in again first (edits need a sign-in from the last 30 days)' : err.code || err.message, 4000); }
+});
+
 /** Forget this device's record (when signing out here). */
 export async function forgetThisDevice() {
   if (DEMO || !F) return;

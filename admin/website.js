@@ -2,7 +2,7 @@
    Studio → Website: control the live site from the app.
    Saved to site/config as JSON (public read, owner write).
    ========================================================= */
-import { DEFAULTS, withDefaults, effective } from '../lib/site-config.js?v=1';
+import { DEFAULTS, withDefaults, effective } from '../lib/site-config.js?v=2';
 import { BASE, LOOP, NAMES } from '../worlds.js?v=22';
 import { OCCASIONS } from '../content.js?v=22';
 
@@ -86,7 +86,8 @@ function draw() {
   </div></section>`);
 
   h.push(`<section class="card ws"><h2>Reports</h2><div class="card-body">
-    ${sw('reports.on', c.reports.on !== false, 'Collect visits', 'Anonymous: country from time zone, device, page, where they came from. No cookies or IP.')}
+    ${sw('reports.on', c.reports.on !== false, 'Collect visits', 'Anonymous: place, device, page, where they came from, time spent. No cookies; the IP address is never stored.')}
+    ${sw('reports.precise', c.reports.precise !== false, 'City, region and network', 'Looks up the visitor’s approximate city and internet provider from their IP with get.geojs.io (free). Off: only the country from their time zone.')}
   </div></section>`);
   $('#wsBody').innerHTML = h.join('');
   dirtyCheck();
