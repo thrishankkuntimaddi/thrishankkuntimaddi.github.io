@@ -424,28 +424,49 @@ if (!calm() && PREFS.pip !== false) {
   setTimeout(() => { face('happy'); say('Hi!', 2600); }, 2800);
   const GESTURES = ['wave', 'up', 'hips', 'point', 'shrug'];
   const gesture = (name) => { GESTURES.forEach((g) => pip.classList.remove(`g-${g}`)); pip.classList.add(`g-${name}`); };
-  const stopWalking = () => { // freeze exactly where Pip is standing
-    const here = innerWidth - pip.getBoundingClientRect().right - (innerWidth <= 560 ? 10 : 18);
-    at = -Math.max(0, here);
-    pip.style.setProperty('--pt', '0s'); pip.style.setProperty('--px', `${at.toFixed(0)}px`);
-    clearTimeout(walkT); pip.classList.remove('walking'); pip.style.setProperty('--face', '1');
+  // Pip's place on screen: --px (left of the bottom-right home, <= 0) and --py (up from it, >= 0).
+  let atY = 0;
+  const pipBase = () => (innerWidth <= 560 ? 70 : 16); // home distance from the bottom (above the phone tour pill)
+  const spans = () => ({ x: Math.max(60, innerWidth - pip.offsetWidth - 40), y: Math.max(0, innerHeight - pip.offsetHeight - pipBase() - 96) }); // stay below the nav
+  const bubbleSide = () => { // keep the speech bubble on screen wherever Pip is
+    const sp = spans();
+    pip.classList.toggle('say-down', atY > sp.y * 0.5);
+    pip.classList.toggle('say-right', -at > sp.x * 0.5);
   };
-  setInterval(() => { // Pip wanders the whole width of the window on foot. After a poke Pip rests a few seconds, then wanders again.
+  const stopWalking = () => { // freeze exactly where Pip is standing
+    const r = pip.getBoundingClientRect();
+    at = -Math.max(0, innerWidth - r.right - 18);
+    atY = Math.max(0, innerHeight - r.bottom - pipBase());
+    pip.style.setProperty('--pt', '0s'); pip.style.setProperty('--px', `${at.toFixed(0)}px`); pip.style.setProperty('--py', `${atY.toFixed(0)}px`);
+    clearTimeout(walkT); pip.classList.remove('walking'); pip.style.setProperty('--face', '1');
+    bubbleSide();
+  };
+  addEventListener('resize', () => { // a smaller window must not leave Pip off screen
+    const sp = spans();
+    at = Math.max(at, -sp.x); atY = Math.min(atY, sp.y);
+    pip.style.setProperty('--pt', '0s'); pip.style.setProperty('--px', `${at.toFixed(0)}px`); pip.style.setProperty('--py', `${atY.toFixed(0)}px`);
+    bubbleSide();
+  }, { passive: true });
+  setInterval(() => { // Pip wanders the whole screen on foot, corners included. After a poke Pip rests a few seconds, then wanders again.
     if (document.hidden || glitching || peeking || pip.classList.contains('walking') || root.classList.contains('at-final')) return;
     acts++;
     if (performance.now() > restUntil && Math.random() < (pokes ? 0.6 : 0.72)) {
-      const span = Math.max(60, innerWidth - pip.offsetWidth - 40);
-      const to = -Math.random() * span, d = Math.abs(to - at);
+      const sp = spans();
+      let tx, ty;
+      if (Math.random() < 0.45) { tx = Math.random() < 0.5 ? 0 : -sp.x; ty = Math.random() < 0.5 ? 0 : sp.y; } // a corner
+      else { tx = -Math.random() * sp.x; ty = Math.random() < 0.35 ? 0 : Math.random() * sp.y; } // anywhere, often the floor
+      const d = Math.hypot(tx - at, ty - atY);
       if (d > 60) {
         const secs = d / 95;
-        face(to < at ? 'left' : 'right');
-        pip.style.setProperty('--face', to < at ? '-1' : '1');
+        face(tx < at ? 'left' : 'right');
+        pip.style.setProperty('--face', tx < at ? '-1' : '1');
         pip.style.setProperty('--pt', `${secs.toFixed(2)}s`);
-        pip.style.setProperty('--px', `${to.toFixed(0)}px`);
+        pip.style.setProperty('--px', `${tx.toFixed(0)}px`);
+        pip.style.setProperty('--py', `${ty.toFixed(0)}px`);
         pip.classList.add('walking');
+        at = tx; atY = ty; bubbleSide();
         clearTimeout(walkT);
         walkT = setTimeout(() => { pip.classList.remove('walking'); pip.style.setProperty('--face', '1'); face(''); }, secs * 1000);
-        at = to;
         return;
       }
     }

@@ -1269,3 +1269,10 @@ ol.story-list li::before { counter-increment: dec; content: counter(dec); positi
   .find-list li { grid-template-columns: 1fr; gap: 2px; }
   .season-row, .pip-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* Pip roams the whole screen: --px moves it left from home, --py moves it up */
+.pip { --pb: 16px; bottom: calc(var(--pb) + var(--py, 0px)); transition: right var(--pt, 1s) linear, bottom var(--pt, 1s) linear; }
+@media (max-width: 560px) { .pip { --pb: 70px; } }
+.pip.say-down .pip-say { bottom: auto; top: calc(100% + 8px); border-radius: 12px 2px 12px 12px; transform-origin: 100% 0; }
+.pip.say-right .pip-say { right: auto; left: 6px; border-radius: 12px 12px 12px 2px; transform-origin: 0 100%; }
+.pip.say-down.say-right .pip-say { border-radius: 2px 12px 12px 12px; transform-origin: 0 0; }
