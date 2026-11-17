@@ -46,7 +46,12 @@ function drawRows() {
 $('#rows').addEventListener('click', (e) => {
   const b = e.target.closest('[data-row]'); if (!b) return;
   const r = ROWS.find((x) => x.key === b.dataset.row);
-  r.set(!r.on(prefs)); save(); drawRows();
+  r.set(!r.on(prefs)); save();
+  if (r.key === 'motion') { drawRows(); return; } // calm mode changes the notes on other rows
+  // flip in place so the knob slides instead of the row being redrawn
+  const on = r.on(prefs);
+  b.setAttribute('aria-checked', String(on));
+  b.querySelector('span').textContent = on ? 'On' : 'Off';
 });
 
 /* ---------------- Universes ---------------- */

@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=21">
+  <link rel="stylesheet" href="style.css?v=22">
 </head>
 <body class="settings-page">
   <header class="nav scrolled">
@@ -34,11 +34,14 @@
 
   <main>
     <section class="section set-hero">
-      <div class="wrap">
+      <div class="wrap set-hero-grid">
+        <div class="set-hero-copy">
         <p class="edition-tag"><span class="dot"></span> Free for your projects</p>
         <h1 class="set-title">Themes, prompts<br><em>and how you like it.</em></h1>
         <p class="set-lede">Every look I have built, packed so you can use it: 29 theme kits, each with a prompt to paste into your AI coding tool, a drop-in stylesheet, every token in a CSV, and the full spec. Below that, a help center, a way to reach me, and the switches for this site.</p>
         <nav class="set-jump" aria-label="On this page"><a class="btn btn-gloss btn-sm" href="#kits">Theme kits</a><a class="btn btn-paper btn-sm" href="#help">Help center</a><a class="btn btn-paper btn-sm" href="#prefs">Site settings</a><a class="btn btn-paper btn-sm" href="#universes">See the universes</a></nav>
+        </div>
+        <a class="hero-stack" id="heroStack" href="#kits" aria-label="Browse the theme kits"></a>
       </div>
     </section>
 
@@ -175,8 +178,8 @@
   </footer>
 
   <p class="set-saved" id="saved" role="status" aria-live="polite"></p>
-  <script type="module" src="universes.js?v=21"></script>
-  <script type="module" src="lib/kits-page.js?v=1"></script>
+  <script type="module" src="universes.js?v=22"></script>
+  <script type="module" src="lib/kits-page.js?v=2"></script>
   <script type="module" src="lib/contact.js?v=1"></script>
 </body>
 </html>
