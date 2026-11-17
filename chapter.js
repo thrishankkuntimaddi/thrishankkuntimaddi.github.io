@@ -8,7 +8,8 @@
    5. Traces: stickers on a wall + optional shared counts
    6. The 30-second version for people in a hurry
    ========================================================= */
-import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=19';
+import { playTune, projectName } from './tunes.js?v=20';
+import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=20';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const PIP_FACE = '<svg class="mini-pip" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><circle class="mp-body" cx="60" cy="62" r="44"/><ellipse class="mp-eye" cx="45" cy="56" rx="8" ry="11"/><ellipse class="mp-eye" cx="75" cy="56" rx="8" ry="11"/><circle class="mp-pupil" cx="46" cy="59" r="5"/><circle class="mp-pupil" cx="76" cy="59" r="5"/><path class="mp-mouth" d="M48 80q12 10 24 0"/></svg>';
@@ -128,6 +129,18 @@ export function initChapter(ctx) {
       setTimeout(() => say('Too much? Glitches and motion can be switched off. Settings are at the very bottom.', 5200), 3400);
     });
     mo.observe(gl, { attributes: true, attributeFilter: ['hidden'] });
+  }
+
+  // Each project plays its own short, quiet tune once when it comes into view (when sound is on).
+  if ('IntersectionObserver' in window && ctx.audio) {
+    const heard = new Set();
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+      if (!en.isIntersecting || document.documentElement.classList.contains('in-loop')) return;
+      const name = projectName(en.target);
+      if (!name || heard.has(en.target)) return;
+      heard.add(en.target); playTune(ctx.audio(), name);
+    }), { threshold: 0.6 });
+    $$('#work .project, #more .mini, .poelys-card').forEach((el) => io.observe(el));
   }
 
   // The final scene: remember it, and greet the game with their best score.

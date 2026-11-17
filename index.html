@@ -30,13 +30,28 @@
       var pr = {}; try { pr = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch (err) {}
       // Settings page choices (universes.html): a pinned edition or universe wins over the automatic one.
       d.dataset.edition = q ? q[1] : list.indexOf(pr.edition) >= 0 ? pr.edition : list[i];
-      var wl = ['paper', 'pixel', 'sketch', 'blueprint', 'news'], w = 0;
-      // The universe (fonts, shapes, wording): Paper on first open, the next one on every refresh.
-      try { var pw = parseInt(sessionStorage.getItem('tk-world'), 10); if (!isNaN(pw)) w = (pw + 1) % 5; sessionStorage.setItem('tk-world', String(w)); } catch (err) {}
-      var qw = /[?&]world=(paper|pixel|sketch|blueprint|news)/.exec(location.search);
-      d.dataset.world = qw ? qw[1] : wl.indexOf(pr.world) >= 0 ? pr.world : wl[w];
-      if (pr.motion === 'calm') d.classList.add('calm');
+      // The universe: normal Paper on the first open of a visit. Every refresh deals the next one from a shuffled
+      // deck of all 27 (kept for this tab only), so none repeats until all have shown. Must match worlds.js.
+      var base = ['paper', 'pixel', 'sketch', 'blueprint', 'news'];
+      var loop = ['core', 'space', 'future', 'robots', 'rage', 'joy', 'sad', 'retro', 'music', 'paint', 'box', 'village', 'city', 'sky', 'water', 'fire', 'ice', 'brick', 'racer', 'noir', 'glitch', 'mars'];
+      var all = base.concat(loop), w = 'paper';
+      try {
+        var cur = sessionStorage.getItem('tk-world');
+        if (cur !== null) {
+          if (all.indexOf(cur) < 0) cur = base[parseInt(cur, 10)] || 'paper'; // older visits stored a number
+          var bag = []; try { bag = JSON.parse(sessionStorage.getItem('tk-bag')) || []; } catch (err) {}
+          bag = bag.filter(function (x) { return all.indexOf(x) >= 0 && x !== cur; });
+          if (!bag.length) { bag = all.filter(function (x) { return x !== cur; }); for (var k = bag.length - 1; k > 0; k--) { var j = Math.floor(Math.random() * (k + 1)), tmp = bag[k]; bag[k] = bag[j]; bag[j] = tmp; } }
+          w = bag.shift();
+          sessionStorage.setItem('tk-bag', JSON.stringify(bag));
+        }
+        sessionStorage.setItem('tk-world', w);
+      } catch (err) {}
+      var qw = /[?&]world=([a-z]+)/.exec(location.search);
+      d.dataset.world = qw && all.indexOf(qw[1]) >= 0 ? qw[1] : all.indexOf(pr.world) >= 0 ? pr.world : w;
       if (d.dataset.world === 'sketch') d.classList.add('sketch');
+      if (loop.indexOf(d.dataset.world) >= 0) { d.setAttribute('data-dark', ''); d.setAttribute('data-loop', ''); }
+      if (pr.motion === 'calm') d.classList.add('calm');
       d.classList.add('js');
     })();
   </script>
@@ -45,7 +60,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=19">
+  <link rel="stylesheet" href="style.css?v=20">
 
   <script type="importmap">
     { "imports": {
@@ -625,6 +640,6 @@
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=19"></script>
+  <script type="module" src="main.js?v=20"></script>
 </body>
 </html>

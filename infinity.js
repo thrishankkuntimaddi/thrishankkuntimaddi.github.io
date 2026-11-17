@@ -9,8 +9,8 @@
    portfolio surface on the way. Quiet generated music.
    Loaded only when needed; drawn on one 2D canvas.
    ========================================================= */
-import { STORIES, EMAIL } from './content.js?v=19';
-import { PIP_WEAR } from './chapter.js?v=19';
+import { STORIES, EMAIL } from './content.js?v=20';
+import { PIP_WEAR } from './chapter.js?v=20';
 
 const TAU = Math.PI * 2;
 const rnd = (a = 1, b) => (b === undefined ? Math.random() * a : a + Math.random() * (b - a));
@@ -50,7 +50,7 @@ const parts = (n, f) => Array.from({ length: n }, (_, i) => f(i));
    a few lines for the story, and how to draw itself.
    draw(g, W, H, t, S, v) — S is this visit's state, v the speed.
    --------------------------------------------------------- */
-const U = {
+export const U = {
   core: {
     name: 'The Core', tag: 'The inside of this site. Every universe you passed is kept here.', emo: 'calm', music: 'core', font: 'display',
     lines: ['Welcome to the inside.', 'Every universe you passed is stored on these panels.', 'The loop resets. The year doesn’t.', 'Somewhere in here is the code for all of it.'],
@@ -513,15 +513,15 @@ function music(actx) {
 /* ---------------------------------------------------------
    Pip's feelings in the loop: extra marks drawn over Pip
    --------------------------------------------------------- */
-const EMO_SVG = '<g class="pip-emo">'
+export const EMO_SVG = '<g class="pip-emo">'
   + '<g class="e-tears"><path d="M42 64q-4 9 0 13 4-4 0-13z"/><path d="M78 64q-4 9 0 13 4-4 0-13z"/></g>'
   + '<g class="e-hearts"><path d="M20 22c-6-8 6-12 8-4 2-8 14-4 8 4l-8 8z"/><path d="M92 12c-4-6 4-9 6-3 2-6 10-3 6 3l-6 6z"/></g>'
   + '<g class="e-sweat"><path d="M96 34q-6 9 0 13 6-4 0-13z"/></g>'
   + '<g class="e-anger"><path d="M90 20q4 6 0 10M100 20q-4 6 0 10M88 22q6 4 14 0M88 28q6-4 14 0"/></g>'
   + '<g class="e-zz"><path d="M96 14h10l-10 10h10M108 2h7l-7 7h7"/></g>'
   + '</g>';
-const EMO_CLASS = { rage: 'angry e-rage', laugh: 'ex-happy e-laugh', cry: 'e-cry', love: 'ex-happy e-love', scared: 'ex-wow e-scared', cool: 'e-cool', wow: 'ex-wow', happy: 'ex-happy', sleepy: 'ex-sleepy e-sleepy', calm: 'ex-happy' };
-const TINT = { rage: '#ff5a5a', cry: '#6b8cff', love: '#ff8fb8', scared: '#a7f0ff', cool: '#ffd166', laugh: '#ffd166', sleepy: '#7fe0c3' };
+export const EMO_CLASS = { rage: 'angry e-rage', laugh: 'ex-happy e-laugh', cry: 'e-cry', love: 'ex-happy e-love', scared: 'ex-wow e-scared', cool: 'e-cool', wow: 'ex-wow', happy: 'ex-happy', sleepy: 'ex-sleepy e-sleepy', calm: 'ex-happy' };
+export const TINT = { rage: '#ff5a5a', cry: '#6b8cff', love: '#ff8fb8', scared: '#a7f0ff', cool: '#ffd166', laugh: '#ffd166', sleepy: '#7fe0c3' };
 
 /* ---------------------------------------------------------
    Enter the loop
@@ -530,7 +530,7 @@ let active = false;
 export function enter(ctx) {
   if (active) return; active = true;
   const root = document.documentElement;
-  if (!document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=19'; l.dataset.inf = '1'; document.head.append(l); }
+  if (!document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=20'; l.dataset.inf = '1'; document.head.append(l); }
   const glitchOn = ctx.PREFS?.glitch !== false;
 
   const el = document.createElement('div');
@@ -617,7 +617,7 @@ export function enter(ctx) {
 
   const hud = { d: $('.h-depth'), y: $('.h-year'), l: $('.h-loop'), n: $('.h-n') };
   function frame(now) {
-    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    const dt = Math.max(0, Math.min((now - last) / 1000, 0.05)); last = now; // a first frame can be stamped a hair early
     impulse *= Math.exp(-dt * 1.4);
     const v = Math.max(-0.7, Math.min(6, impulse)), speed = 1 + v;
     depth += dt * speed;
@@ -625,7 +625,7 @@ export function enter(ctx) {
     if (i !== idx) enterScene(i);
     const t = (now - t0) / 1000;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    try { U[scene.id].draw(g, W, H, t, S, Math.max(0, v), visited, music$.beat()); } catch (err) { console.warn('[loop]', scene.id, err); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
+    try { U[scene.id].draw(g, W, H, t, S, Math.max(0, v), visited, music$.beat()); } catch (err) { console.warn('[loop]', scene?.id, err); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
     hud.d.textContent = String(Math.floor(depth * 9)).padStart(4, '0');
     hud.y.textContent = String(new Date().getFullYear() + Math.floor(depth * 1.6 + (depth * depth) / 160));
     hud.l.textContent = String(Math.floor(idx / CORE_EVERY) + 1);

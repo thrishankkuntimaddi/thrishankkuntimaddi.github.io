@@ -5,6 +5,9 @@
    two glitches change the colours and reveal a final scene, and the
    3D gravity scenes change with each section.
    ========================================================= */
+import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=20';
+import { setWorldBg } from './worldbg.js?v=20';
+import { playTune, PROJECTS } from './tunes.js?v=20';
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -28,6 +31,7 @@ const UNIVERSES = {
   night:   { name: 'Mint edition',  bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#b4cfc7', planet: '#8f6bff', bloom: 0, light: true },
 };
 const edition = UNIVERSES[root.dataset.edition] ? root.dataset.edition : 'morning';
+let engineReady = false; // the 3D engine is created at the end of this file
 const settings = { universe: edition, accent: '', g: 1, speed: 1, trail: 0.8, glow: 1 };
 const SCENE_NAMES = { figure8: 'Figure-8', lagrange: 'Lagrange', binary: 'Binary', debris: 'Debris field', solar: 'Planetary', studio: 'Poelys', chaos: 'Chaos', pythagorean: 'Pythagorean' };
 
@@ -44,16 +48,9 @@ let visits = 1;
 try { visits = (parseInt(localStorage.getItem('tk-visits'), 10) || 0) + 1; localStorage.setItem('tk-visits', String(visits)); } catch { /* private mode */ }
 const hour = new Date().getHours();
 $('#greeting').textContent = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 22 ? 'Good evening' : 'Hello, night owl';
-/* Universes: each has its own fonts, component shapes (see style.css) and wording. */
-const WORLDS = ['paper', 'pixel', 'sketch', 'blueprint', 'news'];
-const WORLD_NAMES = { paper: 'Paper', pixel: 'Pixel', sketch: 'Sketch', blueprint: 'Blueprint', news: 'Newsprint' };
-const COPY = {
-  paper:     { h2: 'I design and build <em>interfaces</em>', h3: 'people enjoy using.', cta: 'See my projects', work: 'Projects', poelys: 'Poelys', more: 'More work', about: 'About me', contact: "Let's build something <em>people love</em>." },
-  pixel:     { h2: 'I build <em>interfaces</em>', h3: 'worth pressing START for.', cta: 'Start', work: 'Level 01: Projects', poelys: 'Home base: Poelys', more: 'Side quests', about: 'Player stats', contact: 'Insert coin. <em>Hire player 1.</em>' },
-  sketch:    { h2: 'I sketch <em>interfaces</em>,', h3: 'then build every line.', cta: 'Flip to my projects', work: 'The good pages', poelys: 'My studio, Poelys', more: 'Scribbles and side work', about: 'About the artist', contact: "Let's draw up something <em>people love</em>." },
-  blueprint: { h2: 'I engineer <em>interfaces</em>', h3: 'to spec, then make them human.', cta: 'Open the drawings', work: 'Fig. 01: Projects', poelys: 'Fig. 02: Poelys', more: 'Fig. 03: Further work', about: 'Spec sheet: me', contact: 'Request a build. <em>Tolerances: tight.</em>' },
-  news:      { h2: 'Developer builds <em>interfaces</em>', h3: 'people actually enjoy using.', cta: 'Read the full story', work: 'Front page: Projects', poelys: 'Business: Poelys', more: 'In other news', about: 'Profile', contact: 'Wanted: a team that <em>ships</em>.' },
-};
+/* Universes: 27 of them (worlds.js). Each has its own fonts, shapes and wording; the 22 from the
+   endless loop also turn the page dark and draw their scene behind it (worldbg.js). */
+const WORLDS = ALL, WORLD_NAMES = NAMES;
 const tagText = () => `${WORLD_NAMES[root.dataset.world] || 'Paper'} universe · ${UNIVERSES[settings.universe].name.replace(' edition', '')}${root.dataset.sky ? ` · ${root.dataset.sky}` : ''}`;
 function applyCopy(world) {
   const c = COPY[world] || COPY.paper;
@@ -65,13 +62,33 @@ function setWorld(name, save) {
   const anchor = viewSection(), before = anchor ? anchor.getBoundingClientRect().top : 0;
   root.dataset.world = name;
   root.classList.toggle('sketch', name === 'sketch');
+  markWorld(name);
   applyCopy(name);
   engine?.setPixelated(name === 'pixel');
   if (anchor) { const d = anchor.getBoundingClientRect().top - before; if (Math.abs(d) > 1) scrollTo(0, scrollY + d); } // keep the visitor's place when heights change
   tour.pos = scrollY;
-  if (save) { try { sessionStorage.setItem('tk-world', String(WORLDS.indexOf(name))); } catch { /* private mode */ } }
+  if (save) { try { sessionStorage.setItem('tk-world', name); } catch { /* private mode */ } }
+}
+// Dark pages, the hidden 3D scene and the drawn background for the 22 loop universes.
+function markWorld(name) {
+  const loop = isLoopWorld(name);
+  root.toggleAttribute('data-dark', loop); root.toggleAttribute('data-loop', loop);
+  if (engineReady) engine?.setPaused?.(loop);
+  const m = $('meta[name="theme-color"]'); if (m) m.content = loop ? getComputedStyle(root).getPropertyValue('--paper').trim() || '#000' : UNIVERSES[settings.universe].bg;
+  setWorldBg(name, calm());
+}
+// The next universe: a shuffled deck of all 27, kept for this tab only, so none repeats until all have shown.
+function nextWorld() {
+  let bag = [];
+  try { bag = JSON.parse(sessionStorage.getItem('tk-bag')) || []; } catch { /* private mode */ }
+  bag = bag.filter((w) => WORLDS.includes(w) && w !== root.dataset.world);
+  if (!bag.length) { bag = WORLDS.filter((w) => w !== root.dataset.world); for (let i = bag.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [bag[i], bag[j]] = [bag[j], bag[i]]; } }
+  const w = bag.shift();
+  try { sessionStorage.setItem('tk-bag', JSON.stringify(bag)); } catch { /* private mode */ }
+  return w;
 }
 if (!WORLDS.includes(root.dataset.world)) root.dataset.world = 'paper';
+markWorld(root.dataset.world);
 applyCopy(root.dataset.world);
 const EDITION_ORDER = ['morning', 'noon', 'dusk', 'night'];
 function setEdition(name) {
@@ -333,7 +350,7 @@ function glitch(ms, label, midpoint, settle) {
   if (peeking) stopPeek();
   const from = settings.universe, to = EDITION_ORDER[(EDITION_ORDER.indexOf(from) + 1) % EDITION_ORDER.length];
   playGlitchSound(ms);
-  const targetWorld = PREFS.world || settle || WORLDS[(WORLDS.indexOf(root.dataset.world) + 1) % WORLDS.length];
+  const targetWorld = PREFS.world || settle || nextWorld();
   let lastFlash = 0, flashes = 0;
   return new Promise((resolve) => {
     const targets = [$('#universe'), nav, viewSection()].filter(Boolean);
@@ -609,7 +626,7 @@ function storyTick() {
 if (/[?&]loop\b/.test(location.search) && !calm()) setTimeout(() => enterLoop(), 1500); // preview: open the loop straight away
 function enterLoop() {
   looping = true; tourPause(true);
-  import('./infinity.js?v=19').then((m) => m.enter({
+  import('./infinity.js?v=20').then((m) => m.enter({
     say, calm, PREFS,
     pipSvg: () => $('#pip svg')?.outerHTML || '',
     audio: () => { unlockSound(); return soundOn ? actx : null; },
@@ -668,7 +685,7 @@ const game = (() => {
   let items = [], px = 0, target = 0, spawnIn = 0.6, round = 0, played = 0, roundT = ROUND_SECS;                    // catch
   let ry = 0, rvy = 0, jumps = 0, obs = [], toks = [], dist = 0, bonus = 0, speed = 210, nextObs = 1.4, nextTok = 2.2, invul = 0; // run
   let best = 0; try { best = parseInt(localStorage.getItem('tk-best'), 10) || 0; } catch { /* private mode */ }
-  const css = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+  const css = (n) => getComputedStyle(cv).getPropertyValue(n).trim();
   const readCols = () => { col = { ink: css('--ink'), a: css('--accent'), a2: css('--accent-2'), a3: css('--accent-3'), tint: css('--tint') }; };
   const sayLine = (t) => { $('#gSay').textContent = t; };
   function hud() {
@@ -935,6 +952,22 @@ const FALL = [ // in falling order. Every project is its own universe; t = how l
   { name: 'Ms. Minutes', line: 'An AI desk companion with an animated face.', code: '8463', glyph: '◔', t: 560, world: 'pixel', ed: 'dusk', bits: ['tick', 'tock'] },
   { name: 'This website', line: 'The one you are falling through.', code: '4373', glyph: '▚', t: 400, world: 'sketch', ed: 'noon', bits: ['you', 'are', 'here'] },
 ];
+// The fall in order: each project in its own universe (tunes.js), and every other universe as a quick
+// flash in between, so all 27 show in about the same time as before.
+function fallPlan() {
+  const total = FALL.reduce((t, p) => t + p.t, 0), FLASH = 170;
+  const projects = FALL.map((p) => ({ ...p, world: PROJECTS[p.name]?.world || p.world }));
+  const used = new Set(projects.map((p) => p.world));
+  const rest = WORLDS.filter((w) => !used.has(w)).sort(() => Math.random() - 0.5);
+  const scale = Math.max(0.6, (total - rest.length * FLASH) / total);
+  const plan = [];
+  projects.forEach((p, i) => {
+    plan.push({ ...p, t: Math.round(p.t * scale) });
+    const gaps = projects.length - 1 - i;
+    if (gaps > 0) for (let k = Math.ceil(rest.length / gaps); k > 0 && rest.length; k--) plan.push({ flash: true, world: rest.shift(), ed: p.ed, t: FLASH });
+  });
+  return plan;
+}
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const fallEl = $('#fall'), fallStage = $('#fallStage'), fallTerm = $('#fallTerm');
 function pipMatrix() { // Pip as a flickering grid of 0s and 1s
@@ -1031,8 +1064,30 @@ async function quickJump(ev) {
 
   // 2. fall. Pip tumbles in the middle the whole way; the universes rush past and Pip is redrawn in each one's style
   const faller = $('#fallPip'), flash = $('#fallFlash'), windows = $$('.project .window');
-  faller.innerHTML = pip.querySelector('svg').outerHTML; faller.hidden = false; faller.className = 'fall-pip';
-  snd.riser(FALL.reduce((t, p) => t + p.t, 0) / 1000);
+  // Every universe shows on the way down: the projects in their own, the rest as quick flashes in between.
+  const [inf, chap] = await Promise.all([import('./infinity.js?v=20').catch(() => null), import('./chapter.js?v=20').catch(() => null)]);
+  if (inf && !document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=20'; l.dataset.inf = '1'; document.head.append(l); }
+  const plan = fallPlan();
+  faller.innerHTML = pip.querySelector('svg').outerHTML.replace('</svg>', `<g class="pip-wear">${chap?.PIP_WEAR || ''}</g>${inf?.EMO_SVG || ''}</svg>`);
+  faller.hidden = false; faller.className = 'fall-pip';
+  const actx$ = () => (soundOn ? actx : null);
+  // The scene of a dark universe is drawn behind the fall.
+  const bg = document.createElement('canvas'); bg.className = 'fall-bg'; fallEl.prepend(bg);
+  const bgc = bg.getContext('2d'); let bgWorld = '', bgS = {}, bgRaf = 0; const bgT0 = performance.now();
+  const sizeBg = () => { bg.width = innerWidth; bg.height = innerHeight; };
+  sizeBg();
+  const drawBg = (now) => { bgRaf = requestAnimationFrame(drawBg); if (!inf?.U?.[bgWorld]) { bgc.clearRect(0, 0, bg.width, bg.height); return; } try { inf.U[bgWorld].draw(bgc, bg.width, bg.height, (now - bgT0) / 1000, bgS, 2.5, [], 0.3); } catch { /* keep falling */ } };
+  bgRaf = requestAnimationFrame(drawBg);
+  const MOODS = ['wow', 'laugh', 'scared', 'happy', 'cool', 'love', 'wow', 'scared'];
+  const pose = (world, side) => { // Pip's face and place change with every universe
+    const emo = inf?.U?.[world]?.emo || MOODS[(Math.random() * MOODS.length) | 0];
+    faller.className = `fall-pip pip-loop emo ${inf?.EMO_CLASS?.[emo] || ''}`;
+    faller.dataset.getup = emo === 'cool' ? 'sun' : '';
+    if (inf?.TINT?.[emo]) faller.style.setProperty('--pip-tint', inf.TINT[emo]); else faller.style.removeProperty('--pip-tint');
+    faller.style.setProperty('--fx', `${(side < 0 ? 58 + Math.random() * 26 : 16 + Math.random() * 26).toFixed(1)}%`);
+    faller.style.setProperty('--fy', `${(26 + Math.random() * 46).toFixed(1)}%`);
+  };
+  snd.riser(plan.reduce((t, p) => t + p.t, 0) / 1000);
   const burst = (big) => { // a flash, a jolt and a spray of shards as we break into the next universe
     flash.animate([{ opacity: big ? 1 : 0.8 }, { opacity: 0 }], { duration: big ? 420 : 200, easing: 'ease-out' });
     fallStage.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${(Math.random() - 0.5) * 22}px,${(Math.random() - 0.5) * 22}px)` }, { transform: 'translate(0,0)' }], { duration: 170 });
@@ -1040,23 +1095,32 @@ async function quickJump(ev) {
     wrap.innerHTML = Array.from({ length: big ? 22 : 11 }, () => `<b style="--a:${(Math.random() * 360).toFixed(0)}deg;--s:${(22 + Math.random() * 90).toFixed(0)}px;--t:${(0.4 + Math.random() * 0.4).toFixed(2)}s;clip-path:polygon(${(Math.random() * 40).toFixed(0)}% 0,100% ${(30 + Math.random() * 50).toFixed(0)}%,${(Math.random() * 60).toFixed(0)}% 100%)"></b>`).join('');
     shards.appendChild(wrap); setTimeout(() => wrap.remove(), 900);
   };
-  for (const [n, p] of FALL.entries()) {
-    const side = n % 2 ? 1 : -1, fast = p.t < 900;
-    fallEl.dataset.edition = p.ed; fallEl.dataset.world = p.world;
-    faller.dataset.world = p.world; faller.dataset.edition = p.ed;
+  for (const [n, p] of plan.entries()) {
+    const side = n % 2 ? 1 : -1, fast = p.t < 900, loopW = isLoopWorld(p.world);
+    fallEl.dataset.edition = p.ed; fallEl.dataset.world = p.world; fallEl.toggleAttribute('data-dark', loopW);
+    faller.dataset.world = p.world; faller.dataset.edition = p.ed; faller.toggleAttribute('data-loop', loopW);
+    bgWorld = loopW ? p.world : ''; bgS = {};
+    pose(p.world, p.flash ? (Math.random() < 0.5 ? 1 : -1) : side);
     const scene = document.createElement('div');
-    scene.className = `fall-scene${p.world === 'sketch' ? ' sketch' : ''}${fast ? ' fast' : ''}`; scene.dataset.world = p.world; scene.dataset.edition = p.ed;
-    let preview = '';
-    if (p.win != null && windows[p.win]) { const c = windows[p.win].cloneNode(true); c.className = 'window'; c.querySelector('.note')?.remove(); preview = c.outerHTML; }
-    else preview = `<div class="window"><div class="win-bar"><i></i><i></i><i></i><span>${p.name.toUpperCase().replace(/[^A-Z]/g, '')}.SYS</span><b>LIVE</b></div><p class="fall-glyph">${p.glyph}</p></div>`;
-    const words = [p.name, `:${p.code}`, ...p.bits, ...p.bits];
-    scene.innerHTML = `<div class="fs-rings">${'<i></i>'.repeat(6)}</div><p class="fs-name">${p.name}</p><p class="fs-name b">${p.name}</p>`
-      + `<div class="fs-bits">${words.map((w, k) => `<i style="--a:${((k / words.length) * 360 + Math.random() * 25).toFixed(0)}deg;--d:${(-Math.random() * 1.1).toFixed(2)}s">${w}</i>`).join('')}</div>`
-      + `<div class="fall-card ${side < 0 ? 'L' : 'R'}"><div class="card fall-inner">${preview}<div class="fall-text"><p class="p-num">:${p.code}</p><h3>${p.name}</h3><p>${p.line}</p></div></div></div>`;
+    scene.className = `fall-scene${p.world === 'sketch' ? ' sketch' : ''}${fast ? ' fast' : ''}${p.flash ? ' flash' : ''}`; scene.dataset.world = p.world; scene.dataset.edition = p.ed;
+    if (loopW) { scene.setAttribute('data-loop', ''); scene.setAttribute('data-dark', ''); }
+    if (p.flash) scene.innerHTML = `<p class="fs-kicker">Universe</p><p class="fs-name">${WORLD_NAMES[p.world]}</p>`;
+    else {
+      let preview = '';
+      if (p.win != null && windows[p.win]) { const c = windows[p.win].cloneNode(true); c.className = 'window'; c.querySelector('.note')?.remove(); preview = c.outerHTML; }
+      else preview = `<div class="window"><div class="win-bar"><i></i><i></i><i></i><span>${p.name.toUpperCase().replace(/[^A-Z]/g, '')}.SYS</span><b>LIVE</b></div><p class="fall-glyph">${p.glyph}</p></div>`;
+      const words = [p.name, `:${p.code}`, ...p.bits, ...p.bits];
+      scene.innerHTML = `<div class="fs-rings">${'<i></i>'.repeat(6)}</div><p class="fs-name">${p.name}</p><p class="fs-name b">${p.name}</p>`
+        + `<div class="fs-bits">${words.map((w, k) => `<i style="--a:${((k / words.length) * 360 + Math.random() * 25).toFixed(0)}deg;--d:${(-Math.random() * 1.1).toFixed(2)}s">${w}</i>`).join('')}</div>`
+        + `<div class="fall-card ${side < 0 ? 'L' : 'R'}"><div class="card fall-inner">${preview}<div class="fall-text"><p class="p-num">:${p.code} · ${WORLD_NAMES[p.world]}</p><h3>${p.name}</h3><p>${p.line}</p></div></div></div>`;
+      playTune(actx$(), p.name, fast);
+    }
     fallStage.appendChild(scene);
-    if (n) burst();
-    snd.whoosh(Math.min(0.7, p.t / 1000), fast ? 0.35 : 0.55); if (n && !fast) snd.boom(0.35);
-    await scene.animate([
+    if (n && !p.flash) burst();
+    if (p.flash) snd.crack(); else { snd.whoosh(Math.min(0.7, p.t / 1000), fast ? 0.35 : 0.55); if (n && !fast) snd.boom(0.35); }
+    await scene.animate(p.flash ? [
+      { transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1)', opacity: 1, offset: 0.3 }, { transform: 'scale(2.6)', opacity: 0 },
+    ] : [
       { transform: `scale(.08) rotate(${side * -18}deg)`, opacity: 0, filter: 'blur(6px)', easing: 'cubic-bezier(.1,.8,.3,1)' },
       { transform: `scale(1) rotate(${side * -2}deg)`, opacity: 1, filter: 'blur(0px)', offset: fast ? 0.36 : 0.16, easing: 'linear' },
       { transform: `scale(1.18) rotate(${side * 3}deg)`, opacity: 1, filter: 'blur(0px)', offset: fast ? 0.64 : 0.86, easing: 'cubic-bezier(.7,0,.9,.4)' },
@@ -1064,6 +1128,8 @@ async function quickJump(ev) {
     ], { duration: p.t }).finished;
     scene.remove();
   }
+  cancelAnimationFrame(bgRaf); bg.remove(); fallEl.removeAttribute('data-dark');
+  faller.className = 'fall-pip'; faller.removeAttribute('data-loop'); faller.style.removeProperty('--fx'); faller.style.removeProperty('--fy');
 
   // 3. the crash landing, on an old amber CRT: Pip flickers into pixels, then a grid of digits, the crash screen, erased, redrawn, power off
   burst(true); snd.boom(1); snd.glass();
@@ -1093,6 +1159,7 @@ async function quickJump(ev) {
   snd.chime();
   await fallEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, easing: 'ease-out' }).finished;
   fallEl.hidden = true; fallEl.className = 'fall';
+  import('./dive.js?v=20').then((m) => m.startDive({ calm, say })).catch(() => {}); // the second scroll dives into each project
   falling = false; pendingNormal = true; jumped = true; tour.done = false; tour.held = false; tour.pos = 0; tour.resumeAt = performance.now() + 2500;
   say('Phew. Home again.', 3200);
 }
@@ -1103,8 +1170,8 @@ $('#jumpBtn').addEventListener('click', quickJump);
    Ask Pip, seasons, stickers and the 30-second version.
    Loaded separately, so the site above never depends on it.
    --------------------------------------------------------- */
-import('./chapter.js?v=19').then((m) => m.initChapter({
-  root, $, $$, calm, say, pip, visits, tourPause, snd, setMenu,
+import('./chapter.js?v=20').then((m) => m.initChapter({
+  root, $, $$, calm, say, pip, visits, tourPause, snd, setMenu, audio: () => (soundOn ? actx : null),
   refreshTag: () => { $('#editionText').textContent = tagText(); },
   openResume: () => $('[data-resume]')?.click(),
 })).catch((err) => console.warn('[chapter]', err));
@@ -1131,6 +1198,8 @@ try {
 
 // A refresh arrives glitching, then settles. It starts once the 3D scene is ready, so the effect is not cut short.
 engine?.setPixelated(root.dataset.world === 'pixel');
+engineReady = true;
+engine?.setPaused(isLoopWorld(root.dataset.world));
 if (root.dataset.reload && !calm()) requestAnimationFrame(() => glitch(1700, '', null, root.dataset.world));
 
 /* =========================================================
@@ -1683,8 +1752,10 @@ function createEngine(THREE, PP) {
     if (uni().bloom * settings.glow > 0.01) composer.render(); else renderer.render(scene, camera);
   }
 
+  let paused = false; // the 22 loop universes draw their own background, so the 3D scene rests
   function loop(now) {
     if (!running) return;
+    if (paused) { last = now; rafId = requestAnimationFrame(loop); return; }
     const dt = Math.max(0, Math.min((now - last) / 1000, 0.1));
     last = now;
 
@@ -1728,6 +1799,7 @@ function createEngine(THREE, PP) {
 
   return {
     setPixelated,
+    setPaused(on) { paused = on; needsRender = true; },
     get sceneName() { return sceneName; },
     get seed() { return seed; },
     setUniverse: setUniverseGL,

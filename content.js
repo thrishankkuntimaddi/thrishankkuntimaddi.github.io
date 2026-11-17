@@ -16,6 +16,7 @@ export const EMAIL = 'thrishankkuntimaddi@gmail.com';
 
 // Newest first. `v` must go up by one with every entry.
 export const CHANGELOG = [
+  { v: 5, date: '2026-11-17', items: ['27 universes now: every refresh deals a new one, no repeats until you have seen them all', 'The quick jump falls through all 27, with every project’s own tune', 'After the quick jump, scroll again to dive into each project in 3D'] },
   { v: 4, date: '2026-11-17', items: ['Pip falls, jumps, flies, changes colour and dresses up', 'Something new lives below the bottom of the page…'] },
   { v: 3, date: '2026-11-17', items: ['Universes & settings: see every look, and switch off glitches, motion or sound', 'Tap Pip to ask a question'] },
   { v: 2, date: '2026-11-18', items: ['The story behind each project', 'Ask Pip anything', 'A wall for your stickers', 'The site now follows the seasons and the moon'] },

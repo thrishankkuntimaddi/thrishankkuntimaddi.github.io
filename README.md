@@ -22,6 +22,10 @@ A light, pencil-sketch portfolio with retro space styling that runs itself.
 - **Universes & settings (`universes.html`, linked in the footer):** live previews of every universe, colour edition, season, occasion outfit and Pip level, plus switches for calm mode, glitches, sound, the auto-tour, Pip and seasonal effects, and pinning a favourite universe or colour. Saved in the visitor's browser (`tk-prefs`) and read by the main site on load.
 - **The endless loop (`infinity.js`, `infinity.css`):** after the quick jump, reaching the very end again opens a dark, cinematic, never-ending fall through 22 universes (deep space, Year 3000, robots, rage, joy, rain, retro, the beat, paint, box, village, night city, sky, the deep, fire, ice, brick, toy racer, noir, the glitch, planet fall) with the Core (glowing particle network, golden light, glass panels of every universe passed) every seventh. Pip feels each one, pieces of the portfolio arrive as transmissions, subtitles tell a random action story, and quiet music is generated per universe. Scroll to fly faster, Esc or “Wake up” to return. Preview with `?loop`.
 - **Pip:** keeps to the corners, side margins and floor; falls going down, jumps or flies going up; changes colour and get-up now and then.
+- **27 page universes (`worlds.js`, `worldbg.js`):** the 5 light ones plus the 22 from the endless loop as dark pages, each with its own fonts, colours, wording and its scene drawn softly behind the content (cards stay light paper). The first open is normal Paper in the time-of-day colours; every refresh deals the next universe from a shuffled deck kept for that tab only, so none repeats until all 27 have shown, and closing the tab starts fresh. Preview any with `?world=fire`.
+- **Quick jump through all 27:** each project falls past in its own universe with its own short tune (`tunes.js`), the other universes flash between them, and Pip changes face and place in every one.
+- **The dive (`dive.js`):** after the quick jump, scrolling down again turns each main project into its own universe, flying in from deep space in 3D, settling in front of you, then diving past.
+- **Project tunes:** every project plays a short, quiet tune once when it scrolls into view (when sound is on).
 - Works on phones, respects reduced motion (no tour, no animation), and still shows all content without WebGL.
 
 ## Stack
@@ -33,6 +37,10 @@ index.html   page and content
 style.css    edition tokens, cards, glass windows, stickers, auto-tour pill
 main.js      editions, auto-tour, reveals + the WebGL engine
 universes.js the Universes & settings page
+worlds.js    the 27 universes (names, wording); tokens at the end of style.css
+worldbg.js   the scene behind the page in the 22 loop universes
+tunes.js     each project's universe and signature tune
+dive.js      the 3D project dive after the quick jump
 infinity.js  the endless loop (loaded only when reached)
 chapter.js   memory, stories, Ask Pip, seasons, sticker wall, 30-second version
 content.js   the words for chapter.js (easy to edit)

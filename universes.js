@@ -4,8 +4,10 @@
    visitor's choices in localStorage 'tk-prefs', which
    index.html, main.js and chapter.js read on load.
    ========================================================= */
-import { OCCASIONS } from './content.js?v=19';
-import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=19';
+import { OCCASIONS } from './content.js?v=20';
+import { LOOP, NAMES, COPY } from './worlds.js?v=20';
+import { U as LOOP_SCENES } from './infinity.js?v=20';
+import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=20';
 
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
@@ -55,6 +57,8 @@ const WORLDS = [
   { id: 'blueprint', name: 'Blueprint', fonts: 'Space Mono, ink blue', about: 'Engineering drawings: thin blue lines, figures and specs.', h: 'I engineer <em>interfaces</em> to spec, then make them human.', cta: 'Open the drawings' },
   { id: 'news', name: 'Newsprint', fonts: 'Georgia, Space Mono', about: 'A broadsheet: double rules, headlines and small caps.', h: 'Developer builds <em>interfaces</em> people actually enjoy using.', cta: 'Read the full story' },
 ];
+// The 22 universes from the endless loop: dark pages with their scene behind them.
+LOOP.forEach((id) => WORLDS.push({ id, name: NAMES[id], dark: true, fonts: 'A dark page, with its scene drawn behind it', about: LOOP_SCENES[id]?.tag || '', h: `${COPY[id].h2} ${COPY[id].h3}`, cta: COPY[id].cta }));
 const EDITIONS = [
   { id: 'morning', name: 'Coral', when: '5 am – 11 am' },
   { id: 'noon', name: 'Sky', when: '11 am – 5 pm' },
@@ -66,7 +70,7 @@ function drawUniverses() {
   $('#uniGrid').innerHTML = WORLDS.map((w) => {
     const pinned = prefs.world === w.id;
     return `<article class="uni${pinned ? ' pinned' : ''}">`
-      + `<div class="mini-site${w.id === 'sketch' ? ' sketch' : ''}" data-world="${w.id}" data-edition="${previewEd}" aria-hidden="true">`
+      + `<div class="mini-site${w.id === 'sketch' ? ' sketch' : ''}" data-world="${w.id}" data-edition="${previewEd}"${w.dark ? ' data-dark data-loop' : ''} aria-hidden="true">`
       + '<div class="ms-nav"><span class="brand-mark">TK</span><i></i><i></i><i></i></div>'
       + `<p class="edition-tag"><span class="dot"></span> ${w.name} universe</p>`
       + `<p class="ms-title">${w.h}</p>`
