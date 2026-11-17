@@ -15,16 +15,17 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://thrishankkuntimaddi.github.io/assets/og.jpg">
 
-  <!-- The edition (a light colour palette) changes automatically on every page load, before first paint -->
+  <!-- The edition (a light colour palette) follows local time on first open and changes on every refresh -->
   <script>
     (function () {
-      var d = document.documentElement, list = ['morning', 'noon', 'dusk', 'night'], i = 0;
-      // A different edition on every load: step to the next one each time, starting from a random one.
+      var d = document.documentElement, list = ['morning', 'noon', 'dusk', 'night'], h = new Date().getHours();
+      // First open: the edition that matches the visitor's local time. Every refresh after that: the next one.
+      var i = h >= 5 && h < 11 ? 0 : h >= 11 && h < 17 ? 1 : h >= 17 && h < 21 ? 2 : 3;
       try {
-        var prev = parseInt(localStorage.getItem('tk-edition'), 10);
-        i = isNaN(prev) ? Math.floor(Math.random() * 4) : (prev + 1) % 4;
-        localStorage.setItem('tk-edition', String(i));
-      } catch (err) { i = Math.floor(Math.random() * 4); }
+        var prev = parseInt(sessionStorage.getItem('tk-edition'), 10);
+        if (!isNaN(prev)) i = (prev + 1) % 4;
+        sessionStorage.setItem('tk-edition', String(i));
+      } catch (err) {}
       var q = /[?&]edition=(morning|noon|dusk|night)/.exec(location.search);
       d.dataset.edition = q ? q[1] : list[i];
       d.classList.add('js');
@@ -75,6 +76,7 @@
   <main>
     <!-- ============ COVER ============ -->
     <section class="hero" id="hero" data-scene="figure8">
+      <svg class="doodle d1 gut" aria-hidden="true" focusable="false"><use href="#d-saturn"/></svg><svg class="doodle d2" aria-hidden="true" focusable="false"><use href="#d-sparkle"/></svg><svg class="doodle d3 gut" aria-hidden="true" focusable="false"><use href="#d-sparkle"/></svg>
       <div class="wrap hero-grid">
         <div class="hero-copy">
           <p class="edition-tag"><span class="dot"></span> <span id="editionText">Coral edition</span> · <span id="visitText">Visit №1</span></p>
@@ -128,6 +130,7 @@
 
     <!-- ============ 01 PROJECTS ============ -->
     <section id="work" class="section">
+      <svg class="doodle d4 gut" aria-hidden="true" focusable="false"><use href="#d-rocket"/></svg><svg class="doodle d5 gut" aria-hidden="true" focusable="false"><use href="#d-moon"/></svg><svg class="doodle d6 gut" aria-hidden="true" focusable="false"><use href="#d-comet"/></svg><svg class="doodle d7 gut" aria-hidden="true" focusable="false"><use href="#d-sparkle"/></svg>
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">01</span>
@@ -149,6 +152,7 @@
               </div>
             </div>
             <p class="win-tag">Three people.<br>One conversation.</p>
+            <p class="note note-b">coded by hand, not a screenshot</p>
           </div>
           <div class="card project-card reveal">
             <p class="p-num">Project 01</p>
@@ -261,6 +265,7 @@
 
     <!-- ============ 02 POELYS ============ -->
     <section id="poelys" class="section" data-scene="studio">
+      <svg class="doodle d8 gut" aria-hidden="true" focusable="false"><use href="#d-planet"/></svg><svg class="doodle d9" aria-hidden="true" focusable="false"><use href="#d-sparkle"/></svg>
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">02</span>
@@ -285,6 +290,18 @@
             <p class="win-tag">Still building.<br>Always.</p>
           </div>
         </div>
+
+        <div class="worlds reveal">
+          <p class="readout" aria-hidden="true"><span>REF 2031-K</span><span>POELYS SECTOR</span><span>KNOWN UNIVERSES : 06</span><span>ALL SIGNALS LIVE</span><span>ORBITS STABLE</span></p>
+          <ul>
+            <li><a href="https://oruinwan.poelys.com" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-18 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="0.0s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0001</i><b>Oruinwan</b></span></a></li>
+            <li><a href="https://expensetracker-in.web.app/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(12 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-1.3s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0002</i><b>Expense Tracker</b></span></a></li>
+            <li><a href="https://sentinelflight.poelys.com/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-6 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-2.6s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0003</i><b>SentinelFlight</b></span></a></li>
+            <li><a href="https://www.learnvianotes.in/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(20 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-3.9s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0004</i><b>LearnViaNotes</b></span></a></li>
+            <li><a href="https://yormenu.poelys.com/" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(-14 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-5.2s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0005</i><b>YorMenu</b></span></a></li>
+            <li><a href="https://app.parla.poelys.com/welcome" target="_blank" rel="noopener"><svg class="globe" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g transform="rotate(8 50 50)"><circle cx="50" cy="50" r="40"/><ellipse cx="50" cy="50" rx="40" ry="13"/><ellipse cx="50" cy="31" rx="35" ry="9"/><ellipse cx="50" cy="69" rx="35" ry="9"/><ellipse cx="50" cy="50" rx="40" ry="40"><animate attributeName="rx" values="40;0;40" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="0" ry="40"><animate attributeName="rx" values="0;40;0" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse><ellipse cx="50" cy="50" rx="28" ry="40"><animate attributeName="rx" values="28;28;0;28;28" keyTimes="0;.2;.5;.8;1" dur="9s" begin="-6.5s" repeatCount="indefinite"/></ellipse></g></svg><span class="plaque"><i>:U-0006</i><b>Parla</b></span></a></li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -292,6 +309,7 @@
 
     <!-- ============ 03 MORE WORK ============ -->
     <section id="more" class="section" data-scene="chaos" data-frame="corner">
+      <svg class="doodle d10 gut" aria-hidden="true" focusable="false"><use href="#d-ufo"/></svg><svg class="doodle d11 gut" aria-hidden="true" focusable="false"><use href="#d-sparkle"/></svg>
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">03</span>
@@ -341,6 +359,7 @@
 
     <!-- ============ 04 ABOUT ============ -->
     <section id="about" class="section" data-scene="pythagorean" data-frame="corner">
+      <svg class="doodle d12 gut" aria-hidden="true" focusable="false"><use href="#d-sat"/></svg><svg class="doodle d13 gut" aria-hidden="true" focusable="false"><use href="#d-moon"/></svg>
       <div class="wrap">
         <header class="sec-head reveal">
           <span class="sec-num">04</span>
@@ -377,8 +396,8 @@
           <div class="card list-card reveal">
             <h3>Path</h3>
             <ul>
-              <li><b>Now</b>Building products at Poelys</li>
-              <li><b>2025 –</b>Software Development Engineer, Chttrix</li>
+              <li><b>Now</b>Building Oruinwan, my own product, to close a gap I saw in how teams work</li>
+              <li><b>2025 –</b>Running Poelys, my product studio</li>
               <li><b>2023</b>Data Science &amp; Machine Learning internship</li>
               <li><b>2022</b>AI with Python internship</li>
               <li><b>2021 – 25</b>B.Tech, Computer Science (Data Science), MITS Madanapalle</li>
@@ -390,6 +409,7 @@
 
     <!-- ============ 05 CONTACT ============ -->
     <section id="contact" class="section contact" data-scene="figure8" data-frame="top">
+      <svg class="doodle d14 gut" aria-hidden="true" focusable="false"><use href="#d-comet"/></svg><svg class="doodle d15 gut" aria-hidden="true" focusable="false"><use href="#d-sparkle"/></svg>
       <div class="wrap">
         <div class="card contact-card reveal">
           <span class="sec-num">05</span>
@@ -411,6 +431,37 @@
       </div>
     </section>
   </main>
+
+  <!-- ============ POST-CREDITS SCENE (revealed by a glitch when the visitor reaches the end) ============ -->
+  <section id="post" class="section post" data-scene="chaos">
+      <svg class="doodle d16 gut" aria-hidden="true" focusable="false"><use href="#d-rocket"/></svg><svg class="doodle d17 gut" aria-hidden="true" focusable="false"><use href="#d-saturn"/></svg>
+    <div class="wrap">
+      <div class="post-screen reveal">
+        <p class="readout" aria-hidden="true"><span>SIGNAL RECOVERED</span><span>END OF TOUR</span><span>SCENE 02</span><span>ORBITS UNSTABLE</span><span>REF 2031-K</span></p>
+        <svg class="converge" viewBox="0 0 1200 360" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d="M0 20L330 150M0 340L300 230M1200 30L880 150M1200 330L900 235M420 0L470 110M800 0L740 105M380 360L450 262M830 360L760 262"/>
+          <path class="wave a" d="M560 0c-40 60 50 70 10 128"/><path class="wave b" d="M690 360c50-50-40-70 0-124"/>
+        </svg>
+        <p class="post-stencil">POST-CREDITS SCENE.</p>
+      </div>
+      <h2 class="post-title">You stayed till the end. <em>Most people don't.</em></h2>
+      <p class="post-sub">So here is the part of the site nobody else sees. It plays by itself. Join in only if you feel like it.</p>
+      <div class="post-grid">
+        <div class="window portal play reveal" id="playWindow" role="button" tabindex="0" aria-label="Gravity sandbox. It runs on its own. Press Enter or tap to drop a star yourself.">
+          <div class="win-bar"><i></i><i></i><i></i><span>SANDBOX.SYS</span><b>LIVE</b></div>
+          <p class="play-hint" id="playHint">Dropping stars by itself…</p>
+          <p class="play-count">Stars in orbit <b id="starCount">5</b></p>
+        </div>
+        <div class="post-actions">
+          <button class="card act reveal" type="button" data-act="shake"><span class="act-ico" aria-hidden="true">✷</span><b>Shake the universe</b><span>Knock every orbit off course and watch which star escapes.</span></button>
+          <button class="card act reveal" type="button" data-act="jump"><span class="act-ico" aria-hidden="true">◐</span><b>Jump to another universe</b><span>Glitch the whole site into its next colour edition.</span></button>
+          <button class="card act reveal" type="button" data-act="replay"><span class="act-ico" aria-hidden="true">↻</span><b>Watch the tour again</b><span>Back to the top, hands off.</span></button>
+          <a class="card act reveal" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume data-resume-slot hidden><span class="act-ico" aria-hidden="true">↓</span><b>Take my resume</b><span>Preview it, then download the PDF.</span></a>
+          <a class="card act reveal" href="mailto:thrishankkuntimaddi@gmail.com"><span class="act-ico" aria-hidden="true">✉</span><b>Say hello</b><span>The fastest way to reach me.</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <footer class="footer">
     <div class="wrap footer-inner">
@@ -442,6 +493,37 @@
     <span class="tour-txt" id="tourTxt">Auto-tour</span>
     <span class="tour-bar" aria-hidden="true"><i id="tourBar"></i></span>
   </button>
+
+  <!-- Glitch effect: an SVG filter that tears rows sideways and splits the colour channels, plus flickering bars -->
+  <svg class="fx-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <!-- Pencil wobble: makes straight CSS borders and SVG strokes look hand-drawn -->
+    <filter id="sketch" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)"><line x1="0" y1="3" x2="6" y2="3" stroke="currentColor" stroke-width="1" opacity=".55"/></pattern>
+    <symbol id="d-saturn" viewBox="0 0 150 120"><ellipse cx="75" cy="60" rx="64" ry="15" transform="rotate(-18 75 60)"/><circle cx="75" cy="60" r="30" class="fill"/><path d="M96 82a30 30 0 0 0 6-36c2 20-10 34-30 42 8 3 17 1 24-6z" fill="url(#hatch)" stroke="none"/><path d="M47 52c8-10 22-18 40-22M46 62c14-12 34-22 56-26" opacity=".6"/><path d="M12 79c20 8 96-18 127-39" /></symbol>
+    <symbol id="d-moon" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" class="fill"/><path d="M82 84a40 40 0 0 0 10-45c1 26-14 44-40 54 11 3 22 0 30-9z" fill="url(#hatch)" stroke="none"/><circle cx="42" cy="40" r="8"/><circle cx="66" cy="58" r="5"/><circle cx="38" cy="68" r="6"/><circle cx="62" cy="32" r="3"/></symbol>
+    <symbol id="d-rocket" viewBox="0 0 90 150"><path d="M45 8c20 24 22 58 16 88H29C23 66 25 32 45 8z" class="fill"/><circle cx="45" cy="50" r="9"/><path d="M29 74L10 104l20-8M61 74l19 30-20-8"/><path d="M30 96h30" /><path d="M36 100q5 16-2 26M45 100q3 22 0 40M54 100q-5 16 2 26" opacity=".8"/><path d="M52 22c6 10 8 22 8 34" fill="none" opacity=".5"/></symbol>
+    <symbol id="d-comet" viewBox="0 0 160 90"><circle cx="128" cy="30" r="14" class="fill"/><path d="M119 40a14 14 0 0 0 20-4c-4 8-12 10-20 4z" fill="url(#hatch)" stroke="none"/><path d="M114 36L18 74M118 44L52 80M112 28L40 50M110 22L76 30" /></symbol>
+    <symbol id="d-ufo" viewBox="0 0 140 110"><path d="M48 44a22 20 0 0 1 44 0" class="fill"/><ellipse cx="70" cy="50" rx="52" ry="13" class="fill"/><circle cx="44" cy="51" r="2.5"/><circle cx="70" cy="55" r="2.5"/><circle cx="96" cy="51" r="2.5"/><path d="M50 66L36 104M90 66l14 38M70 68v36" stroke-dasharray="5 6" opacity=".7"/></symbol>
+    <symbol id="d-planet" viewBox="0 0 160 150"><ellipse cx="80" cy="75" rx="70" ry="26" transform="rotate(20 80 75)" stroke-dasharray="4 7" opacity=".7"/><circle cx="80" cy="75" r="28" class="fill"/><path d="M60 66c8-6 14 2 22-2s10-10 18-6M58 82c10 2 12 8 22 6s14-4 20 2" opacity=".7"/><path d="M100 96a28 28 0 0 0 6-34c1 18-10 30-28 38 8 3 16 1 22-4z" fill="url(#hatch)" stroke="none"/><circle cx="142" cy="96" r="7" class="fill"/></symbol>
+    <symbol id="d-sparkle" viewBox="0 0 44 44"><path d="M22 3q2 17 19 19-17 2-19 19-2-17-19-19 17-2 19-19z" class="fill"/></symbol>
+    <symbol id="d-sat" viewBox="0 0 150 90"><rect x="58" y="30" width="34" height="28" rx="4" class="fill"/><rect x="10" y="33" width="42" height="22" class="fill"/><rect x="98" y="33" width="42" height="22" class="fill"/><path d="M24 33v22M38 33v22M112 33v22M126 33v22M10 44h42M98 44h42M52 44h6M92 44h6"/><path d="M75 30V14"/><circle cx="75" cy="10" r="4"/><path d="M66 70q9 8 18 0M60 78q15 12 30 0" opacity=".6"/></symbol>
+    <filter id="glitchFx" x="-6%" y="-2%" width="112%" height="104%" color-interpolation-filters="sRGB">
+      <feTurbulence id="gNoise" type="fractalNoise" baseFrequency="0.0001 0.08" numOctaves="1" seed="3" result="noise"/>
+      <feColorMatrix in="noise" type="matrix" values="1 0 0 0 0  0 0 0 0 0.5  0 0 0 0 0  0 0 0 0 1" result="rows"/>
+      <feDisplacementMap id="gDisp" in="SourceGraphic" in2="rows" scale="0" xChannelSelector="R" yChannelSelector="G" result="torn"/>
+      <feOffset id="gR" in="torn" dx="0" result="rs"/>
+      <feColorMatrix in="rs" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="rc"/>
+      <feOffset id="gB" in="torn" dx="0" result="bs"/>
+      <feColorMatrix in="bs" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="bc"/>
+      <feColorMatrix in="torn" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="gc"/>
+      <feBlend in="rc" in2="gc" mode="screen" result="rg"/>
+      <feBlend in="rg" in2="bc" mode="screen"/>
+    </filter>
+  </svg>
+  <div class="glitch-layer" id="glitchLayer" hidden aria-hidden="true"><div id="glitchBars"></div><p id="glitchText">POST-CREDITS SCENE</p></div>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <script type="module" src="main.js"></script>

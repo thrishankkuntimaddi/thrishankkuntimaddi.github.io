@@ -1,7 +1,8 @@
 /* =========================================================
    Thrishank Kuntimaddi: portfolio
-   Everything here is automatic: the colour edition changes
-   on every page load, the page tours itself, and the
+   Everything here is automatic: the colour edition follows
+   local time and changes on refresh, the page tours itself, a
+   glitch reveals a hidden scene at the end, and the
    3D gravity scenes change with each section.
    ========================================================= */
 const root = document.documentElement;
@@ -16,12 +17,13 @@ const isSmall = () => innerWidth < 980;
    Editions: light palettes shared by the CSS and the 3D scene
    --------------------------------------------------------- */
 const INK = ['#ff7a59', '#3b9bff', '#8f6bff', '#19b894', '#f2a51a', '#ff5fa2'];
-const rotate = (arr, n) => arr.slice(n).concat(arr.slice(0, n));
+const GRAPHITE = '#3a3e52';
+const rotate = (arr, n) => [GRAPHITE, arr[n % 6], '#6a6f88', arr[(n + 1) % 6], GRAPHITE, arr[(n + 2) % 6]];
 const UNIVERSES = {
-  morning: { name: 'Coral edition', bg: '#fbf8f2', stars: rotate(INK, 0), dust: '#c9bfb4', planet: '#3b9bff', bloom: 0, light: true },
-  noon:    { name: 'Sky edition',   bg: '#f6fafe', stars: rotate(INK, 1), dust: '#b7c6d8', planet: '#ff7a59', bloom: 0, light: true },
-  dusk:    { name: 'Lilac edition', bg: '#fbf7fd', stars: rotate(INK, 2), dust: '#c9bcd9', planet: '#ff5fa2', bloom: 0, light: true },
-  night:   { name: 'Mint edition',  bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#b4cfc7', planet: '#8f6bff', bloom: 0, light: true },
+  morning: { name: 'Coral edition', bg: '#fbf8f2', stars: rotate(INK, 0), dust: '#8d91a6', planet: '#3b9bff', bloom: 0, light: true },
+  noon:    { name: 'Sky edition',   bg: '#f6fafe', stars: rotate(INK, 1), dust: '#8d91a6', planet: '#ff7a59', bloom: 0, light: true },
+  dusk:    { name: 'Lilac edition', bg: '#fbf7fd', stars: rotate(INK, 2), dust: '#8d91a6', planet: '#ff5fa2', bloom: 0, light: true },
+  night:   { name: 'Mint edition',  bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#8d91a6', planet: '#8f6bff', bloom: 0, light: true },
 };
 const edition = UNIVERSES[root.dataset.edition] ? root.dataset.edition : 'morning';
 const settings = { universe: edition, accent: '', g: 1, speed: 1, trail: 0.8, glow: 1 };
@@ -41,6 +43,16 @@ try { visits = (parseInt(localStorage.getItem('tk-visits'), 10) || 0) + 1; local
 const hour = new Date().getHours();
 $('#greeting').textContent = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 22 ? 'Good evening' : 'Hello, night owl';
 $('#editionText').textContent = UNIVERSES[edition].name;
+const EDITION_ORDER = ['morning', 'noon', 'dusk', 'night'];
+function setEdition(name) {
+  root.dataset.edition = name;
+  settings.universe = name;
+  $('#editionText').textContent = UNIVERSES[name].name;
+  $('meta[name="theme-color"]').content = UNIVERSES[name].bg;
+  try { sessionStorage.setItem('tk-edition', String(EDITION_ORDER.indexOf(name))); } catch { /* private mode */ }
+  engine?.setUniverse();
+}
+const nextEdition = () => setEdition(EDITION_ORDER[(EDITION_ORDER.indexOf(settings.universe) + 1) % EDITION_ORDER.length]);
 $('#visitText').textContent = `Visit №${visits}`;
 $('meta[name="theme-color"]').content = UNIVERSES[edition].bg;
 $('#year').textContent = new Date().getFullYear();
@@ -143,9 +155,10 @@ if (!calm()) {
         tour.speed += (cruise() - tour.speed) * (1 - Math.exp(-dt * 1.4)); // ease in, never jerk
         tour.pos = Math.min(maxScroll(), tour.pos + tour.speed * dt);
         scrollTo(0, tour.pos);
-        if (tour.pos >= maxScroll() - 0.5) { tour.on = false; tour.done = true; }
+        if (tour.pos >= maxScroll() - 0.5) { tour.on = false; tour.done = finale.fired; }
       }
     } else if (!tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open') && !resumeDlg.open) tourPlay();
+    if (!finale.fired && !tour.glide && maxScroll() > 200 && scrollY >= maxScroll() - 3) runFinale();
     tourUI(now);
     requestAnimationFrame(frame);
   };
@@ -196,6 +209,111 @@ document.addEventListener('click', (e) => {
   const y = target ? target.getBoundingClientRect().top + scrollY - 70 : 0;
   if (calm()) scrollTo(0, y); else glideTo(y, 1000);
 });
+
+/* ---------------------------------------------------------
+   Glitch: rows tear sideways, colours split, bars flicker.
+   `midpoint` runs at the peak, hidden by the noise.
+   --------------------------------------------------------- */
+const fx = { layer: $('#glitchLayer'), bars: $('#glitchBars'), text: $('#glitchText'), disp: $('#gDisp'), noise: $('#gNoise'), r: $('#gR'), b: $('#gB') };
+let glitching = false;
+function glitch(targets, ms, label, midpoint) {
+  if (calm() || glitching) { midpoint?.(); return Promise.resolve(); }
+  glitching = true;
+  return new Promise((resolve) => {
+    fx.layer.hidden = false;
+    fx.text.textContent = label || '';
+    targets.forEach((t) => { if (t) t.style.filter = 'url(#glitchFx)'; });
+    const t0 = performance.now();
+    let fired = false, lastStep = 0;
+    const colours = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)', 'var(--ink)'];
+    const step = (now) => {
+      const p = (now - t0) / ms;
+      if (p >= 1) {
+        targets.forEach((t) => { if (t) t.style.filter = ''; });
+        fx.disp.setAttribute('scale', '0'); fx.r.setAttribute('dx', '0'); fx.b.setAttribute('dx', '0');
+        fx.bars.innerHTML = ''; fx.layer.hidden = true; root.style.removeProperty('--gx');
+        if (!fired) midpoint?.();
+        glitching = false; resolve(); return;
+      }
+      if (!fired && p > 0.55) { fired = true; midpoint?.(); }
+      if (now - lastStep > 60) { // a new random frame about 16 times a second, like a damaged signal
+        lastStep = now;
+        const strength = Math.sin(Math.PI * p) * (Math.random() < 0.78 ? 1 : 0.08);
+        fx.disp.setAttribute('scale', (strength * (120 + Math.random() * 520)).toFixed(0));
+        fx.noise.setAttribute('seed', String((Math.random() * 999) | 0));
+        fx.noise.setAttribute('baseFrequency', `0.0001 ${(0.015 + Math.random() * 0.16).toFixed(3)}`);
+        const split = strength * (3 + Math.random() * 16);
+        fx.r.setAttribute('dx', split.toFixed(1)); fx.b.setAttribute('dx', (-split).toFixed(1));
+        root.style.setProperty('--gx', `${((Math.random() - 0.5) * strength * 26).toFixed(1)}px`);
+        let html = '';
+        for (let i = 0, n = Math.round(strength * (3 + Math.random() * 6)); i < n; i++) {
+          const thin = Math.random() < 0.5;
+          html += `<i style="top:${(Math.random() * 100).toFixed(1)}%;left:${(Math.random() * 70 - 10).toFixed(1)}%;width:${(18 + Math.random() * 70).toFixed(1)}%;height:${thin ? 2 + Math.random() * 4 : 10 + Math.random() * 46}px;background:${colours[(Math.random() * colours.length) | 0]};opacity:${thin ? 0.7 : 0.38}"></i>`;
+        }
+        fx.bars.innerHTML = html;
+        fx.text.style.opacity = Math.random() < 0.6 ? '1' : '0';
+        fx.text.style.transform = `translate(calc(-50% + ${((Math.random() - 0.5) * 30 * strength).toFixed(1)}px), -50%) skewX(${((Math.random() - 0.5) * 30 * strength).toFixed(1)}deg)`;
+      }
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+/* ---------------------------------------------------------
+   Finale: reaching the bottom glitches the site, shifts the
+   edition and reveals the hidden post-credits scene.
+   --------------------------------------------------------- */
+const postEl = $('#post');
+const finale = { fired: calm() };
+if (!calm()) postEl.hidden = true;
+const stageEls = () => [$('#universe'), nav, $('#contact'), postEl.hidden ? null : postEl, $('.footer')];
+async function runFinale() {
+  finale.fired = true;
+  tourPause(false);
+  await glitch(stageEls(), 1500, 'POST-CREDITS SCENE', () => { postEl.hidden = false; nextEdition(); });
+  glideTo(postEl.getBoundingClientRect().top + scrollY - 60, 1300);
+}
+function starCount() { $('#starCount').textContent = engine ? engine.massive : '—'; }
+document.addEventListener('click', (e) => {
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if (!act) return;
+  if (act === 'shake') {
+    engine?.disturb();
+    const w = $('#playWindow'); w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
+  }
+  if (act === 'jump') glitch(stageEls(), 900, 'NEXT UNIVERSE', nextEdition);
+  if (act === 'replay') { tour.done = false; tour.held = false; glideTo(0, 1400, () => { tour.resumeAt = performance.now() + 800; }); }
+});
+const playWindow = $('#playWindow');
+playWindow.addEventListener('pointerdown', (e) => { engine?.addStar(e.clientX, e.clientY); starCount(); });
+playWindow.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  e.preventDefault();
+  const r = playWindow.getBoundingClientRect();
+  engine?.addStar(r.left + r.width * (0.25 + Math.random() * 0.5), r.top + r.height * (0.25 + Math.random() * 0.5));
+  starCount();
+});
+// The scene performs on its own: it drops stars, then shakes the system, and repeats. Visitors may join in.
+let autoTick = 0;
+setInterval(() => {
+  if (postEl.hidden || !engine || document.hidden) return;
+  const r = playWindow.getBoundingClientRect();
+  if (r.bottom < 80 || r.top > innerHeight - 80) return; // only while the sandbox is on screen
+  autoTick++;
+  const hint = $('#playHint');
+  if (autoTick % 6 === 0 || engine.massive >= 9) {
+    engine.disturb();
+    playWindow.classList.remove('shake'); void playWindow.offsetWidth; playWindow.classList.add('shake');
+    hint.textContent = 'Shaking the universe…';
+  } else if (autoTick % 6 === 5) {
+    hint.textContent = 'Tap in here to drop your own';
+  } else {
+    engine.addStar(r.left + r.width * (0.2 + Math.random() * 0.6), r.top + r.height * (0.25 + Math.random() * 0.5));
+    hint.textContent = 'Dropping stars by itself…';
+  }
+  starCount();
+}, 2400);
 
 /* =========================================================
    The 3D universe (visuals only). The page works without it.
@@ -379,7 +497,7 @@ function createEngine(THREE, PP) {
     const s = (b.size || (0.8 + Math.cbrt(Math.max(b.m, 0.05)) * 0.5));
     const core = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({ color: b.planet ? col : col.clone().lerp(new THREE.Color(uni().light ? col : '#ffffff'), 0.55), transparent: true }));
     core.scale.setScalar(0.035 * s * (b.planet ? 2.4 : 1) * (uni().light ? 1.5 : 1));
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, depthWrite: false, blending: additive() ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: uni().light ? 0.6 : 1 }));
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, depthWrite: false, blending: additive() ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: uni().light ? 0.3 : 1 }));
     glow.scale.setScalar(0.5 * s * (b.glowScale ?? 1));
     glow.userData.alpha = b.glowAlpha ?? 1;
     b.core = core; b.glow = glow;
@@ -758,7 +876,7 @@ function createEngine(THREE, PP) {
       b.glow.position.copy(b.core.position);
       const eo = b.escaped ? Math.max(0, 1 - (Math.hypot(b.x[0] - com.x, b.x[1] - com.y, b.x[2] - com.z) - sceneCfg.escR) / 12) : 1;
       b.core.material.opacity = o * eo;
-      b.glow.material.opacity = o * eo * (uni().light ? 0.6 : 1) * b.glow.userData.alpha;
+      b.glow.material.opacity = o * eo * (uni().light ? 0.3 : 1) * b.glow.userData.alpha;
       if (b.trail) b.trail.line.material.opacity = o;
     }
     starfield.rotation.z += dt * 0.004;
@@ -807,5 +925,7 @@ function createEngine(THREE, PP) {
     settingsChanged,
     motionChanged() { needsRender = true; if (calm()) buildScene(sceneName); },
     disturb, lockScene, unlockScene,
+    addStar: addStarAt,
+    get massive() { return bodies.filter((b) => b.m > 0 && !b.escaped).length; },
   };
 }

@@ -415,3 +415,135 @@ dialog.resume.zoom .resume-body img { width: 100%; max-height: none; cursor: zoo
   .hud-chart { width: 52%; }
   .resume-foot .btn { flex: 1 1 auto; }
 }
+
+/* =========================================================
+   Glitch layer + post-credits scene
+   ========================================================= */
+.fx-defs { position: absolute; }
+main { transform: translateX(var(--gx, 0)); }
+.glitch-layer { position: fixed; inset: 0; z-index: 250; pointer-events: none; overflow: hidden; }
+.glitch-layer[hidden] { display: none; }
+#glitchBars i { position: absolute; mix-blend-mode: multiply; }
+#glitchText { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin: 0; white-space: nowrap; font-family: var(--mono); font-weight: 700; font-size: clamp(18px, 4.6vw, 54px); letter-spacing: .14em; color: var(--ink);
+  text-shadow: 5px 0 0 color-mix(in srgb, var(--accent) 85%, transparent), -5px 0 0 color-mix(in srgb, var(--accent-2) 85%, transparent); }
+
+.post { padding-top: clamp(40px, 7vh, 80px); }
+.post-kicker { font-family: var(--mono); font-weight: 700; font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-deep); }
+.post-title { margin-top: 12px; font-family: var(--display); font-weight: 500; font-size: clamp(34px, 5vw, 66px); line-height: 1.02; letter-spacing: -0.025em; }
+.post-sub { margin-top: 16px; max-width: 54ch; color: var(--muted); font-size: 17px; }
+.post-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(26px, 4.5vw, 64px); align-items: center; margin-top: clamp(30px, 5vh, 54px); }
+.window.play { cursor: crosshair; touch-action: manipulation; }
+.play-hint { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 2; white-space: nowrap; font-family: var(--hand); font-size: 22px; color: var(--accent-deep); background: rgba(255,255,255,.8); padding: 2px 14px; border-radius: 999px; border: 1.5px solid var(--line); pointer-events: none; }
+.play-count { position: absolute; right: 16px; top: 54px; z-index: 2; font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: rgba(255,255,255,.85); padding: 4px 11px; border-radius: 999px; border: 1.5px solid var(--line); pointer-events: none; }
+.play-count b { color: var(--ink); font-size: 13px; }
+.window.shake { animation: shake .55s var(--ease); }
+@keyframes shake { 15% { transform: translate(-9px, 4px) rotate(-1.4deg); } 35% { transform: translate(8px, -5px) rotate(1.2deg); } 55% { transform: translate(-6px, 3px) rotate(-.8deg); } 75% { transform: translate(4px, -2px) rotate(.5deg); } }
+.post-actions { display: grid; gap: 14px; }
+.act { display: grid; grid-template-columns: 46px 1fr; column-gap: 14px; align-items: center; padding: 14px 18px; text-align: left; cursor: pointer; width: 100%; }
+.act:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--shadow); }
+.act .act-ico { grid-row: span 2; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; font-size: 19px; background: radial-gradient(circle at 32% 26%, #fff 0, var(--accent) 70%); border: 1.5px solid var(--line-2); box-shadow: inset 0 2px 0 rgba(255,255,255,.8); transition: transform .4s var(--spring); }
+.act:hover .act-ico { transform: rotate(-14deg) scale(1.08); }
+.act b { font-family: var(--display); font-weight: 500; font-size: 21px; line-height: 1.15; }
+.act > span:last-child { color: var(--muted); font-size: 14px; }
+.js .act.reveal.in:hover { transform: translate(-3px, -3px); }
+@media (max-width: 980px) { .post-grid { grid-template-columns: 1fr; } .window.play { aspect-ratio: 1 / .9; } }
+
+.post { position: relative; z-index: 2; }
+
+/* =========================================================
+   Pencil-sketch layer: wobbly hand-drawn outlines, hatched
+   shading and space doodles. Structure stays the same.
+   ========================================================= */
+.card { border-color: transparent; box-shadow: none; }
+.card::before { content: ""; position: absolute; inset: -1px; border: 1.8px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; opacity: .9; }
+.card::after { content: ""; position: absolute; inset: 9px -10px -10px 9px; border-radius: inherit; filter: url(#sketch); pointer-events: none; transition: transform .35s var(--ease);
+  background: repeating-linear-gradient(-45deg, var(--accent-deep) 0 1.1px, transparent 1.1px 5.5px); opacity: .6;
+  clip-path: polygon(calc(100% - 10px) 0, 100% 0, 100% 100%, 0 100%, 0 calc(100% - 10px), calc(100% - 10px) calc(100% - 10px)); }
+a.card:hover, .project-card:hover, .act:hover, .mini:hover { box-shadow: none; }
+a.card:hover::after, .project-card:hover::after, .act:hover::after, .mini:hover::after { transform: translate(4px, 4px); }
+.mini-self::before { border-style: dashed; }
+
+.window { overflow: visible; border-color: transparent; box-shadow: inset 0 2px 0 rgba(255,255,255,.95), inset 0 -18px 40px -22px color-mix(in srgb, var(--accent) 55%, transparent); }
+.window::before { content: ""; position: absolute; inset: -1px; z-index: 3; border: 2px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; box-shadow: 4px 5px 0 -1px color-mix(in srgb, var(--ink) 22%, transparent); }
+.win-bar { border-radius: 29px 29px 0 0; }
+.win-foot { border-radius: 0 0 29px 29px; }
+
+.btn { border-color: transparent; }
+.btn::after { content: ""; position: absolute; inset: -1px; border: 1.8px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; }
+.polaroid, .sec-num, .brand-mark, .sticker, .tour { border-color: var(--ink); }
+
+.note-b { left: 22px; bottom: -34px; transform: rotate(-2deg); font-size: 21px; }
+.note-b::before { content: "↑ "; }
+
+/* Doodles */
+.hero, .section { position: relative; }
+.doodle { position: absolute; z-index: 0; width: var(--w, 110px); height: auto; aspect-ratio: var(--ar, 1); overflow: visible; pointer-events: none; color: var(--ink); opacity: .78;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: url(#sketch);
+  animation: drift var(--t, 9s) ease-in-out infinite alternate; }
+.doodle .fill, .doodle use { fill: none; }
+@keyframes drift { from { transform: translate(0, 0) rotate(var(--rot, 0deg)); } to { transform: translate(var(--dx, 6px), var(--dy, -16px)) rotate(calc(var(--rot, 0deg) + var(--spin, 5deg))); } }
+.wrap { position: relative; z-index: 1; }
+.d1  { --w: 170px; --ar: 150/120; right: calc(50% - 760px); top: 30px; --rot: -8deg; --t: 11s; }
+.d2  { --w: 30px; left: 46%; top: 42px; color: var(--accent-deep); --t: 4s; --spin: 40deg; --dy: -4px; }
+.d3  { --w: 44px; left: calc(50% - 700px); top: 62%; color: var(--accent-deep); --t: 6s; --spin: 30deg; }
+.d4  { --w: 96px; --ar: 90/150; left: calc(50% - 720px); top: 18%; --rot: 24deg; --dx: 10px; --dy: -34px; --t: 7s; --spin: 0deg; }
+.d5  { --w: 120px; right: calc(50% - 730px); top: 40%; --t: 12s; --spin: 14deg; }
+.d6  { --w: 170px; --ar: 160/90; left: calc(50% - 760px); top: 66%; --dx: 26px; --dy: -12px; --t: 8s; --spin: 0deg; }
+.d7  { --w: 36px; right: calc(50% - 660px); top: 86%; color: var(--accent-deep); --t: 5s; --spin: 40deg; }
+.d8  { --w: 180px; --ar: 160/150; right: calc(50% - 780px); top: 8%; --t: 13s; --spin: 10deg; }
+.d9  { --w: 28px; left: 38%; top: 70px; color: var(--accent-deep); --t: 4.5s; --spin: 45deg; --dy: -4px; }
+.d10 { --w: 150px; --ar: 140/110; right: calc(50% - 760px); top: 12%; --dx: -30px; --dy: -8px; --t: 6s; --spin: -6deg; }
+.d11 { --w: 40px; left: calc(50% - 680px); top: 74%; color: var(--accent-deep); --t: 5s; --spin: 35deg; }
+.d12 { --w: 160px; --ar: 150/90; left: calc(50% - 770px); top: 16%; --rot: -12deg; --t: 10s; --dx: 14px; }
+.d13 { --w: 100px; right: calc(50% - 720px); top: 70%; --t: 12s; --spin: 16deg; }
+.d14 { --w: 170px; --ar: 160/90; right: calc(50% - 770px); top: 14%; --dx: 22px; --dy: -10px; --t: 8s; --spin: 0deg; }
+.d15 { --w: 42px; left: calc(50% - 690px); top: 60%; color: var(--accent-deep); --t: 5.5s; --spin: 35deg; }
+.d16 { --w: 100px; --ar: 90/150; right: calc(50% - 730px); top: 10%; --rot: -20deg; --dx: -10px; --dy: -34px; --t: 7s; --spin: 0deg; }
+.d17 { --w: 150px; --ar: 150/120; left: calc(50% - 760px); top: 62%; --rot: 10deg; --t: 11s; }
+@media (max-width: 1500px) { .doodle.gut { display: none; } }
+@media (max-width: 1500px) and (min-width: 700px) {
+  .doodle.d1 { display: block; right: 8px; top: 8px; --w: 120px; opacity: .45; }
+  .doodle.d8, .doodle.d14 { display: block; right: 6px; --w: 120px; opacity: .4; }
+}
+
+/* =========================================================
+   Retro readout pieces: coded strips, wireframe globes with
+   ID plaques, and the stencil reveal with converging lines
+   ========================================================= */
+.readout { display: flex; flex-wrap: wrap; gap: 4px 22px; padding: 7px 14px; font-family: var(--mono); font-weight: 700; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-deep);
+  background: repeating-linear-gradient(0deg, transparent 0 3px, color-mix(in srgb, var(--accent) 14%, transparent) 3px 4px), color-mix(in srgb, var(--tint) 60%, #fff); border-block: 1.5px solid var(--ink); }
+.readout span:nth-child(odd) { color: var(--ink); }
+.readout span + span::before { content: "//"; margin-right: 22px; opacity: .4; }
+
+.worlds { margin-top: clamp(40px, 7vh, 72px); }
+.worlds ul { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 26px; }
+.worlds a { display: grid; justify-items: center; gap: 12px; transition: transform .4s var(--spring); }
+.worlds a:hover { transform: translateY(-6px); }
+.globe { width: min(100%, 132px); overflow: visible; fill: none; stroke: var(--accent-deep); stroke-width: 1.6; stroke-linecap: round; filter: url(#sketch); }
+.globe circle { stroke: var(--ink); stroke-width: 2.2; fill: color-mix(in srgb, var(--tint) 35%, transparent); }
+.worlds li:nth-child(even) .globe { stroke: color-mix(in oklab, var(--accent-2) 62%, var(--ink)); }
+.plaque { position: relative; display: grid; justify-items: center; padding: 6px 12px 7px; min-width: 104px; background: #fff; border: 1.8px solid var(--ink); border-radius: 8px; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 4.5px color-mix(in srgb, var(--accent) 70%, transparent); }
+.plaque i { font-family: var(--mono); font-style: normal; font-weight: 700; font-size: 13px; letter-spacing: .12em; }
+.plaque b { font-size: 11.5px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+
+.post-screen { position: relative; overflow: hidden; background: color-mix(in srgb, var(--paper) 86%, #fff); min-height: clamp(210px, 32vw, 360px); display: grid; grid-template-rows: auto 1fr; margin-bottom: 28px; }
+.post-screen::after { content: ""; position: absolute; inset: 0; border: 2px solid var(--ink); filter: url(#sketch); pointer-events: none; }
+.converge { position: absolute; inset: 34px 0 0; width: 100%; height: calc(100% - 34px); fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .55; }
+.converge path { vector-effect: non-scaling-stroke; stroke-dasharray: 420; stroke-dashoffset: 420; }
+.converge .wave { stroke-width: 2.4; opacity: 1; }
+.converge .wave.a { stroke: var(--accent); } .converge .wave.b { stroke: var(--accent-2); }
+.post-screen.in .converge path { animation: draw 1.6s var(--ease) .3s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.post-stencil { position: relative; align-self: center; justify-self: center; text-align: center; padding: 0 16px; font-family: var(--mono); font-weight: 700; font-size: clamp(22px, 5.4vw, 68px); letter-spacing: .1em; color: var(--accent-deep);
+  text-shadow: 3px 0 0 color-mix(in srgb, var(--accent-3) 80%, transparent), -3px 0 0 color-mix(in srgb, var(--accent-2) 60%, transparent); }
+.post-screen.in .post-stencil { animation: flicker 2.2s steps(1) .2s 1 both; }
+@keyframes flicker { 0%, 8%, 14%, 22% { opacity: 0; } 4%, 11%, 18%, 26%, 100% { opacity: 1; } }
+.post-title { font-size: clamp(28px, 3.6vw, 46px); }
+.js .post-screen.reveal { transform: translateY(34px); }
+.js .post-screen.reveal.in { transform: none; }
+
+@media (max-width: 980px) { .worlds ul { grid-template-columns: repeat(3, 1fr); gap: 22px 8px; } }
+@media (max-width: 560px) { .readout { font-size: 9.5px; gap: 3px 12px; } .readout span + span::before { margin-right: 12px; } .plaque { min-width: 0; padding: 5px 8px 6px; } .plaque i { font-size: 11px; } .plaque b { font-size: 10.5px; } }
+@media (prefers-reduced-motion: reduce) { .converge path { stroke-dashoffset: 0; } }
+
+@media (max-width: 980px) { .note-b { display: none; } }
