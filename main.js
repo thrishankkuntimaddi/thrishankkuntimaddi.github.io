@@ -794,20 +794,20 @@ if (calm()) game.start();
    text, erased, redrawn) and we land in the normal look with
    the colours for the visitor's local time.
    --------------------------------------------------------- */
-const FALL = [ // every project gets its own universe (style + colours); t = how long it stays, in ms
-  { name: 'Oruinwan', line: 'One workspace for a team: chat, calls, tasks, notes and AI.', code: '83267', win: 0, t: 3800, world: 'paper', ed: 'morning' },
-  { name: 'SentinelFlight', line: 'Launch real rockets past real orbital debris, in 3D.', code: '359', win: 2, t: 2900, world: 'blueprint', ed: 'noon' },
-  { name: 'Expense Tracker', line: 'A calm money app on web, Android and desktop.', code: '2274', win: 1, t: 2400, world: 'sketch', ed: 'dusk' },
-  { name: 'LearnViaNotes', line: '22 subjects and 150 coding problems. No sign-up.', code: '66837', win: 3, t: 2100, world: 'news', ed: 'night' },
-  { name: 'Poelys', line: 'My product studio. Everything I build lives here.', code: '4663', glyph: '◎', t: 1900, world: 'paper', ed: 'dusk' },
-  { name: 'Interstellar', line: 'A 15-minute real-time 3D space journey.', code: '327', glyph: '✦', t: 1500, world: 'blueprint', ed: 'night' },
-  { name: 'YorMenu', line: 'A restaurant platform, from table to kitchen to bill.', code: '6368', glyph: '☕', t: 1300, world: 'pixel', ed: 'morning' },
-  { name: 'Parla', line: 'Clear conversations, less friction.', code: '729', glyph: '❝', t: 1050, world: 'sketch', ed: 'noon' },
-  { name: 'Ms. Minutes', line: 'An AI desk companion with an animated face.', code: '8463', glyph: '◔', t: 850, world: 'pixel', ed: 'dusk' },
-  { name: 'My Rovers', line: 'Home-built robot rovers.', code: '76837', glyph: '⛭', t: 700, world: 'blueprint', ed: 'morning' },
-  { name: 'Meditation', line: 'Breathing that quiets every device.', code: '2256', glyph: '◌', t: 560, world: 'news', ed: 'dusk' },
-  { name: 'ClearMyMind', line: 'Dump your thoughts, then clear them.', code: '25327', glyph: '✧', t: 450, world: 'sketch', ed: 'night' },
-  { name: 'This website', line: 'The one you are falling through.', code: '4373', glyph: '▚', t: 380, world: 'pixel', ed: 'noon' },
+const FALL = [ // in falling order. Every project is its own universe; t = how long we stay in it (ms): some linger, some flash past
+  { name: 'Oruinwan', line: 'One workspace for a team: chat, calls, tasks, notes and AI.', code: '83267', win: 0, t: 4000, world: 'paper', ed: 'morning', bits: ['chat', 'calls', 'tasks', 'notes', '@ai', 'React 19'] },
+  { name: 'SentinelFlight', line: 'Launch real rockets past real orbital debris, in 3D.', code: '359', win: 2, t: 3200, world: 'blueprint', ed: 'noon', bits: ['SGP4', 'Three.js', 'Δv', 'orbit', 'debris', 'AI copilot'] },
+  { name: 'Meditation', line: 'Breathing that quiets every device.', code: '2256', glyph: '◌', t: 520, world: 'news', ed: 'dusk', bits: ['breathe', 'in', 'out'] },
+  { name: 'Expense Tracker', line: 'A calm money app on web, Android and desktop.', code: '2274', win: 1, t: 2700, world: 'sketch', ed: 'dusk', bits: ['₹', 'budget', 'bills', 'chai 20', 'PWA', 'Tauri'] },
+  { name: 'ClearMyMind', line: 'Dump your thoughts, then clear them.', code: '25327', glyph: '✧', t: 430, world: 'pixel', ed: 'night', bits: ['clear', 'think'] },
+  { name: 'My Rovers', line: 'Home-built robot rovers.', code: '76837', glyph: '⛭', t: 560, world: 'blueprint', ed: 'morning', bits: ['ESP32', 'Mark 1', 'Wi-Fi'] },
+  { name: 'LearnViaNotes', line: '22 subjects and 150 coding problems. No sign-up.', code: '66837', win: 3, t: 2300, world: 'news', ed: 'night', bits: ['DSA', '150 problems', 'offline', 'streak', 'notes'] },
+  { name: 'Poelys', line: 'My product studio. Everything I build lives here.', code: '4663', glyph: '◎', t: 1900, world: 'paper', ed: 'dusk', bits: ['studio', 'poelys.com', 'still building'] },
+  { name: 'Interstellar', line: 'A 15-minute real-time 3D space journey.', code: '327', glyph: '✦', t: 1400, world: 'pixel', ed: 'noon', bits: ['GLSL', 'TARS', 'Gargantua', 'dock'] },
+  { name: 'YorMenu', line: 'A restaurant platform, from table to kitchen to bill.', code: '6368', glyph: '☕', t: 1050, world: 'sketch', ed: 'morning', bits: ['table 5', 'KOT', 'bill'] },
+  { name: 'Parla', line: 'Clear conversations, less friction.', code: '729', glyph: '❝', t: 760, world: 'blueprint', ed: 'night', bits: ['say it', 'clearly'] },
+  { name: 'Ms. Minutes', line: 'An AI desk companion with an animated face.', code: '8463', glyph: '◔', t: 560, world: 'pixel', ed: 'dusk', bits: ['tick', 'tock'] },
+  { name: 'This website', line: 'The one you are falling through.', code: '4373', glyph: '▚', t: 400, world: 'sketch', ed: 'noon', bits: ['you', 'are', 'here'] },
 ];
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const fallEl = $('#fall'), fallStage = $('#fallStage'), fallTerm = $('#fallTerm');
@@ -848,32 +848,47 @@ async function quickJump() {
   setWorld('paper', false); // neutral base, so each card shows only its own universe
   scrollTo(0, 0); // we are already back at the top, hidden behind the fall
 
-  // 2. fall through the projects
-  const windows = $$('.project .window');
-  for (const p of FALL) {
+  // 2. fall. Pip tumbles in the middle the whole way; the universes rush past and Pip is redrawn in each one's style
+  const faller = $('#fallPip'), flash = $('#fallFlash'), windows = $$('.project .window');
+  faller.innerHTML = pip.querySelector('svg').outerHTML; faller.hidden = false; faller.className = 'fall-pip';
+  const burst = () => { // a flash and a spray of shards as we break into the next universe
+    flash.animate([{ opacity: 0.85 }, { opacity: 0 }], { duration: 220, easing: 'ease-out' });
+    const wrap = document.createElement('div');
+    wrap.innerHTML = Array.from({ length: 9 }, () => `<b style="--a:${(Math.random() * 360).toFixed(0)}deg;--s:${(30 + Math.random() * 90).toFixed(0)}px;clip-path:polygon(${(Math.random() * 40).toFixed(0)}% 0,100% ${(30 + Math.random() * 50).toFixed(0)}%,${(Math.random() * 60).toFixed(0)}% 100%)"></b>`).join('');
+    shards.appendChild(wrap); setTimeout(() => wrap.remove(), 650);
+    blip(260 + Math.random() * 520, 70);
+  };
+  for (const [n, p] of FALL.entries()) {
+    const side = n % 2 ? 1 : -1, fast = p.t < 900;
     fallEl.dataset.edition = p.ed; fallEl.dataset.world = p.world;
-    const card = document.createElement('div');
-    card.className = 'fall-card'; card.dataset.world = p.world; card.dataset.edition = p.ed;
-    if (p.world === 'sketch') card.classList.add('sketch');
+    faller.dataset.world = p.world; faller.dataset.edition = p.ed;
+    const scene = document.createElement('div');
+    scene.className = `fall-scene${p.world === 'sketch' ? ' sketch' : ''}${fast ? ' fast' : ''}`; scene.dataset.world = p.world; scene.dataset.edition = p.ed;
     let preview = '';
     if (p.win != null && windows[p.win]) { const c = windows[p.win].cloneNode(true); c.className = 'window'; c.querySelector('.note')?.remove(); preview = c.outerHTML; }
-    if (!preview) preview = `<div class="window"><div class="win-bar"><i></i><i></i><i></i><span>${p.name.toUpperCase().replace(/[^A-Z]/g, '')}.SYS</span><b>LIVE</b></div><p class="fall-glyph">${p.glyph}</p></div>`;
-    card.innerHTML = `<div class="card fall-inner">${preview}<div class="fall-text"><p class="p-num">:${p.code}</p><h3>${p.name}</h3><p>${p.line}</p></div></div>`;
-    fallStage.appendChild(card);
-    const side = Math.random() < 0.5 ? -1 : 1;
-    blip(300 + Math.random() * 500, 60);
-    await card.animate([
-      { transform: `translate3d(${side * -18}vw, -40vh, -2800px) rotateX(38deg) rotateY(${side * -40}deg)`, opacity: 0 },
-      { transform: `translate3d(0, 0, -60px) rotateX(6deg) rotateY(${side * -12}deg)`, opacity: 1, offset: 0.26 },
-      { transform: `translate3d(0, 0, 40px) rotateX(-4deg) rotateY(${side * 10}deg)`, opacity: 1, offset: 0.78 },
-      { transform: `translate3d(${side * 14}vw, 60vh, 900px) rotateX(-40deg) rotateY(${side * 30}deg)`, opacity: 0 },
-    ], { duration: p.t, easing: 'cubic-bezier(.3,.1,.4,1)' }).finished;
-    card.remove();
+    else preview = `<div class="window"><div class="win-bar"><i></i><i></i><i></i><span>${p.name.toUpperCase().replace(/[^A-Z]/g, '')}.SYS</span><b>LIVE</b></div><p class="fall-glyph">${p.glyph}</p></div>`;
+    const words = [p.name, `:${p.code}`, ...p.bits, ...p.bits];
+    scene.innerHTML = `<p class="fs-name">${p.name}</p><p class="fs-name b">${p.name}</p>`
+      + `<div class="fs-bits">${words.map((w, k) => `<i style="--a:${((k / words.length) * 360 + Math.random() * 25).toFixed(0)}deg;--d:${(-Math.random() * 1.4).toFixed(2)}s">${w}</i>`).join('')}</div>`
+      + `<div class="fall-card ${side < 0 ? 'L' : 'R'}"><div class="card fall-inner">${preview}<div class="fall-text"><p class="p-num">:${p.code}</p><h3>${p.name}</h3><p>${p.line}</p></div></div></div>`;
+    fallStage.appendChild(scene);
+    burst();
+    await scene.animate([
+      { transform: `scale(.1) rotate(${side * -16}deg)`, opacity: 0, easing: 'cubic-bezier(.1,.7,.3,1)' },
+      { transform: `scale(1) rotate(${side * -2}deg)`, opacity: 1, offset: fast ? 0.34 : 0.14, easing: 'linear' },
+      { transform: `scale(1.16) rotate(${side * 3}deg)`, opacity: 1, offset: fast ? 0.66 : 0.88, easing: 'cubic-bezier(.7,0,.9,.4)' },
+      { transform: `scale(5.5) rotate(${side * 18}deg)`, opacity: 0 },
+    ], { duration: p.t }).finished;
+    scene.remove();
   }
 
-  // 3. Pip crashes: dot matrix, crash text, erased, redrawn
+  // 3. the crash landing. Pip freezes, breaks into pixels, then: dot matrix, crash text, erased, redrawn
+  burst();
   fallEl.dataset.edition = 'noon'; fallEl.dataset.world = 'pixel'; fallEl.className = 'fall crashing';
+  faller.dataset.world = 'pixel'; faller.classList.add('still');
   playGlitchSound(1300);
+  await wait(650);
+  faller.hidden = true; faller.innerHTML = '';
   for (let i = 0; i < 12; i++) { fallTerm.textContent = pipMatrix(); await wait(95); }
   fallTerm.textContent = '';
   for (const line of CRASH) { fallTerm.textContent += `${line}\n`; blip(900, 20); await wait(line ? 120 : 60); }

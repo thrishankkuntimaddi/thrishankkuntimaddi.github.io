@@ -876,3 +876,60 @@ main { transform: translateX(var(--gx, 0)); }
 .fall-text h3 { font-size: clamp(30px, 4.4vw, 58px); } .fall-text p:last-child { font-size: clamp(16px, 1.6vw, 21px); } .fall-text .p-num { font-size: 15px; }
 [data-world="pixel"] .fall-text h3 { font-size: clamp(15px, 2.2vw, 26px); line-height: 1.5; }
 @media (max-width: 980px) { .fall-card { width: min(90vw, 440px); } .fall-inner { gap: 14px; padding: 14px; } }
+
+/* =========================================================
+   The fall, rebuilt: Pip tumbles in the centre while whole
+   universes rush past, and Pip is redrawn in each one.
+   ========================================================= */
+.fall-streaks { display: none; }
+.fall-stage { perspective: none; display: block; }
+.fall-scene { position: absolute; inset: 0; overflow: hidden; color: var(--ink); font-family: var(--sans); transform-origin: 50% 50%; will-change: transform, opacity;
+  background:
+    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0 5deg, color-mix(in srgb, var(--accent) 30%, transparent) 5deg 5.7deg, transparent 5.7deg 11deg, color-mix(in srgb, var(--accent-2) 26%, transparent) 11deg 11.5deg),
+    radial-gradient(circle at 50% 50%, #fff 0, var(--paper) 30%, var(--tint) 100%); }
+[data-world="blueprint"].fall-scene { background: linear-gradient(var(--line-2) 1px, transparent 1px) 0 0 / 60px 60px, linear-gradient(90deg, var(--line-2) 1px, transparent 1px) 0 0 / 60px 60px, radial-gradient(circle, #fff 0, var(--tint) 100%); }
+[data-world="pixel"].fall-scene { background: conic-gradient(from 0deg at 50% 50%, var(--tint) 0 25%, var(--paper) 0 50%, var(--tint) 0 75%, var(--paper) 0) 0 0 / 56px 56px; }
+[data-world="news"].fall-scene { background: radial-gradient(color-mix(in srgb, var(--ink) 30%, transparent) 1.6px, transparent 2px) 0 0 / 11px 11px, var(--paper); }
+[data-world="sketch"].fall-scene { background: repeating-linear-gradient(-38deg, transparent 0 13px, color-mix(in srgb, var(--ink) 16%, transparent) 13px 14.2px), var(--paper); }
+.fs-name { position: absolute; left: 50%; top: 4%; margin: 0; transform: translateX(-50%); white-space: nowrap; font-family: var(--display); font-weight: 700; font-size: clamp(64px, 17vw, 270px); line-height: .9; letter-spacing: -.04em; color: var(--accent-deep); opacity: .2; }
+.fs-name.b { top: auto; bottom: 3%; color: var(--ink); opacity: .1; }
+[data-world="pixel"] .fs-name { font-size: clamp(26px, 7.5vw, 120px); letter-spacing: 0; }
+.fs-bits i { position: absolute; left: 50%; top: 50%; font-family: var(--mono); font-style: normal; font-weight: 700; font-size: clamp(13px, 1.6vw, 22px); white-space: nowrap; padding: 3px 12px; color: var(--ink); background: #fff; border: 1.5px solid var(--ink); border-radius: var(--r-sm);
+  transform-origin: 0 50%; animation: rush 1.5s linear var(--d) infinite; }
+@keyframes rush { from { transform: rotate(var(--a)) translateX(5vmax) scale(.15); opacity: 0; } 18% { opacity: .95; } to { transform: rotate(var(--a)) translateX(78vmax) scale(2.4); opacity: 0; } }
+.fall-scene.fast .fs-bits i { animation-duration: .5s; }
+.fall-card { position: absolute; top: 50%; width: min(36vw, 500px); grid-area: auto; animation: sway 3.2s ease-in-out infinite alternate; }
+.fall-card.L { left: 4vw; --ry: 26deg; } .fall-card.R { right: 4vw; --ry: -26deg; }
+@keyframes sway { from { transform: translateY(-50%) perspective(900px) rotateY(var(--ry)) rotateX(7deg); } to { transform: translateY(-50%) perspective(900px) rotateY(calc(var(--ry) * .45)) rotateX(-5deg); } }
+.fall-inner { grid-template-columns: 1fr; gap: 16px; padding: 18px; }
+.fall-inner .window { aspect-ratio: 1 / .74; }
+.fall-text h3 { font-size: clamp(26px, 3vw, 44px); margin: 2px 0 6px; } .fall-text p:last-child { font-size: clamp(15px, 1.3vw, 19px); }
+[data-world="pixel"] .fall-text h3 { font-size: clamp(13px, 1.5vw, 20px); }
+.fall-scene.fast .fall-card { top: 50%; left: 50%; right: auto; width: min(60vw, 420px); margin-left: calc(min(60vw, 420px) / -2); --ry: 0deg; }
+.fall-scene.fast .fall-inner .window { display: none; } .fall-scene.fast .fall-text { text-align: center; padding-bottom: 120px; }
+
+.fall-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 5; }
+.fall-shards b { position: absolute; left: 50%; top: 50%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2); background: linear-gradient(135deg, #fff 20%, var(--tint) 60%, var(--accent)); z-index: 6; animation: burst .6s cubic-bezier(.1, .6, .3, 1) forwards; }
+@keyframes burst { from { transform: rotate(var(--a)) translateX(2vmax) rotate(0deg) scale(.3); opacity: 1; } to { transform: rotate(var(--a)) translateX(70vmax) rotate(260deg) scale(1.7); opacity: 0; } }
+.fall-shards { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+
+.fall-pip { position: absolute; left: 50%; top: 50%; z-index: 4; width: min(22vw, 170px); margin: calc(min(22vw, 170px) / -2); animation: tumble 2.4s linear infinite; filter: drop-shadow(0 14px 18px color-mix(in srgb, var(--ink) 25%, transparent)); }
+.fall-pip[hidden] { display: none; }
+@keyframes tumble { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.18) translateY(-6%); } 100% { transform: rotate(360deg) scale(1); } }
+.fall-pip.still { animation: none; transform: scale(1.5); transition: transform .5s var(--spring); }
+.fall-pip svg { display: block; width: 100%; overflow: visible; fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.fall-pip .pip-leg { animation: step .16s ease-in-out infinite alternate; } .fall-pip .pip-leg.b { animation-direction: alternate-reverse; }
+.fall-pip .pip-wave { animation-duration: .5s; }
+.fall-pip .pip-o { display: block; } .fall-pip .pip-mouth { display: none; }
+[data-world="pixel"].fall-pip svg { filter: url(#pixelate); }
+[data-world="sketch"].fall-pip svg { filter: url(#sketch); stroke-width: 3.6; } [data-world="sketch"].fall-pip .pip-body { fill: #fff; } [data-world="sketch"].fall-pip .pip-shoe { fill: none; }
+[data-world="blueprint"].fall-pip :is(.pip-body, .pip-shoe, .pip-hand) { fill: none; } [data-world="blueprint"].fall-pip svg { stroke-dasharray: 6 4; stroke-width: 2.4; }
+[data-world="news"].fall-pip svg { filter: grayscale(1) contrast(1.4); } [data-world="news"].fall-pip .pip-body { fill: color-mix(in srgb, var(--ink) 30%, #fff); }
+
+@media (max-width: 980px) {
+  .fall-card, .fall-card.L, .fall-card.R { left: 50%; right: auto; top: 26%; width: min(84vw, 380px); margin-left: calc(min(84vw, 380px) / -2); --ry: 10deg; }
+  .fall-inner { padding: 12px; gap: 10px; } .fall-inner .window { aspect-ratio: 1 / .52; }
+  .fall-pip { top: 76%; width: 104px; margin: -52px; }
+  .fall-scene.fast .fall-card { top: 40%; } .fall-scene.fast .fall-text { padding-bottom: 0; }
+  .fs-name { top: 1%; } 
+}
