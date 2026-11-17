@@ -1,8 +1,8 @@
 /* =========================================================
    Thrishank Kuntimaddi: portfolio
    Everything here is automatic: the colour edition follows
-   local time and changes on refresh, the page tours itself, a
-   glitch reveals a hidden scene at the end, and the
+   local time and changes on refresh, the page tours itself,
+   two glitches change the colours and reveal a final scene, and the
    3D gravity scenes change with each section.
    ========================================================= */
 const root = document.documentElement;
@@ -17,13 +17,12 @@ const isSmall = () => innerWidth < 980;
    Editions: light palettes shared by the CSS and the 3D scene
    --------------------------------------------------------- */
 const INK = ['#ff7a59', '#3b9bff', '#8f6bff', '#19b894', '#f2a51a', '#ff5fa2'];
-const GRAPHITE = '#3a3e52';
-const rotate = (arr, n) => [GRAPHITE, arr[n % 6], '#6a6f88', arr[(n + 1) % 6], GRAPHITE, arr[(n + 2) % 6]];
+const rotate = (arr, n) => arr.slice(n).concat(arr.slice(0, n));
 const UNIVERSES = {
-  morning: { name: 'Coral edition', bg: '#fbf8f2', stars: rotate(INK, 0), dust: '#8d91a6', planet: '#3b9bff', bloom: 0, light: true },
-  noon:    { name: 'Sky edition',   bg: '#f6fafe', stars: rotate(INK, 1), dust: '#8d91a6', planet: '#ff7a59', bloom: 0, light: true },
-  dusk:    { name: 'Lilac edition', bg: '#fbf7fd', stars: rotate(INK, 2), dust: '#8d91a6', planet: '#ff5fa2', bloom: 0, light: true },
-  night:   { name: 'Mint edition',  bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#8d91a6', planet: '#8f6bff', bloom: 0, light: true },
+  morning: { name: 'Coral edition', bg: '#fbf8f2', stars: rotate(INK, 0), dust: '#c9bfb4', planet: '#3b9bff', bloom: 0, light: true },
+  noon:    { name: 'Sky edition',   bg: '#f6fafe', stars: rotate(INK, 1), dust: '#b7c6d8', planet: '#ff7a59', bloom: 0, light: true },
+  dusk:    { name: 'Lilac edition', bg: '#fbf7fd', stars: rotate(INK, 2), dust: '#c9bcd9', planet: '#ff5fa2', bloom: 0, light: true },
+  night:   { name: 'Mint edition',  bg: '#f5fbf9', stars: rotate(INK, 3), dust: '#b4cfc7', planet: '#8f6bff', bloom: 0, light: true },
 };
 const edition = UNIVERSES[root.dataset.edition] ? root.dataset.edition : 'morning';
 const settings = { universe: edition, accent: '', g: 1, speed: 1, trail: 0.8, glow: 1 };
@@ -137,9 +136,9 @@ if (!calm()) {
   // Anything the visitor does takes over immediately.
   const yieldToUser = () => { if (tour.on || tour.glide) tourPause(false); else if (!tour.held) tour.resumeAt = performance.now() + IDLE_MS; };
   addEventListener('wheel', yieldToUser, { passive: true });
-  addEventListener('touchstart', (e) => { if (!e.target.closest('#tour')) yieldToUser(); }, { passive: true });
+  addEventListener('touchstart', (e) => { if (!e.target.closest('#tour, #pip')) yieldToUser(); }, { passive: true });
   addEventListener('touchmove', yieldToUser, { passive: true });
-  addEventListener('pointerdown', (e) => { if (!e.target.closest('#tour, a[href^="#"]')) yieldToUser(); }, { passive: true });
+  addEventListener('pointerdown', (e) => { if (!e.target.closest('#tour, #pip, a[href^="#"]')) yieldToUser(); }, { passive: true });
   addEventListener('keydown', (e) => { if (!e.target.closest?.('#tour')) yieldToUser(); });
 
   let last = performance.now();
@@ -149,6 +148,7 @@ if (!calm()) {
       const g = tour.glide, p = Math.min(1, (now - g.t0) / g.ms), e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
       scrollTo(0, g.y0 + (g.y1 - g.y0) * e);
       if (p >= 1) { tour.glide = null; tour.resumeAt = now + IDLE_MS; g.then?.(); }
+    } else if (glitching) { tour.pos = scrollY; tour.speed = 0; // hold still while the picture breaks up
     } else if (tour.on) {
       if (Math.abs(scrollY - tour.pos) > 4) tourPause(false); // scrollbar drag or any other outside scroll
       else {
@@ -158,7 +158,7 @@ if (!calm()) {
         if (tour.pos >= maxScroll() - 0.5) { tour.on = false; tour.done = finale.fired; }
       }
     } else if (!tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open') && !resumeDlg.open) tourPlay();
-    if (!finale.fired && !tour.glide && maxScroll() > 200 && scrollY >= maxScroll() - 3) runFinale();
+    storyTick();
     tourUI(now);
     requestAnimationFrame(frame);
   };
@@ -179,6 +179,7 @@ fetch('resume/meta.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : 
   $('#resumeDate').textContent = `Updated ${d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`;
   $('#resumeDownload').href = RESUME + resumeV;
   $('#resumeOpen').href = RESUME + resumeV;
+  $('#postDownload').href = RESUME + resumeV;
   $$('[data-resume-slot]').forEach((el) => { el.hidden = false; });
 }).catch(() => {});
 document.addEventListener('click', (e) => {
@@ -211,48 +212,127 @@ document.addEventListener('click', (e) => {
 });
 
 /* ---------------------------------------------------------
-   Glitch: rows tear sideways, colours split, bars flicker.
-   `midpoint` runs at the peak, hidden by the noise.
+   Sound. Browsers only allow audio after the visitor has
+   touched the page once, so any tap, click or key press
+   (poking Pip included) quietly switches it on.
    --------------------------------------------------------- */
-const fx = { layer: $('#glitchLayer'), bars: $('#glitchBars'), text: $('#glitchText'), disp: $('#gDisp'), noise: $('#gNoise'), r: $('#gR'), b: $('#gB') };
-let glitching = false;
-function glitch(targets, ms, label, midpoint) {
+const sfx = new Audio('assets/glitch.mp3');
+sfx.preload = 'auto';
+let soundOn = false, actx = null, sfxT = 0;
+function unlockSound() {
+  if (soundOn) return;
+  soundOn = true;
+  sfx.muted = true;
+  sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; sfx.muted = false; }).catch(() => { soundOn = false; });
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch { /* no Web Audio */ }
+}
+['pointerdown', 'keydown', 'touchend'].forEach((ev) => addEventListener(ev, unlockSound, { passive: true }));
+function blip(freq = 660, ms = 90) {
+  if (!actx || !soundOn) return;
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = 'square'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.05, actx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + ms / 1000);
+  o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime + ms / 1000);
+}
+function playGlitchSound(ms) {
+  if (!soundOn) return;
+  clearTimeout(sfxT);
+  sfx.pause(); sfx.currentTime = 0; sfx.volume = 0.75;
+  sfx.play().catch(() => {});
+  sfxT = setTimeout(() => { // fade out as the picture settles
+    const f = setInterval(() => { sfx.volume = Math.max(0, sfx.volume - 0.08); if (sfx.volume <= 0.01) { clearInterval(f); sfx.pause(); } }, 40);
+  }, Math.max(200, ms - 350));
+}
+
+/* ---------------------------------------------------------
+   Strips: horizontal bands that show another colour edition
+   through the page. Used while glitching (old and new look
+   at once) and when the visitor holds Pip to peek back.
+   --------------------------------------------------------- */
+const HUE = { morning: 14, noon: 212, dusk: 258, night: 164 };
+const fx = { layer: $('#glitchLayer'), cover: $('#glitchCover'), bars: $('#glitchBars'), text: $('#glitchText'), strips: $('#strips'), disp: $('#gDisp'), noise: $('#gNoise'), r: $('#gR'), b: $('#gB') };
+let glitching = false, prevEdition = null, peeking = false, peekInt = 0;
+function drawStrips(other, amount) {
+  const d = HUE[other] - HUE[settings.universe];
+  let html = '';
+  for (let i = 0, n = Math.round(2 + amount * 6); i < n; i++) {
+    html += `<i style="top:${(Math.random() * 96).toFixed(1)}%;height:${(2 + Math.random() * (5 + amount * 14)).toFixed(1)}vh;--hue:${d}deg;--bg:${UNIVERSES[other].bg}"></i>`;
+  }
+  fx.strips.innerHTML = html;
+  fx.strips.hidden = false;
+}
+function hideStrips() { fx.strips.hidden = true; fx.strips.innerHTML = ''; }
+function startPeek() {
+  if (!prevEdition || glitching) return false;
+  peeking = true;
+  drawStrips(prevEdition, 0.85);
+  peekInt = setInterval(() => drawStrips(prevEdition, 0.85), 240);
+  return true;
+}
+function stopPeek() { peeking = false; clearInterval(peekInt); hideStrips(); }
+
+/* ---------------------------------------------------------
+   Glitch: rows tear sideways, colours split, bars flicker and
+   strips of the next edition cut through. At the peak a cover
+   of static hides the screen; `midpoint` runs behind it, so
+   the change itself is never seen.
+   --------------------------------------------------------- */
+function viewSection() {
+  const mid = innerHeight / 2;
+  return $$('main > section, #post').find((el) => { if (el.hidden) return false; const r = el.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; });
+}
+function glitch(ms, label, midpoint) {
   if (calm() || glitching) { midpoint?.(); return Promise.resolve(); }
   glitching = true;
+  if (peeking) stopPeek();
+  const from = settings.universe, to = EDITION_ORDER[(EDITION_ORDER.indexOf(from) + 1) % EDITION_ORDER.length];
+  playGlitchSound(ms);
   return new Promise((resolve) => {
+    const targets = [$('#universe'), nav, viewSection()].filter(Boolean);
     fx.layer.hidden = false;
     fx.text.textContent = label || '';
-    targets.forEach((t) => { if (t) t.style.filter = 'url(#glitchFx)'; });
+    targets.forEach((t) => { t.style.filter = 'url(#glitchFx)'; });
     const t0 = performance.now();
     let fired = false, lastStep = 0;
     const colours = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)', 'var(--ink)'];
+    const fire = () => {
+      fired = true;
+      const extra = midpoint?.();
+      if (extra) { extra.style.filter = 'url(#glitchFx)'; targets.push(extra); }
+    };
     const step = (now) => {
       const p = (now - t0) / ms;
       if (p >= 1) {
-        targets.forEach((t) => { if (t) t.style.filter = ''; });
+        if (!fired) fire();
+        targets.forEach((t) => { t.style.filter = ''; });
         fx.disp.setAttribute('scale', '0'); fx.r.setAttribute('dx', '0'); fx.b.setAttribute('dx', '0');
-        fx.bars.innerHTML = ''; fx.layer.hidden = true; root.style.removeProperty('--gx');
-        if (!fired) midpoint?.();
+        fx.bars.innerHTML = ''; fx.cover.style.opacity = '0'; fx.layer.hidden = true; root.style.removeProperty('--gx');
+        hideStrips();
         glitching = false; resolve(); return;
       }
-      if (!fired && p > 0.55) { fired = true; midpoint?.(); }
-      if (now - lastStep > 60) { // a new random frame about 16 times a second, like a damaged signal
+      fx.cover.style.opacity = String(Math.max(0, Math.min(1, 1.25 - Math.abs(p - 0.5) / 0.08))); // opaque only around the peak
+      if (!fired && p >= 0.5) fire();
+      if (now - lastStep > 70) { // a new random frame about 14 times a second, like a damaged signal
         lastStep = now;
-        const strength = Math.sin(Math.PI * p) * (Math.random() < 0.78 ? 1 : 0.08);
-        fx.disp.setAttribute('scale', (strength * (120 + Math.random() * 520)).toFixed(0));
+        const env = Math.sin(Math.PI * p);
+        const strength = env * (Math.random() < 0.8 ? 1 : 0.1);
+        fx.disp.setAttribute('scale', (strength * (90 + Math.random() * 480)).toFixed(0));
         fx.noise.setAttribute('seed', String((Math.random() * 999) | 0));
-        fx.noise.setAttribute('baseFrequency', `0.0001 ${(0.015 + Math.random() * 0.16).toFixed(3)}`);
-        const split = strength * (3 + Math.random() * 16);
+        fx.noise.setAttribute('baseFrequency', `0.0001 ${(0.015 + Math.random() * 0.15).toFixed(3)}`);
+        const split = strength * (3 + Math.random() * 15);
         fx.r.setAttribute('dx', split.toFixed(1)); fx.b.setAttribute('dx', (-split).toFixed(1));
-        root.style.setProperty('--gx', `${((Math.random() - 0.5) * strength * 26).toFixed(1)}px`);
+        root.style.setProperty('--gx', `${((Math.random() - 0.5) * strength * 24).toFixed(1)}px`);
         let html = '';
         for (let i = 0, n = Math.round(strength * (3 + Math.random() * 6)); i < n; i++) {
           const thin = Math.random() < 0.5;
           html += `<i style="top:${(Math.random() * 100).toFixed(1)}%;left:${(Math.random() * 70 - 10).toFixed(1)}%;width:${(18 + Math.random() * 70).toFixed(1)}%;height:${thin ? 2 + Math.random() * 4 : 10 + Math.random() * 46}px;background:${colours[(Math.random() * colours.length) | 0]};opacity:${thin ? 0.7 : 0.38}"></i>`;
         }
         fx.bars.innerHTML = html;
-        fx.text.style.opacity = Math.random() < 0.6 ? '1' : '0';
-        fx.text.style.transform = `translate(calc(-50% + ${((Math.random() - 0.5) * 30 * strength).toFixed(1)}px), -50%) skewX(${((Math.random() - 0.5) * 30 * strength).toFixed(1)}deg)`;
+        // Before the peak the next edition cuts in; after it, the old one lingers and thins out.
+        drawStrips(fired ? from : to, fired ? env * 0.7 : env);
+        fx.text.style.opacity = Math.random() < 0.65 ? '1' : '0';
+        fx.text.style.transform = `translate(calc(-50% + ${((Math.random() - 0.5) * 28 * strength).toFixed(1)}px), -50%) skewX(${((Math.random() - 0.5) * 26 * strength).toFixed(1)}deg)`;
       }
       requestAnimationFrame(step);
     };
@@ -261,59 +341,171 @@ function glitch(targets, ms, label, midpoint) {
 }
 
 /* ---------------------------------------------------------
-   Finale: reaching the bottom glitches the site, shifts the
-   edition and reveals the hidden post-credits scene.
+   Pip, the guide. A poke switches the sound on; holding Pip
+   peeks at the previous colour edition.
+   --------------------------------------------------------- */
+const pip = $('#pip'), pipSay = $('#pipSay');
+let sayT = 0;
+function say(text, ms = 5200) {
+  pipSay.textContent = text;
+  pip.classList.add('talk');
+  clearTimeout(sayT);
+  sayT = setTimeout(() => pip.classList.remove('talk'), ms);
+}
+if (!calm()) {
+  pip.hidden = false;
+  setTimeout(() => say('Psst. Poke me!', 7000), 2200);
+  let holdT = 0, held = false, pokes = 0;
+  const lines = ['Sound on ♪ Keep watching.', 'Hold me down to peek at the last universe.', 'I only work here.', 'Boop.'];
+  pip.addEventListener('pointerdown', () => {
+    held = false;
+    holdT = setTimeout(() => { held = true; if (startPeek()) say('The last universe…', 60000); else say('Nothing to peek at yet. Keep watching.'); }, 320);
+  });
+  const release = () => { clearTimeout(holdT); if (peeking) { stopPeek(); say('And back to now.', 1800); } };
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => pip.addEventListener(ev, release));
+  pip.addEventListener('contextmenu', (e) => e.preventDefault());
+  pip.addEventListener('click', () => {
+    if (held) { held = false; return; }
+    unlockSound();
+    blip(520 + (pokes % 4) * 110);
+    pip.classList.remove('hop'); void pip.offsetWidth; pip.classList.add('hop');
+    say(lines[pokes++ % lines.length]);
+  });
+}
+
+/* ---------------------------------------------------------
+   The two glitches. 1: when the tour reaches "More work", the
+   colours change. 2: at the very end, they change again and
+   the final scene (resume + game) is revealed in place.
    --------------------------------------------------------- */
 const postEl = $('#post');
-const finale = { fired: calm() };
+const moreEl = $('#more');
+const story = { warned: false, first: calm(), finale: calm() };
+const finale = { get fired() { return story.finale; } };
 if (!calm()) postEl.hidden = true;
-const stageEls = () => [$('#universe'), nav, $('#contact'), postEl.hidden ? null : postEl, $('.footer')];
-async function runFinale() {
-  finale.fired = true;
-  tourPause(false);
-  await glitch(stageEls(), 1500, 'POST-CREDITS SCENE', () => { postEl.hidden = false; nextEdition(); });
-  glideTo(postEl.getBoundingClientRect().top + scrollY - 60, 1300);
+function storyTick() {
+  if (glitching) return;
+  const top = moreEl.getBoundingClientRect().top;
+  if (!story.warned && top < innerHeight * 1.15) { story.warned = true; say('Uh oh. Something is off up ahead…'); }
+  if (!story.first && top < innerHeight * 0.5 && top > -moreEl.offsetHeight) {
+    story.first = true;
+    glitch(2400, 'SIGNAL LOST', () => { prevEdition = settings.universe; nextEdition(); })
+      .then(() => say('New universe! Hold me down to peek at the old one.', 7000));
+  } else if (!story.finale && !tour.glide && maxScroll() > 200 && scrollY >= maxScroll() - 3) {
+    story.finale = true;
+    glitch(3000, 'FINAL SCENE', () => {
+      prevEdition = settings.universe; nextEdition();
+      postEl.hidden = false;
+      $('#postResume').src = `resume/preview.jpg${resumeV}`;
+      scrollTo(0, postEl.getBoundingClientRect().top + scrollY - 68); // swapped in behind the static, so nobody sees a jump
+      return postEl;
+    }).then(() => {
+      tour.on = false; tour.done = true; tour.speed = 0;
+      game.start();
+      say('That is the whole tour. Catch some skills!', 7000);
+    });
+  }
 }
-function starCount() { $('#starCount').textContent = engine ? engine.massive : '—'; }
 document.addEventListener('click', (e) => {
-  const act = e.target.closest('[data-act]')?.dataset.act;
-  if (!act) return;
-  if (act === 'shake') {
-    engine?.disturb();
-    const w = $('#playWindow'); w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
-  }
-  if (act === 'jump') glitch(stageEls(), 900, 'NEXT UNIVERSE', nextEdition);
-  if (act === 'replay') { tour.done = false; tour.held = false; glideTo(0, 1400, () => { tour.resumeAt = performance.now() + 800; }); }
+  if (e.target.closest('[data-act="replay"]')) { tour.done = false; tour.held = false; glideTo(0, 1600, () => { tour.resumeAt = performance.now() + 800; }); }
 });
-const playWindow = $('#playWindow');
-playWindow.addEventListener('pointerdown', (e) => { engine?.addStar(e.clientX, e.clientY); starCount(); });
-playWindow.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter' && e.key !== ' ') return;
-  e.preventDefault();
-  const r = playWindow.getBoundingClientRect();
-  engine?.addStar(r.left + r.width * (0.25 + Math.random() * 0.5), r.top + r.height * (0.25 + Math.random() * 0.5));
-  starCount();
-});
-// The scene performs on its own: it drops stars, then shakes the system, and repeats. Visitors may join in.
-let autoTick = 0;
-setInterval(() => {
-  if (postEl.hidden || !engine || document.hidden) return;
-  const r = playWindow.getBoundingClientRect();
-  if (r.bottom < 80 || r.top > innerHeight - 80) return; // only while the sandbox is on screen
-  autoTick++;
-  const hint = $('#playHint');
-  if (autoTick % 6 === 0 || engine.massive >= 9) {
-    engine.disturb();
-    playWindow.classList.remove('shake'); void playWindow.offsetWidth; playWindow.classList.add('shake');
-    hint.textContent = 'Shaking the universe…';
-  } else if (autoTick % 6 === 5) {
-    hint.textContent = 'Tap in here to drop your own';
-  } else {
-    engine.addStar(r.left + r.width * (0.2 + Math.random() * 0.6), r.top + r.height * (0.25 + Math.random() * 0.5));
-    hint.textContent = 'Dropping stars by itself…';
+
+/* ---------------------------------------------------------
+   Final-scene game: the skills from the resume fall and Pip
+   catches them. It plays itself; moving a mouse or finger
+   over it takes over, and it goes back to auto when left alone.
+   --------------------------------------------------------- */
+const game = (() => {
+  const cv = $('#game'), g = cv.getContext('2d');
+  const SKILLS = ['React', 'TypeScript', 'Three.js', 'CSS', 'Node.js', 'Firebase', 'Python', 'WebGL', 'Tailwind', 'Vite', 'PWA', 'Accessibility'];
+  const caught = new Set();
+  let W = 0, H = 0, items = [], px = 0, target = 0, lastUser = -1e9, spawnIn = 0.4, k = 0, score = 0, bugs = 0, last = 0, shake = 0, raf = 0, running = false, frame = 0, col = {};
+  const css = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+  const readCols = () => { col = { ink: css('--ink'), muted: css('--muted'), a: css('--accent'), a2: css('--accent-2'), a3: css('--accent-3'), tint: css('--tint') }; };
+  function resize() {
+    const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!px) px = target = W / 2;
   }
-  starCount();
-}, 2400);
+  function spawn() {
+    const bug = Math.random() < 0.2, label = bug ? 'BUG' : SKILLS[k++ % SKILLS.length];
+    g.font = '600 13px "Space Mono", monospace';
+    const w = g.measureText(label).width + 24;
+    items.push({ x: w / 2 + 8 + Math.random() * (W - w - 16), y: -18, vy: 62 + Math.random() * 46, label, bug, w });
+  }
+  function hit(it) {
+    if (it.bug) { bugs++; shake = 0.35; blip(160, 160); $('#gBugs').textContent = bugs; return; }
+    score++; blip(700 + (caught.size % 6) * 70, 70);
+    if (!caught.has(it.label)) {
+      caught.add(it.label);
+      const li = document.createElement('li'); li.textContent = `✓ ${it.label}`; $('#caught').appendChild(li);
+      $('#gScore').textContent = caught.size;
+      if (caught.size === SKILLS.length) { $('#postDownload').classList.add('won'); say('All 12 caught. Now take the resume!', 8000); }
+    }
+  }
+  function roundRect(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  function loop(now) {
+    if (!running) return;
+    const dt = Math.max(0, Math.min((now - last) / 1000, 0.05)); last = now;
+    if (frame++ % 45 === 0) readCols();
+    const auto = now - lastUser > 2500;
+    const mode = caught.size === SKILLS.length ? 'All 12 caught. Now you know my stack.' : auto ? 'Pip is playing' : 'You are playing';
+    if ($('#gMode').textContent !== mode) $('#gMode').textContent = mode;
+    spawnIn -= dt; if (spawnIn <= 0) { spawn(); spawnIn = 0.75 + Math.random() * 0.5; }
+    if (auto) {
+      const want = items.filter((it) => !it.bug && it.y < H - 62).sort((a, b) => b.y - a.y)[0];
+      if (want) target = want.x;
+      const danger = items.find((it) => it.bug && it.y > H - 170 && it.y < H - 40 && Math.abs(it.x - px) < 56);
+      if (danger) target = px + (px < danger.x ? -90 : 90);
+    }
+    target = Math.max(28, Math.min(W - 28, target));
+    px += (target - px) * (1 - Math.exp(-dt * (auto ? 5 : 16)));
+    for (const it of items) {
+      it.y += it.vy * dt;
+      if (!it.done && it.y > H - 74 && it.y < H - 40 && Math.abs(it.x - px) < 30 + it.w / 4) { it.done = true; hit(it); }
+    }
+    items = items.filter((it) => !it.done && it.y < H + 30);
+    shake = Math.max(0, shake - dt);
+
+    g.clearRect(0, 0, W, H);
+    g.save();
+    if (shake) g.translate((Math.random() - 0.5) * 10 * shake * 3, 0);
+    g.strokeStyle = col.ink; g.lineWidth = 1.5; g.setLineDash([5, 6]);
+    g.beginPath(); g.moveTo(8, H - 12); g.lineTo(W - 8, H - 12); g.stroke(); g.setLineDash([]);
+    g.font = '600 13px "Space Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    for (const it of items) {
+      roundRect(it.x - it.w / 2, it.y - 13, it.w, 26, 13);
+      g.fillStyle = it.bug ? '#ffd9df' : '#fff'; g.fill();
+      g.strokeStyle = it.bug ? '#d6456b' : col.ink; g.lineWidth = 1.6; g.stroke();
+      g.fillStyle = it.bug ? '#b02a4f' : col.ink; g.fillText(it.label, it.x, it.y + 1);
+    }
+    // Pip with a basket
+    const y = H - 38 + Math.sin(now / 260) * 2;
+    g.strokeStyle = col.ink; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(px - 30, y - 22); g.quadraticCurveTo(px, y - 4, px + 30, y - 22); g.stroke(); // basket
+    g.beginPath(); g.ellipse(px, y + 4, 30, 8, -0.25, 0, Math.PI * 2); g.strokeStyle = col.a2; g.stroke();
+    g.beginPath(); g.arc(px, y, 18, 0, Math.PI * 2); g.fillStyle = col.a; g.fill(); g.strokeStyle = col.ink; g.stroke();
+    g.fillStyle = '#fff'; g.beginPath(); g.ellipse(px - 6, y - 3, 4, 5.5, 0, 0, Math.PI * 2); g.ellipse(px + 6, y - 3, 4, 5.5, 0, 0, Math.PI * 2); g.fill();
+    const look = Math.max(-1.5, Math.min(1.5, (target - px) / 30));
+    g.fillStyle = col.ink; g.beginPath(); g.arc(px - 6 + look, y - 2, 2, 0, Math.PI * 2); g.arc(px + 6 + look, y - 2, 2, 0, Math.PI * 2); g.fill();
+    g.restore();
+    raf = requestAnimationFrame(loop);
+  }
+  const steer = (e) => { const r = cv.getBoundingClientRect(); target = e.clientX - r.left; lastUser = performance.now(); };
+  cv.addEventListener('pointermove', steer);
+  cv.addEventListener('pointerdown', steer);
+  addEventListener('resize', () => { if (running) resize(); });
+  let visible = false, wanted = false;
+  const sync = () => {
+    const should = wanted && visible && !document.hidden;
+    if (should && !running) { running = true; resize(); readCols(); last = performance.now(); raf = requestAnimationFrame(loop); }
+    if (!should && running) { running = false; cancelAnimationFrame(raf); }
+  };
+  if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => { visible = en.isIntersecting; sync(); }).observe(cv); else visible = true;
+  document.addEventListener('visibilitychange', sync);
+  return { start() { wanted = true; sync(); } };
+})();
+if (calm()) { $('#postResume').src = 'resume/preview.jpg'; game.start(); }
 
 /* =========================================================
    The 3D universe (visuals only). The page works without it.
@@ -497,7 +689,7 @@ function createEngine(THREE, PP) {
     const s = (b.size || (0.8 + Math.cbrt(Math.max(b.m, 0.05)) * 0.5));
     const core = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({ color: b.planet ? col : col.clone().lerp(new THREE.Color(uni().light ? col : '#ffffff'), 0.55), transparent: true }));
     core.scale.setScalar(0.035 * s * (b.planet ? 2.4 : 1) * (uni().light ? 1.5 : 1));
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, depthWrite: false, blending: additive() ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: uni().light ? 0.3 : 1 }));
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, depthWrite: false, blending: additive() ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: uni().light ? 0.6 : 1 }));
     glow.scale.setScalar(0.5 * s * (b.glowScale ?? 1));
     glow.userData.alpha = b.glowAlpha ?? 1;
     b.core = core; b.glow = glow;
@@ -876,7 +1068,7 @@ function createEngine(THREE, PP) {
       b.glow.position.copy(b.core.position);
       const eo = b.escaped ? Math.max(0, 1 - (Math.hypot(b.x[0] - com.x, b.x[1] - com.y, b.x[2] - com.z) - sceneCfg.escR) / 12) : 1;
       b.core.material.opacity = o * eo;
-      b.glow.material.opacity = o * eo * (uni().light ? 0.3 : 1) * b.glow.userData.alpha;
+      b.glow.material.opacity = o * eo * (uni().light ? 0.6 : 1) * b.glow.userData.alpha;
       if (b.trail) b.trail.line.material.opacity = o;
     }
     starfield.rotation.z += dt * 0.004;

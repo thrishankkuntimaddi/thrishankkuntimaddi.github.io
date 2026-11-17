@@ -451,35 +451,38 @@ main { transform: translateX(var(--gx, 0)); }
 .post { position: relative; z-index: 2; }
 
 /* =========================================================
-   Pencil-sketch layer: wobbly hand-drawn outlines, hatched
-   shading and space doodles. Structure stays the same.
+   Pencil-sketch mode. The site starts in the clean paper
+   style; the glitch at the end adds `.sketch` to <html> and
+   everything is redrawn: wobbly hand-drawn outlines, hatched
+   shading, space doodles, wireframe globes and readouts.
    ========================================================= */
-.card { border-color: transparent; box-shadow: none; }
-.card::before { content: ""; position: absolute; inset: -1px; border: 1.8px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; opacity: .9; }
-.card::after { content: ""; position: absolute; inset: 9px -10px -10px 9px; border-radius: inherit; filter: url(#sketch); pointer-events: none; transition: transform .35s var(--ease);
+.sketch .card { border-color: transparent; box-shadow: none; }
+.sketch .card::before { content: ""; position: absolute; inset: -1px; border: 1.8px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; opacity: .9; }
+.sketch .card::after { content: ""; position: absolute; inset: 9px -10px -10px 9px; border-radius: inherit; filter: url(#sketch); pointer-events: none; transition: transform .35s var(--ease);
   background: repeating-linear-gradient(-45deg, var(--accent-deep) 0 1.1px, transparent 1.1px 5.5px); opacity: .6;
   clip-path: polygon(calc(100% - 10px) 0, 100% 0, 100% 100%, 0 100%, 0 calc(100% - 10px), calc(100% - 10px) calc(100% - 10px)); }
-a.card:hover, .project-card:hover, .act:hover, .mini:hover { box-shadow: none; }
-a.card:hover::after, .project-card:hover::after, .act:hover::after, .mini:hover::after { transform: translate(4px, 4px); }
-.mini-self::before { border-style: dashed; }
+.sketch a.card:hover, .sketch .project-card:hover, .sketch .act:hover, .sketch .mini:hover { box-shadow: none; }
+.sketch a.card:hover::after, .sketch .project-card:hover::after, .sketch .act:hover::after, .sketch .mini:hover::after { transform: translate(4px, 4px); }
+.sketch .mini-self::before { border-style: dashed; }
 
-.window { overflow: visible; border-color: transparent; box-shadow: inset 0 2px 0 rgba(255,255,255,.95), inset 0 -18px 40px -22px color-mix(in srgb, var(--accent) 55%, transparent); }
-.window::before { content: ""; position: absolute; inset: -1px; z-index: 3; border: 2px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; box-shadow: 4px 5px 0 -1px color-mix(in srgb, var(--ink) 22%, transparent); }
-.win-bar { border-radius: 29px 29px 0 0; }
-.win-foot { border-radius: 0 0 29px 29px; }
+.sketch .window { overflow: visible; border-color: transparent; box-shadow: inset 0 2px 0 rgba(255,255,255,.95), inset 0 -18px 40px -22px color-mix(in srgb, var(--accent) 55%, transparent); }
+.sketch .window::before { content: ""; position: absolute; inset: -1px; z-index: 3; border: 2px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; box-shadow: 4px 5px 0 -1px color-mix(in srgb, var(--ink) 22%, transparent); }
+.sketch .win-bar { border-radius: 29px 29px 0 0; }
+.sketch .win-foot { border-radius: 0 0 29px 29px; }
 
-.btn { border-color: transparent; }
-.btn::after { content: ""; position: absolute; inset: -1px; border: 1.8px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; }
-.polaroid, .sec-num, .brand-mark, .sticker, .tour { border-color: var(--ink); }
+.sketch .btn { border-color: transparent; }
+.sketch .btn::after { content: ""; position: absolute; inset: -1px; border: 1.8px solid var(--ink); border-radius: inherit; filter: url(#sketch); pointer-events: none; }
+.sketch .polaroid, .sketch .sec-num, .sketch .brand-mark, .sketch .sticker, .sketch .tour { border-color: var(--ink); }
 
 .note-b { left: 22px; bottom: -34px; transform: rotate(-2deg); font-size: 21px; }
 .note-b::before { content: "↑ "; }
 
-/* Doodles */
+/* Doodles (only drawn in sketch mode) */
 .hero, .section { position: relative; }
-.doodle { position: absolute; z-index: 0; width: var(--w, 110px); height: auto; aspect-ratio: var(--ar, 1); overflow: visible; pointer-events: none; color: var(--ink); opacity: .78;
+.doodle { display: none; position: absolute; z-index: 0; width: var(--w, 110px); height: auto; aspect-ratio: var(--ar, 1); overflow: visible; pointer-events: none; color: var(--ink); opacity: .78;
   fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: url(#sketch);
   animation: drift var(--t, 9s) ease-in-out infinite alternate; }
+.sketch .doodle { display: block; }
 .doodle .fill, .doodle use { fill: none; }
 @keyframes drift { from { transform: translate(0, 0) rotate(var(--rot, 0deg)); } to { transform: translate(var(--dx, 6px), var(--dy, -16px)) rotate(calc(var(--rot, 0deg) + var(--spin, 5deg))); } }
 .wrap { position: relative; z-index: 1; }
@@ -500,11 +503,12 @@ a.card:hover::after, .project-card:hover::after, .act:hover::after, .mini:hover:
 .d15 { --w: 42px; left: calc(50% - 690px); top: 60%; color: var(--accent-deep); --t: 5.5s; --spin: 35deg; }
 .d16 { --w: 100px; --ar: 90/150; right: calc(50% - 730px); top: 10%; --rot: -20deg; --dx: -10px; --dy: -34px; --t: 7s; --spin: 0deg; }
 .d17 { --w: 150px; --ar: 150/120; left: calc(50% - 760px); top: 62%; --rot: 10deg; --t: 11s; }
-@media (max-width: 1500px) { .doodle.gut { display: none; } }
+@media (max-width: 1500px) { .sketch .doodle.gut { display: none; } }
 @media (max-width: 1500px) and (min-width: 700px) {
-  .doodle.d1 { display: block; right: 8px; top: 8px; --w: 120px; opacity: .45; }
-  .doodle.d8, .doodle.d14 { display: block; right: 6px; --w: 120px; opacity: .4; }
+  .sketch .doodle.d1 { display: block; right: 8px; top: 8px; --w: 120px; opacity: .45; }
+  .sketch .doodle.d8, .sketch .doodle.d14 { display: block; right: 6px; --w: 120px; opacity: .4; }
 }
+
 
 /* =========================================================
    Retro readout pieces: coded strips, wireframe globes with
@@ -547,3 +551,56 @@ a.card:hover::after, .project-card:hover::after, .act:hover::after, .mini:hover:
 @media (prefers-reduced-motion: reduce) { .converge path { stroke-dashoffset: 0; } }
 
 @media (max-width: 980px) { .note-b { display: none; } }
+
+/* =========================================================
+   Strips, glitch cover, Pip, and the final scene
+   ========================================================= */
+.strips { position: fixed; inset: 0; z-index: 240; pointer-events: none; overflow: hidden; }
+.strips[hidden] { display: none; }
+.strips i { position: absolute; left: 0; right: 0; background: color-mix(in srgb, var(--bg) 26%, transparent);
+  backdrop-filter: hue-rotate(var(--hue)) saturate(1.2); -webkit-backdrop-filter: hue-rotate(var(--hue)) saturate(1.2);
+  border-block: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); }
+#glitchCover { position: absolute; inset: 0; opacity: 0;
+  background: repeating-linear-gradient(0deg, var(--paper) 0 3px, var(--tint) 3px 5px, #fff 5px 9px, color-mix(in srgb, var(--accent) 35%, #fff) 9px 10px); }
+
+.pip { position: fixed; right: 18px; bottom: 16px; z-index: 85; width: 74px; padding: 0; border: 0; background: none; cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+  animation: pip-in .7s var(--spring) 1.6s both, pip-bob 3.2s ease-in-out 2.4s infinite alternate; }
+.pip[hidden] { display: none; }
+.pip svg { display: block; width: 100%; overflow: visible; fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; filter: url(#sketch); }
+.pip-body { fill: var(--accent); } .pip-ring { stroke: var(--accent-deep); } .pip-shoe { fill: var(--accent-3); }
+.pip-eyes ellipse { fill: #fff; stroke-width: 2.4; transform-box: fill-box; transform-origin: center; animation: blinkeye 4.4s infinite; }
+.pip-pupil { fill: var(--ink); stroke: none; }
+@keyframes blinkeye { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+@keyframes pip-in { from { opacity: 0; transform: translateY(90px) rotate(20deg); } }
+@keyframes pip-bob { to { translate: 0 -7px; } }
+.pip.hop svg { animation: hop .5s var(--spring); }
+@keyframes hop { 40% { transform: translateY(-22px) rotate(-10deg) scale(1.08); } }
+.pip:active svg { transform: scale(.94); }
+.pip-say { position: absolute; right: 6px; bottom: calc(100% + 8px); width: max-content; max-width: min(230px, 70vw); padding: 8px 12px; text-align: left; font-family: var(--mono); font-weight: 700; font-size: 12px; line-height: 1.35; color: var(--ink);
+  background: #fff; border: 1.8px solid var(--ink); border-radius: 12px 12px 2px 12px; box-shadow: 3px 3px 0 var(--shadow);
+  opacity: 0; transform: translateY(8px) scale(.9); transform-origin: 100% 100%; transition: opacity .25s, transform .35s var(--spring); pointer-events: none; }
+.pip.talk .pip-say { opacity: 1; transform: none; }
+
+.post { min-height: 100vh; padding-top: clamp(28px, 5vh, 56px); padding-bottom: 60px; }
+.post .post-title { margin-top: 22px; }
+.post-grid { grid-template-columns: .82fr 1.18fr; align-items: start; margin-top: clamp(22px, 4vh, 40px); }
+.resume-card { display: grid; gap: 16px; padding: 18px; }
+.resume-thumb { display: block; cursor: zoom-in; }
+.resume-thumb img { width: 100%; max-height: 64vh; object-fit: contain; object-position: top; background: #fff; border: 1.5px solid var(--line-2); border-radius: 8px; transition: transform .4s var(--ease); }
+.resume-thumb:hover img { transform: scale(1.015) rotate(-.4deg); }
+.resume-card .p-actions, .game-card .p-actions { margin-top: 0; }
+#postDownload.won { animation: won 1s var(--spring) 4; }
+@keyframes won { 50% { transform: scale(1.1) rotate(-2deg); } }
+.game-card h3 { font-family: var(--display); font-weight: 500; font-size: clamp(28px, 3vw, 38px); line-height: 1.05; margin-top: 4px; }
+.game-sub { margin-top: 8px; color: var(--muted); font-size: 15px; }
+#game { display: block; width: 100%; height: clamp(260px, 42vh, 380px); margin-top: 14px; border-radius: 16px; touch-action: none; cursor: ew-resize;
+  background: linear-gradient(color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px) 0 0 / 100% 30px, linear-gradient(90deg, color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px) 0 0 / 30px 100%, color-mix(in srgb, var(--tint) 40%, #fff);
+  border: 1.5px solid var(--line-2); }
+.game-hud { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 10px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.game-hud b { color: var(--ink); font-size: 13px; }
+.game-hud #gMode { margin-left: auto; color: var(--accent-deep); }
+.caught { min-height: 28px; margin: 10px 0 14px; }
+.caught li { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); animation: chip-in .4s var(--spring); }
+@keyframes chip-in { from { opacity: 0; transform: scale(.5); } }
+@media (max-width: 980px) { .post-grid { grid-template-columns: 1fr; } .resume-thumb img { max-height: 56vh; } .game-hud #gMode { margin-left: 0; } }
+@media (max-width: 560px) { .pip { width: 58px; right: 10px; bottom: 70px; } .pip-say { font-size: 11px; } }

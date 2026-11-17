@@ -432,32 +432,31 @@
     </section>
   </main>
 
-  <!-- ============ POST-CREDITS SCENE (revealed by a glitch when the visitor reaches the end) ============ -->
-  <section id="post" class="section post" data-scene="chaos">
-      <svg class="doodle d16 gut" aria-hidden="true" focusable="false"><use href="#d-rocket"/></svg><svg class="doodle d17 gut" aria-hidden="true" focusable="false"><use href="#d-saturn"/></svg>
+  <!-- ============ FINAL SCENE (revealed by the second glitch, at the end of the page) ============ -->
+  <section id="post" class="section post sketch" data-scene="chaos" data-frame="corner">
+    <svg class="doodle d16 gut" aria-hidden="true" focusable="false"><use href="#d-rocket"/></svg><svg class="doodle d17 gut" aria-hidden="true" focusable="false"><use href="#d-saturn"/></svg>
     <div class="wrap">
-      <div class="post-screen reveal">
-        <p class="readout" aria-hidden="true"><span>SIGNAL RECOVERED</span><span>END OF TOUR</span><span>SCENE 02</span><span>ORBITS UNSTABLE</span><span>REF 2031-K</span></p>
-        <svg class="converge" viewBox="0 0 1200 360" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-          <path d="M0 20L330 150M0 340L300 230M1200 30L880 150M1200 330L900 235M420 0L470 110M800 0L740 105M380 360L450 262M830 360L760 262"/>
-          <path class="wave a" d="M560 0c-40 60 50 70 10 128"/><path class="wave b" d="M690 360c50-50-40-70 0-124"/>
-        </svg>
-        <p class="post-stencil">POST-CREDITS SCENE.</p>
-      </div>
-      <h2 class="post-title">You stayed till the end. <em>Most people don't.</em></h2>
-      <p class="post-sub">So here is the part of the site nobody else sees. It plays by itself. Join in only if you feel like it.</p>
+      <p class="readout" aria-hidden="true"><span>SIGNAL RECOVERED</span><span>FINAL SCENE</span><span>RESUME UNLOCKED</span><span>REF 2031-K</span></p>
+      <h2 class="post-title">You made it to the end. <em>Here is my resume.</em></h2>
       <div class="post-grid">
-        <div class="window portal play reveal" id="playWindow" role="button" tabindex="0" aria-label="Gravity sandbox. It runs on its own. Press Enter or tap to drop a star yourself.">
-          <div class="win-bar"><i></i><i></i><i></i><span>SANDBOX.SYS</span><b>LIVE</b></div>
-          <p class="play-hint" id="playHint">Dropping stars by itself…</p>
-          <p class="play-count">Stars in orbit <b id="starCount">5</b></p>
+        <div class="card resume-card">
+          <a class="resume-thumb" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume aria-label="Open my resume full size"><img id="postResume" alt="First page of Thrishank Kuntimaddi's resume" width="1314" height="1700"></a>
+          <div class="p-actions">
+            <a class="btn btn-gloss" id="postDownload" href="resume/Thrishank-Kuntimaddi-Resume.pdf" download="Thrishank-Kuntimaddi-Resume.pdf">Download PDF ↓</a>
+            <a class="btn btn-paper" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume>Read full size</a>
+          </div>
         </div>
-        <div class="post-actions">
-          <button class="card act reveal" type="button" data-act="shake"><span class="act-ico" aria-hidden="true">✷</span><b>Shake the universe</b><span>Knock every orbit off course and watch which star escapes.</span></button>
-          <button class="card act reveal" type="button" data-act="jump"><span class="act-ico" aria-hidden="true">◐</span><b>Jump to another universe</b><span>Glitch the whole site into its next colour edition.</span></button>
-          <button class="card act reveal" type="button" data-act="replay"><span class="act-ico" aria-hidden="true">↻</span><b>Watch the tour again</b><span>Back to the top, hands off.</span></button>
-          <a class="card act reveal" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume data-resume-slot hidden><span class="act-ico" aria-hidden="true">↓</span><b>Take my resume</b><span>Preview it, then download the PDF.</span></a>
-          <a class="card act reveal" href="mailto:thrishankkuntimaddi@gmail.com"><span class="act-ico" aria-hidden="true">✉</span><b>Say hello</b><span>The fastest way to reach me.</span></a>
+        <div class="card game-card">
+          <p class="p-num">Mini game</p>
+          <h3>Catch my skills</h3>
+          <p class="game-sub">The skills from my resume are falling. Pip is catching them. Move your mouse or finger over the game to take over, and dodge the bugs.</p>
+          <canvas id="game" aria-label="A small game: skills from the resume fall and a character catches them"></canvas>
+          <p class="game-hud"><span>Caught <b id="gScore">0</b> / 12</span><span>Bugs hit <b id="gBugs">0</b></span><span id="gMode">Pip is playing</span></p>
+          <ul class="chips caught" id="caught" aria-label="Skills caught so far"></ul>
+          <div class="p-actions">
+            <button class="btn btn-paper btn-sm" type="button" data-act="replay">Watch the tour again ↻</button>
+            <a class="btn btn-paper btn-sm" href="mailto:thrishankkuntimaddi@gmail.com">Say hello ✉</a>
+          </div>
         </div>
       </div>
     </div>
@@ -523,7 +522,22 @@
       <feBlend in="rg" in2="bc" mode="screen"/>
     </filter>
   </svg>
-  <div class="glitch-layer" id="glitchLayer" hidden aria-hidden="true"><div id="glitchBars"></div><p id="glitchText">POST-CREDITS SCENE</p></div>
+  <!-- Horizontal strips that show another colour edition through the page (used by the glitch and by "peek") -->
+  <div class="strips" id="strips" hidden aria-hidden="true"></div>
+  <div class="glitch-layer" id="glitchLayer" hidden aria-hidden="true"><div id="glitchCover"></div><div id="glitchBars"></div><p id="glitchText">SIGNAL LOST</p></div>
+
+  <!-- Pip: the site's guide. A poke switches the sound on; holding it peeks at the previous colour edition. -->
+  <button class="pip" id="pip" type="button" hidden aria-label="Pip, the site guide. Tap to switch sound on. Hold to peek at the previous colours.">
+    <span class="pip-say" id="pipSay"></span>
+    <svg viewBox="0 0 120 132" aria-hidden="true" focusable="false">
+      <path class="pip-leg" d="M48 96v20M72 96v20"/><path class="pip-shoe" d="M36 120h14a4 4 0 0 0 0-8h-8zM84 120H70a4 4 0 0 1 0-8h8z"/>
+      <path class="pip-ring" d="M8 70c-6-14 22-30 54-34"/>
+      <circle class="pip-body" cx="60" cy="60" r="38"/>
+      <path class="pip-ring" d="M98 44c22 4 18 22-6 32-26 12-66 12-84-6"/>
+      <g class="pip-eyes"><ellipse cx="47" cy="54" rx="8" ry="11"/><ellipse cx="73" cy="54" rx="8" ry="11"/><circle class="pip-pupil" cx="49" cy="57" r="4"/><circle class="pip-pupil" cx="75" cy="57" r="4"/></g>
+      <path class="pip-mouth" d="M50 76q10 8 20 0"/>
+    </svg>
+  </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <script type="module" src="main.js"></script>

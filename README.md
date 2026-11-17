@@ -4,8 +4,9 @@ A light, pencil-sketch portfolio with retro space styling that runs itself.
 
 - **Auto-tour:** the page scrolls on its own. Any scroll, tap or key press hands control to the visitor at once, and the tour resumes after five idle seconds.
 - **Automatic editions:** four light colour palettes (Coral, Sky, Lilac, Mint). The first open matches the visitor's local time; every refresh steps to the next one. There are no theme controls.
-- **Pencil-sketch style:** hand-drawn wobbly outlines and hatched shading (an SVG filter over plain CSS borders), sketched planets and rockets, spinning wireframe globes with ID plaques, and retro readout strips.
-- **Post-credits scene:** reaching the bottom glitches the site (torn rows, split colours), shifts the edition and reveals a hidden scene with a gravity sandbox that plays itself. Visitors can join in if they want.
+- **Two glitches:** when the tour reaches "More work", and again at the end, the picture breaks up (torn rows, split colours, horizontal strips of the next edition) and the colours change without a reload. `assets/glitch.mp3` plays if the visitor has touched the page.
+- **Pip:** a small guide character. Poking it switches the sound on; holding it peeks at the previous colour edition in strips.
+- **Final scene:** the second glitch reveals the resume next to "Catch my skills", a small canvas game that plays itself until the visitor takes over. This scene is drawn in a pencil-sketch style.
 - **Live 3D gravity scenes:** a real N-body simulation drawn as pastel ink orbits on paper. Each section has its own system, framed by a glossy glass window. The hero orbit changes on every visit.
 - **One layout per project:** a window, a card, three points and two buttons (Open live, Code).
 - **Coded app previews:** each project window holds a small animated HTML/CSS version of that app's interface, not a screenshot.
