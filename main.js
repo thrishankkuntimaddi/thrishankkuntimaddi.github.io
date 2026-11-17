@@ -402,6 +402,7 @@ function pipAngry(ms = 1500) {
 }
 if (!calm()) {
   pip.hidden = false;
+  setTimeout(() => pip.classList.add('in'), 2600); // entrance done; walking and bobbing take over
   let holdT = 0, held = false, pokes = 0, at = 0, walkT = 0, acts = 0;
   const FACES = ['happy', 'wow', 'left', 'right', 'sleepy', 'wink'];
   const lines = ['Hehe.', 'That tickles.', 'Again!', 'Okay, okay.', 'Boop.', 'Hold me down and see.'];
@@ -502,10 +503,11 @@ const postEl = $('#post');
 const moreEl = $('#more');
 const story = { warned: false, first: calm(), finale: calm() };
 const finale = { get fired() { return story.finale; } };
-let holdTour = false;
+let holdTour = false, pendingNormal = false;
 if (!calm()) postEl.hidden = true;
 function storyTick() {
   if (glitching) return;
+  if (pendingNormal && !falling && scrollY > innerHeight * 0.55) { pendingNormal = false; glitch(1500, '', null, 'paper'); return; }
   const top = moreEl.getBoundingClientRect().top;
   if (!story.warned && top < innerHeight * 1.15) { story.warned = true; say('Uh oh…'); }
   if (!story.first && top < innerHeight * 0.5 && top > -moreEl.offsetHeight) {
@@ -787,6 +789,37 @@ const game = (() => {
 if (calm()) game.start();
 
 /* ---------------------------------------------------------
+   Sound design, all synthesised with Web Audio (no files):
+   impact, glass, whooshes, a riser, CRT hum and power-down.
+   --------------------------------------------------------- */
+const snd = (() => {
+  let out = null, nbuf = null;
+  const ok = () => { if (!actx || !soundOn) return false; if (!out) { out = actx.createGain(); out.gain.value = 0.6; const comp = actx.createDynamicsCompressor(); out.connect(comp).connect(actx.destination); } return true; };
+  const noise = () => { if (!nbuf) { nbuf = actx.createBuffer(1, actx.sampleRate * 2, actx.sampleRate); const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } const n = actx.createBufferSource(); n.buffer = nbuf; n.loop = true; return n; };
+  const env = (g, t, peak, a, d) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
+  return {
+    boom(vol = 1) { // a deep hit you feel: falling sine plus a thump of low noise
+      if (!ok()) return; const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+      o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(28, t + 0.7); env(g, t, 0.9 * vol, 0.005, 0.9); o.connect(g).connect(out); o.start(t); o.stop(t + 1);
+      const n = noise(), f = actx.createBiquadFilter(), g2 = actx.createGain(); f.type = 'lowpass'; f.frequency.value = 240; env(g2, t, 0.8 * vol, 0.004, 0.35); n.connect(f).connect(g2).connect(out); n.start(t); n.stop(t + 0.5);
+    },
+    crack() { if (!ok()) return; const t = actx.currentTime, n = noise(), f = actx.createBiquadFilter(), g = actx.createGain(); f.type = 'bandpass'; f.frequency.value = 2600 + Math.random() * 3000; f.Q.value = 6; env(g, t, 0.5, 0.001, 0.05); n.connect(f).connect(g).connect(out); n.start(t); n.stop(t + 0.08); },
+    glass() { // bright burst plus a scatter of falling tinkles
+      if (!ok()) return; const t = actx.currentTime, n = noise(), f = actx.createBiquadFilter(), g = actx.createGain();
+      f.type = 'highpass'; f.frequency.value = 3200; env(g, t, 0.7, 0.002, 0.5); n.connect(f).connect(g).connect(out); n.start(t); n.stop(t + 0.6);
+      for (let i = 0; i < 22; i++) { const o = actx.createOscillator(), g2 = actx.createGain(), at = t + 0.03 + Math.random() * 0.9; o.type = 'triangle'; o.frequency.value = 2200 + Math.random() * 6500; env(g2, at, 0.09, 0.001, 0.07 + Math.random() * 0.16); o.connect(g2).connect(out); o.start(at); o.stop(at + 0.3); }
+    },
+    whoosh(dur = 0.5, vol = 0.5) { if (!ok()) return; const t = actx.currentTime, n = noise(), f = actx.createBiquadFilter(), g = actx.createGain(); f.type = 'bandpass'; f.Q.value = 1.4; f.frequency.setValueAtTime(260, t); f.frequency.exponentialRampToValueAtTime(4200, t + dur * 0.55); f.frequency.exponentialRampToValueAtTime(380, t + dur); env(g, t, vol, dur * 0.45, dur * 0.55); n.connect(f).connect(g).connect(out); n.start(t); n.stop(t + dur + 0.05); },
+    riser(dur) { if (!ok()) return; const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(), f = actx.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(55, t); o.frequency.exponentialRampToValueAtTime(880, t + dur); f.type = 'lowpass'; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(5000, t + dur); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + dur * 0.9); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(f).connect(g).connect(out); o.start(t); o.stop(t + dur + 0.05); },
+    key() { if (!ok()) return; const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(); o.type = 'square'; o.frequency.value = 1100 + Math.random() * 500; env(g, t, 0.05, 0.001, 0.025); o.connect(g).connect(out); o.start(t); o.stop(t + 0.04); },
+    beep(freq = 880, dur = 0.14) { if (!ok()) return; const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(); o.type = 'square'; o.frequency.value = freq; env(g, t, 0.12, 0.004, dur); o.connect(g).connect(out); o.start(t); o.stop(t + dur + 0.05); },
+    hum(dur) { if (!ok()) return; const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(); o.type = 'sawtooth'; o.frequency.value = 60; g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.05, t + 0.3); g.gain.setValueAtTime(0.05, t + dur - 0.2); g.gain.linearRampToValueAtTime(0.0001, t + dur); o.connect(g).connect(out); o.start(t); o.stop(t + dur + 0.05); },
+    powerDown() { if (!ok()) return; const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(30, t + 0.55); env(g, t, 0.3, 0.005, 0.6); o.connect(g).connect(out); o.start(t); o.stop(t + 0.7); },
+    chime() { if (!ok()) return; const t = actx.currentTime; [523, 659, 784, 1047].forEach((fq, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'triangle'; o.frequency.value = fq; env(g, t + i * 0.07, 0.14, 0.005, 0.7); o.connect(g).connect(out); o.start(t + i * 0.07); o.stop(t + i * 0.07 + 0.8); }); },
+  };
+})();
+
+/* ---------------------------------------------------------
    Quick jump. The screen cracks and shatters, then we fall
    back to the top through every project, each in a different
    universe and shown in 3D: the big ones slowly, the small
@@ -795,19 +828,19 @@ if (calm()) game.start();
    the colours for the visitor's local time.
    --------------------------------------------------------- */
 const FALL = [ // in falling order. Every project is its own universe; t = how long we stay in it (ms): some linger, some flash past
-  { name: 'Oruinwan', line: 'One workspace for a team: chat, calls, tasks, notes and AI.', code: '83267', win: 0, t: 4000, world: 'paper', ed: 'morning', bits: ['chat', 'calls', 'tasks', 'notes', '@ai', 'React 19'] },
-  { name: 'SentinelFlight', line: 'Launch real rockets past real orbital debris, in 3D.', code: '359', win: 2, t: 3200, world: 'blueprint', ed: 'noon', bits: ['SGP4', 'Three.js', 'Δv', 'orbit', 'debris', 'AI copilot'] },
-  { name: 'Meditation', line: 'Breathing that quiets every device.', code: '2256', glyph: '◌', t: 520, world: 'news', ed: 'dusk', bits: ['breathe', 'in', 'out'] },
-  { name: 'Expense Tracker', line: 'A calm money app on web, Android and desktop.', code: '2274', win: 1, t: 2700, world: 'sketch', ed: 'dusk', bits: ['₹', 'budget', 'bills', 'chai 20', 'PWA', 'Tauri'] },
-  { name: 'ClearMyMind', line: 'Dump your thoughts, then clear them.', code: '25327', glyph: '✧', t: 430, world: 'pixel', ed: 'night', bits: ['clear', 'think'] },
-  { name: 'My Rovers', line: 'Home-built robot rovers.', code: '76837', glyph: '⛭', t: 560, world: 'blueprint', ed: 'morning', bits: ['ESP32', 'Mark 1', 'Wi-Fi'] },
-  { name: 'LearnViaNotes', line: '22 subjects and 150 coding problems. No sign-up.', code: '66837', win: 3, t: 2300, world: 'news', ed: 'night', bits: ['DSA', '150 problems', 'offline', 'streak', 'notes'] },
-  { name: 'Poelys', line: 'My product studio. Everything I build lives here.', code: '4663', glyph: '◎', t: 1900, world: 'paper', ed: 'dusk', bits: ['studio', 'poelys.com', 'still building'] },
-  { name: 'Interstellar', line: 'A 15-minute real-time 3D space journey.', code: '327', glyph: '✦', t: 1400, world: 'pixel', ed: 'noon', bits: ['GLSL', 'TARS', 'Gargantua', 'dock'] },
-  { name: 'YorMenu', line: 'A restaurant platform, from table to kitchen to bill.', code: '6368', glyph: '☕', t: 1050, world: 'sketch', ed: 'morning', bits: ['table 5', 'KOT', 'bill'] },
-  { name: 'Parla', line: 'Clear conversations, less friction.', code: '729', glyph: '❝', t: 760, world: 'blueprint', ed: 'night', bits: ['say it', 'clearly'] },
-  { name: 'Ms. Minutes', line: 'An AI desk companion with an animated face.', code: '8463', glyph: '◔', t: 560, world: 'pixel', ed: 'dusk', bits: ['tick', 'tock'] },
-  { name: 'This website', line: 'The one you are falling through.', code: '4373', glyph: '▚', t: 400, world: 'sketch', ed: 'noon', bits: ['you', 'are', 'here'] },
+  { name: 'Oruinwan', line: 'One workspace for a team: chat, calls, tasks, notes and AI.', code: '83267', win: 0, t: 2300, world: 'paper', ed: 'morning', bits: ['chat', 'calls', 'tasks', 'notes', '@ai', 'React 19'] },
+  { name: 'SentinelFlight', line: 'Launch real rockets past real orbital debris, in 3D.', code: '359', win: 2, t: 1800, world: 'blueprint', ed: 'noon', bits: ['SGP4', 'Three.js', 'Δv', 'orbit', 'debris', 'AI copilot'] },
+  { name: 'Meditation', line: 'Breathing that quiets every device.', code: '2256', glyph: '◌', t: 300, world: 'news', ed: 'dusk', bits: ['breathe', 'in', 'out'] },
+  { name: 'Expense Tracker', line: 'A calm money app on web, Android and desktop.', code: '2274', win: 1, t: 1500, world: 'sketch', ed: 'dusk', bits: ['₹', 'budget', 'bills', 'chai 20', 'PWA', 'Tauri'] },
+  { name: 'ClearMyMind', line: 'Dump your thoughts, then clear them.', code: '25327', glyph: '✧', t: 260, world: 'pixel', ed: 'night', bits: ['clear', 'think'] },
+  { name: 'My Rovers', line: 'Home-built robot rovers.', code: '76837', glyph: '⛭', t: 300, world: 'blueprint', ed: 'morning', bits: ['ESP32', 'Mark 1', 'Wi-Fi'] },
+  { name: 'LearnViaNotes', line: '22 subjects and 150 coding problems. No sign-up.', code: '66837', win: 3, t: 1300, world: 'news', ed: 'night', bits: ['DSA', '150 problems', 'offline', 'streak', 'notes'] },
+  { name: 'Poelys', line: 'My product studio. Everything I build lives here.', code: '4663', glyph: '◎', t: 1050, world: 'paper', ed: 'dusk', bits: ['studio', 'poelys.com', 'still building'] },
+  { name: 'Interstellar', line: 'A 15-minute real-time 3D space journey.', code: '327', glyph: '✦', t: 720, world: 'pixel', ed: 'noon', bits: ['GLSL', 'TARS', 'Gargantua', 'dock'] },
+  { name: 'YorMenu', line: 'A restaurant platform, from table to kitchen to bill.', code: '6368', glyph: '☕', t: 520, world: 'sketch', ed: 'morning', bits: ['table 5', 'KOT', 'bill'] },
+  { name: 'Parla', line: 'Clear conversations, less friction.', code: '729', glyph: '❝', t: 400, world: 'blueprint', ed: 'night', bits: ['say it', 'clearly'] },
+  { name: 'Ms. Minutes', line: 'An AI desk companion with an animated face.', code: '8463', glyph: '◔', t: 320, world: 'pixel', ed: 'dusk', bits: ['tick', 'tock'] },
+  { name: 'This website', line: 'The one you are falling through.', code: '4373', glyph: '▚', t: 260, world: 'sketch', ed: 'noon', bits: ['you', 'are', 'here'] },
 ];
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const fallEl = $('#fall'), fallStage = $('#fallStage'), fallTerm = $('#fallTerm');
@@ -825,41 +858,97 @@ function pipMatrix() { // Pip as a flickering grid of 0s and 1s
 }
 const CRASH = ['┌───────────┐', '│ ┌───────┐ │', '│ │       │ │', '│ └───────┘ │', '│   ┌───┐   │', '└───┴───┴───┘', '', 'A problem has been detected and Pip will', 'shut down to prevent damage.', '', 'collecting universes for crash dump...', 'saving your place...', 'dumping memory to disk...', 'erasing...'];
 const PIP_ASCII = ['    .-""""""-.', '   /  O    O  \\', '  |     __     |', '   \\   \\__/   /', "    '-......-'", '      |    |', '     _|    |_'].join('\n');
-async function quickJump() {
-  if (falling) return;
+// A still copy of what is on screen (nav + current section), used as the picture on every piece of glass.
+function snapshotView() {
+  const snap = document.createElement('div'); snap.className = 'snap';
+  for (const el of [viewSection(), nav]) {
+    if (!el) continue;
+    const r = el.getBoundingClientRect(), box = document.createElement('div'), c = el.cloneNode(true);
+    box.style.cssText = `position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px`;
+    c.style.cssText += ';position:static;margin:0;min-height:0;transform:none;filter:none';
+    const from = [...el.querySelectorAll('canvas')];
+    c.querySelectorAll('canvas').forEach((cv, k) => { cv.width = from[k].width; cv.height = from[k].height; try { cv.getContext('2d').drawImage(from[k], 0, 0); } catch { /* blank is fine */ } });
+    box.appendChild(c); snap.appendChild(box);
+  }
+  return snap;
+}
+// Break the screen like glass from the point of impact: cracks race outward, then every piece (showing the real page) tips and falls.
+async function shatterScreen(cx, cy) {
+  const W = innerWidth, H = innerHeight, D = Math.hypot(W, H), N = 9;
+  const ang = Array.from({ length: N }, (_, i) => (i / N) * Math.PI * 2 + (Math.random() - 0.5) * 0.4);
+  const at = (a, r) => [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+  const r1 = ang.map(() => D * (0.1 + Math.random() * 0.07)), r2 = ang.map(() => D * (0.27 + Math.random() * 0.1));
+  const A = ang.map((a, i) => at(a, r1[i])), B = ang.map((a, i) => at(a + (Math.random() - 0.5) * 0.12, r2[i])), C = ang.map((a) => at(a, D * 1.1));
+  const polys = [];
+  for (let i = 0; i < N; i++) { const k = (i + 1) % N; polys.push({ p: [[cx, cy], A[i], A[k]], ring: 0 }, { p: [A[i], B[i], B[k], A[k]], ring: 1 }, { p: [B[i], C[i], C[k], B[k]], ring: 2 }); }
+  const cracks = $('#fallCracks'), shards = $('#fallShards');
+  cracks.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const seg = (p, q, d) => `<path class="cr" style="--d:${d}s" d="M${p[0].toFixed(0)} ${p[1].toFixed(0)}L${((p[0] + q[0]) / 2 + (Math.random() - 0.5) * 14).toFixed(0)} ${((p[1] + q[1]) / 2 + (Math.random() - 0.5) * 14).toFixed(0)}L${q[0].toFixed(0)} ${q[1].toFixed(0)}"/>`;
+  let lines = '';
+  for (let i = 0; i < N; i++) { const k = (i + 1) % N; lines += seg([cx, cy], A[i], 0) + seg(A[i], B[i], 0.07) + seg(B[i], C[i], 0.15) + seg(A[i], A[k], 0.09) + seg(B[i], B[k], 0.18); }
+  cracks.innerHTML = `<g class="under">${lines}</g><g class="over">${lines}</g><circle class="hit" cx="${cx}" cy="${cy}" r="7"/>`;
+  fallEl.hidden = false; fallEl.className = 'fall cracking';
+  snd.boom(0.8); for (let i = 0; i < 7; i++) setTimeout(() => snd.crack(), i * 45);
+  document.body.animate([{ transform: 'translate(0,0)' }, { transform: 'translate(-7px,4px)' }, { transform: 'translate(6px,-5px)' }, { transform: 'translate(-3px,2px)' }, { transform: 'translate(0,0)' }], { duration: 260 });
+  const snap = snapshotView();
+  await wait(430);
+  const frag = document.createDocumentFragment();
+  for (const { p, ring } of polys) {
+    const mx = p.reduce((t, q) => t + q[0], 0) / p.length, my = p.reduce((t, q) => t + q[1], 0) / p.length;
+    // each piece is only as big as its own shape, so the browser handles 27 of them easily
+    const xs = p.map((q) => q[0]), ys = p.map((q) => q[1]);
+    const bx = Math.max(0, Math.min(...xs)), by = Math.max(0, Math.min(...ys)), bw = Math.min(W, Math.max(...xs)) - bx, bh = Math.min(H, Math.max(...ys)) - by;
+    if (bw < 2 || bh < 2) continue;
+    const rel = p.map((q) => [q[0] - bx, q[1] - by]);
+    const el = document.createElement('div'); el.className = 'shard';
+    el.style.cssText = `left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px;clip-path:polygon(${rel.map((q) => `${q[0].toFixed(1)}px ${q[1].toFixed(1)}px`).join(',')})`;
+    const inner = snap.cloneNode(true); inner.style.cssText = `inset:auto;left:${-bx}px;top:${-by}px;width:${W}px;height:${H}px`;
+    const src = [...snap.querySelectorAll('canvas')]; inner.querySelectorAll('canvas').forEach((cv, k) => { cv.width = src[k].width; cv.height = src[k].height; try { cv.getContext('2d').drawImage(src[k], 0, 0); } catch { /* blank */ } });
+    el.appendChild(inner);
+    el.insertAdjacentHTML('beforeend', `<svg class="edge" viewBox="0 0 ${bw.toFixed(0)} ${bh.toFixed(0)}" preserveAspectRatio="none"><polygon points="${rel.map((q) => `${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(' ')}"/></svg>`);
+    frag.appendChild(el);
+    const dx = (mx - cx) * (0.5 + Math.random() * 0.5), spin = () => (Math.random() - 0.5) * 2;
+    el.animate([
+      { transform: 'translate3d(0,0,0) rotateX(0) rotateY(0) rotateZ(0)', opacity: 1 },
+      { transform: `translate3d(${dx * 0.25}px,${-18 - Math.random() * 30}px,60px) rotateX(${spin() * 20}deg) rotateY(${spin() * 20}deg) rotateZ(${spin() * 6}deg)`, opacity: 1, offset: 0.18, easing: 'cubic-bezier(.5,0,1,.6)' },
+      { transform: `translate3d(${dx}px,${H * (0.9 + Math.random() * 0.5)}px,${-200 + Math.random() * 500}px) rotateX(${spin() * 200}deg) rotateY(${spin() * 160}deg) rotateZ(${spin() * 70}deg)`, opacity: 0.9 },
+    ], { duration: 900 + Math.random() * 500, delay: ring * 70 + Math.random() * 90, fill: 'forwards' });
+  }
+  shards.appendChild(frag);
+  cracks.innerHTML = '';
+  fallEl.className = 'fall dropping';
+  snd.glass(); snd.boom(1);
+  setTimeout(() => { shards.querySelectorAll('.shard').forEach((e) => e.remove()); }, 1700);
+}
+async function typeOut(el, text, perTick = 3, ms = 14) { for (let i = 0; i < text.length; i += perTick) { el.textContent += text.slice(i, i + perTick); if (i % 9 === 0) snd.key(); await wait(ms); } }
+async function quickJump(ev) {
+  if (falling || glitching) return;
   if (calm()) { scrollTo(0, 0); return; }
   falling = true; tour.on = false; tour.glide = null;
-  unlockSound(); playGlitchSound(1600);
-  const W = innerWidth, H = innerHeight, cx = W * (0.4 + Math.random() * 0.2), cy = H * (0.4 + Math.random() * 0.2);
-  // 1. cracks spread over the page, then it breaks into shards that fall away
-  const N = 13, pts = Array.from({ length: N }, (_, i) => { const a = (i / N) * Math.PI * 2 + Math.random() * 0.25, r = Math.hypot(W, H); return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; });
-  fallEl.hidden = false; fallEl.className = 'fall cracking';
-  fallEl.dataset.edition = settings.universe; fallEl.dataset.world = root.dataset.world;
-  const cracks = $('#fallCracks'); cracks.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  cracks.innerHTML = pts.map(([x, y]) => `<path d="M${cx} ${cy} L${(cx + x) / 2 + (Math.random() - 0.5) * 60} ${(cy + y) / 2 + (Math.random() - 0.5) * 60} L${x} ${y}"/>`).join('');
-  blip(240, 300);
-  await wait(520);
+  unlockSound();
+  const r = $('#jumpBtn').getBoundingClientRect();
+  const cx = ev?.clientX || r.left + r.width / 2, cy = ev?.clientY || r.top + r.height / 2;
   const shards = $('#fallShards');
-  shards.innerHTML = pts.map((p, i) => { const q = pts[(i + 1) % N]; return `<i style="clip-path:polygon(${cx}px ${cy}px,${p[0]}px ${p[1]}px,${q[0]}px ${q[1]}px);--dx:${((p[0] + q[0]) / 2 - cx) * 0.5}px;--dy:${H * (0.7 + Math.random() * 0.6)}px;--rot:${(Math.random() - 0.5) * 80}deg;--d:${(Math.random() * 0.18).toFixed(2)}s"></i>`; }).join('');
-  fallEl.className = 'fall shattering';
-  await wait(900);
-  cracks.innerHTML = ''; shards.innerHTML = '';
-  fallEl.className = 'fall dropping';
-  setWorld('paper', false); // neutral base, so each card shows only its own universe
-  scrollTo(0, 0); // we are already back at the top, hidden behind the fall
+  fallEl.dataset.edition = settings.universe; fallEl.dataset.world = root.dataset.world;
+
+  // 1. the screen breaks where it was hit
+  await shatterScreen(cx, cy);
+  setWorld('paper', false); // neutral base, so each scene shows only its own universe
+  scrollTo(0, 0);           // we are already back at the top, hidden behind the fall
 
   // 2. fall. Pip tumbles in the middle the whole way; the universes rush past and Pip is redrawn in each one's style
   const faller = $('#fallPip'), flash = $('#fallFlash'), windows = $$('.project .window');
   faller.innerHTML = pip.querySelector('svg').outerHTML; faller.hidden = false; faller.className = 'fall-pip';
-  const burst = () => { // a flash and a spray of shards as we break into the next universe
-    flash.animate([{ opacity: 0.85 }, { opacity: 0 }], { duration: 220, easing: 'ease-out' });
+  snd.riser(FALL.reduce((t, p) => t + p.t, 0) / 1000);
+  const burst = (big) => { // a flash, a jolt and a spray of shards as we break into the next universe
+    flash.animate([{ opacity: big ? 1 : 0.8 }, { opacity: 0 }], { duration: big ? 420 : 200, easing: 'ease-out' });
+    fallStage.animate([{ transform: 'translate(0,0)' }, { transform: `translate(${(Math.random() - 0.5) * 22}px,${(Math.random() - 0.5) * 22}px)` }, { transform: 'translate(0,0)' }], { duration: 170 });
     const wrap = document.createElement('div');
-    wrap.innerHTML = Array.from({ length: 9 }, () => `<b style="--a:${(Math.random() * 360).toFixed(0)}deg;--s:${(30 + Math.random() * 90).toFixed(0)}px;clip-path:polygon(${(Math.random() * 40).toFixed(0)}% 0,100% ${(30 + Math.random() * 50).toFixed(0)}%,${(Math.random() * 60).toFixed(0)}% 100%)"></b>`).join('');
-    shards.appendChild(wrap); setTimeout(() => wrap.remove(), 650);
-    blip(260 + Math.random() * 520, 70);
+    wrap.innerHTML = Array.from({ length: big ? 22 : 11 }, () => `<b style="--a:${(Math.random() * 360).toFixed(0)}deg;--s:${(22 + Math.random() * 90).toFixed(0)}px;--t:${(0.4 + Math.random() * 0.4).toFixed(2)}s;clip-path:polygon(${(Math.random() * 40).toFixed(0)}% 0,100% ${(30 + Math.random() * 50).toFixed(0)}%,${(Math.random() * 60).toFixed(0)}% 100%)"></b>`).join('');
+    shards.appendChild(wrap); setTimeout(() => wrap.remove(), 900);
   };
   for (const [n, p] of FALL.entries()) {
-    const side = n % 2 ? 1 : -1, fast = p.t < 900;
+    const side = n % 2 ? 1 : -1, fast = p.t < 600;
     fallEl.dataset.edition = p.ed; fallEl.dataset.world = p.world;
     faller.dataset.world = p.world; faller.dataset.edition = p.ed;
     const scene = document.createElement('div');
@@ -868,44 +957,50 @@ async function quickJump() {
     if (p.win != null && windows[p.win]) { const c = windows[p.win].cloneNode(true); c.className = 'window'; c.querySelector('.note')?.remove(); preview = c.outerHTML; }
     else preview = `<div class="window"><div class="win-bar"><i></i><i></i><i></i><span>${p.name.toUpperCase().replace(/[^A-Z]/g, '')}.SYS</span><b>LIVE</b></div><p class="fall-glyph">${p.glyph}</p></div>`;
     const words = [p.name, `:${p.code}`, ...p.bits, ...p.bits];
-    scene.innerHTML = `<p class="fs-name">${p.name}</p><p class="fs-name b">${p.name}</p>`
-      + `<div class="fs-bits">${words.map((w, k) => `<i style="--a:${((k / words.length) * 360 + Math.random() * 25).toFixed(0)}deg;--d:${(-Math.random() * 1.4).toFixed(2)}s">${w}</i>`).join('')}</div>`
+    scene.innerHTML = `<div class="fs-rings">${'<i></i>'.repeat(6)}</div><p class="fs-name">${p.name}</p><p class="fs-name b">${p.name}</p>`
+      + `<div class="fs-bits">${words.map((w, k) => `<i style="--a:${((k / words.length) * 360 + Math.random() * 25).toFixed(0)}deg;--d:${(-Math.random() * 1.1).toFixed(2)}s">${w}</i>`).join('')}</div>`
       + `<div class="fall-card ${side < 0 ? 'L' : 'R'}"><div class="card fall-inner">${preview}<div class="fall-text"><p class="p-num">:${p.code}</p><h3>${p.name}</h3><p>${p.line}</p></div></div></div>`;
     fallStage.appendChild(scene);
-    burst();
+    if (n) burst();
+    snd.whoosh(Math.min(0.7, p.t / 1000), fast ? 0.35 : 0.55); if (n && !fast) snd.boom(0.35);
     await scene.animate([
-      { transform: `scale(.1) rotate(${side * -16}deg)`, opacity: 0, easing: 'cubic-bezier(.1,.7,.3,1)' },
-      { transform: `scale(1) rotate(${side * -2}deg)`, opacity: 1, offset: fast ? 0.34 : 0.14, easing: 'linear' },
-      { transform: `scale(1.16) rotate(${side * 3}deg)`, opacity: 1, offset: fast ? 0.66 : 0.88, easing: 'cubic-bezier(.7,0,.9,.4)' },
-      { transform: `scale(5.5) rotate(${side * 18}deg)`, opacity: 0 },
+      { transform: `scale(.08) rotate(${side * -18}deg)`, opacity: 0, filter: 'blur(6px)', easing: 'cubic-bezier(.1,.8,.3,1)' },
+      { transform: `scale(1) rotate(${side * -2}deg)`, opacity: 1, filter: 'blur(0px)', offset: fast ? 0.36 : 0.16, easing: 'linear' },
+      { transform: `scale(1.18) rotate(${side * 3}deg)`, opacity: 1, filter: 'blur(0px)', offset: fast ? 0.64 : 0.86, easing: 'cubic-bezier(.7,0,.9,.4)' },
+      { transform: `scale(6) rotate(${side * 20}deg)`, opacity: 0, filter: 'blur(10px)' },
     ], { duration: p.t }).finished;
     scene.remove();
   }
 
-  // 3. the crash landing. Pip freezes, breaks into pixels, then: dot matrix, crash text, erased, redrawn
-  burst();
-  fallEl.dataset.edition = 'noon'; fallEl.dataset.world = 'pixel'; fallEl.className = 'fall crashing';
-  faller.dataset.world = 'pixel'; faller.classList.add('still');
-  playGlitchSound(1300);
-  await wait(650);
+  // 3. the crash landing, on an old amber CRT: Pip flickers into pixels, then a grid of digits, the crash screen, erased, redrawn, power off
+  burst(true); snd.boom(1); snd.glass();
+  fallEl.className = 'fall crashing crt'; fallEl.dataset.world = 'paper';
+  faller.classList.add('still'); snd.hum(6.4);
+  for (let i = 0; i < 9; i++) { faller.dataset.world = i % 2 ? 'paper' : 'pixel'; if (i % 3 === 0) snd.crack(); await wait(80); }
   faller.hidden = true; faller.innerHTML = '';
-  for (let i = 0; i < 12; i++) { fallTerm.textContent = pipMatrix(); await wait(95); }
-  fallTerm.textContent = '';
-  for (const line of CRASH) { fallTerm.textContent += `${line}\n`; blip(900, 20); await wait(line ? 120 : 60); }
-  await wait(650);
-  while (fallTerm.textContent.length > 1) { fallTerm.textContent = fallTerm.textContent.slice(0, -Math.ceil(fallTerm.textContent.length / 9)); await wait(45); }
-  for (let i = 0; i < 4; i++) { fallTerm.textContent = i % 2 ? '' : '.'; await wait(230); }
-  fallTerm.textContent = PIP_ASCII; blip(660, 120);
-  await wait(1100);
+  for (let i = 0; i < 10; i++) { fallTerm.textContent = pipMatrix(); if (i % 2 === 0) snd.key(); await wait(85); }
+  fallTerm.textContent = ''; snd.beep(440, 0.25);
+  await typeOut(fallTerm, `${CRASH.slice(0, 6).join('\n')}\n\n`, 12, 12);
+  await typeOut(fallTerm, `${CRASH.slice(7, 9).join('\n')}\n\n`, 3, 13);
+  for (const line of CRASH.slice(10)) { await typeOut(fallTerm, `${line}\n`, 4, 12); await wait(110); }
+  fallTerm.textContent += '█'; await wait(450);
+  while (fallTerm.textContent.length > 1) { fallTerm.textContent = fallTerm.textContent.slice(0, -Math.ceil(fallTerm.textContent.length / 7)); await wait(38); }
+  for (let i = 0; i < 4; i++) { fallTerm.textContent = i % 2 ? ' ' : '█'; await wait(170); }
+  fallTerm.textContent = PIP_ASCII; snd.beep(660, 0.12); await wait(120); snd.beep(990, 0.18);
+  await wait(800);
+  snd.powerDown();
+  await fallTerm.animate([{ transform: 'scale(1,1)', filter: 'brightness(1)' }, { transform: 'scale(1.1,.006)', filter: 'brightness(3)', offset: 0.55 }, { transform: 'scale(.004,.006)', filter: 'brightness(4)', offset: 0.85 }, { transform: 'scale(0,0)', filter: 'brightness(1)' }], { duration: 430, easing: 'ease-in', fill: 'forwards' }).finished;
+  fallTerm.textContent = ''; fallTerm.getAnimations().forEach((a) => a.cancel());
+  await wait(220);
 
-  // 4. land: the normal look, in the colours for the local time
+  // 4. land in the Pixel universe, in the colours for the local time. It turns back to normal once the page scrolls down.
   const hr = new Date().getHours();
-  setWorld('paper', true);
+  setWorld('pixel', true);
   setEdition(hr >= 5 && hr < 11 ? 'morning' : hr >= 11 && hr < 17 ? 'noon' : hr >= 17 && hr < 21 ? 'dusk' : 'night');
-  fallTerm.textContent = '';
+  snd.chime();
   await fallEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, easing: 'ease-out' }).finished;
   fallEl.hidden = true; fallEl.className = 'fall';
-  falling = false; tour.done = false; tour.held = false; tour.pos = 0; tour.resumeAt = performance.now() + 2500;
+  falling = false; pendingNormal = true; tour.done = false; tour.held = false; tour.pos = 0; tour.resumeAt = performance.now() + 2500;
   say('Phew. Home again.', 3200);
 }
 $('#jumpBtn').addEventListener('click', quickJump);
