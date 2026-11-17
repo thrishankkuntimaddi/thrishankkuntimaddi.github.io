@@ -1,3 +1,12 @@
 {
-  "firestore": { "rules": "firestore.rules" }
+  "firestore": { "rules": "firestore.rules" },
+  "hosting": {
+    "site": "thrishankkuntimaddi",
+    "public": ".",
+    "ignore": ["firebase.json", ".firebaserc", "firestore.rules", "**/.*", "**/node_modules/**", "tools/**", "kits/_src/**", "README.md", "update-resume.sh"],
+    "headers": [
+      { "source": "**/*.@(ttf|woff2|jpg|png|svg|mp3)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }] },
+      { "source": "kits/**/*.@(md|csv|txt)", "headers": [{ "key": "Content-Type", "value": "text/plain; charset=utf-8" }] }
+    ]
+  }
 }
