@@ -425,7 +425,10 @@ if (!calm() && PREFS.pip !== false) {
   const GESTURES = ['wave', 'up', 'hips', 'point', 'shrug'];
   const gesture = (name) => { GESTURES.forEach((g) => pip.classList.remove(`g-${g}`)); pip.classList.add(`g-${name}`); };
   // Pip's place on screen: --px (left of the bottom-right home, <= 0) and --py (up from it, >= 0).
-  let atY = 0;
+  // Pip keeps off the content: it stays in the corners and along the side edges (in the empty margins on
+  // wide screens), and crosses from one side to the other along the floor. Going down it falls, going up
+  // it jumps or flies, and along the floor it walks.
+  let atY = 0, moving = false, legT = [];
   const pipBase = () => (innerWidth <= 560 ? 70 : 16); // home distance from the bottom (above the phone tour pill)
   const spans = () => ({ x: Math.max(60, innerWidth - pip.offsetWidth - 40), y: Math.max(0, innerHeight - pip.offsetHeight - pipBase() - 96) }); // stay below the nav
   const bubbleSide = () => { // keep the speech bubble on screen wherever Pip is
@@ -433,12 +436,14 @@ if (!calm() && PREFS.pip !== false) {
     pip.classList.toggle('say-down', atY > sp.y * 0.5);
     pip.classList.toggle('say-right', -at > sp.x * 0.5);
   };
+  const MOVES = ['walking', 'falling', 'flying', 'jumping'];
+  const clearMove = () => { legT.forEach(clearTimeout); legT = []; MOVES.forEach((m) => pip.classList.remove(m)); moving = false; };
   const stopWalking = () => { // freeze exactly where Pip is standing
     const r = pip.getBoundingClientRect();
     at = -Math.max(0, innerWidth - r.right - 18);
     atY = Math.max(0, innerHeight - r.bottom - pipBase());
     pip.style.setProperty('--pt', '0s'); pip.style.setProperty('--px', `${at.toFixed(0)}px`); pip.style.setProperty('--py', `${atY.toFixed(0)}px`);
-    clearTimeout(walkT); pip.classList.remove('walking'); pip.style.setProperty('--face', '1');
+    clearTimeout(walkT); clearMove(); pip.style.setProperty('--face', '1');
     bubbleSide();
   };
   addEventListener('resize', () => { // a smaller window must not leave Pip off screen
@@ -447,28 +452,51 @@ if (!calm() && PREFS.pip !== false) {
     pip.style.setProperty('--pt', '0s'); pip.style.setProperty('--px', `${at.toFixed(0)}px`); pip.style.setProperty('--py', `${atY.toFixed(0)}px`);
     bubbleSide();
   }, { passive: true });
-  setInterval(() => { // Pip wanders the whole screen on foot, corners included. After a poke Pip rests a few seconds, then wanders again.
-    if (document.hidden || glitching || peeking || pip.classList.contains('walking') || root.classList.contains('at-final')) return;
+  function leg(tx, ty, then) { // one straight move, with the motion that suits its direction
+    const dx = tx - at, dy = ty - atY, d = Math.hypot(dx, dy);
+    if (d < 4) { then(); return; }
+    MOVES.forEach((m) => pip.classList.remove(m));
+    let kind = 'walking', secs = d / 95, ease = 'linear';
+    if (dy < -20) { kind = 'falling'; secs = Math.max(0.45, d / 260); ease = 'cubic-bezier(.55,0,1,.45)'; face('wow'); gesture('up'); }
+    else if (dy > 20) {
+      kind = Math.random() < 0.5 ? 'flying' : 'jumping';
+      secs = d / (kind === 'flying' ? 120 : 150); ease = kind === 'flying' ? 'ease-in-out' : 'cubic-bezier(.3,1.25,.6,1)';
+      face(kind === 'flying' ? 'happy' : 'wink'); gesture(kind === 'flying' ? 'wave' : 'up');
+    } else {
+      face(dx < 0 ? 'left' : 'right');
+      pip.style.setProperty('--face', dx < 0 ? '-1' : '1');
+    }
+    pip.style.setProperty('--pe', ease);
+    pip.style.setProperty('--pt', `${secs.toFixed(2)}s`);
+    pip.style.setProperty('--px', `${tx.toFixed(0)}px`);
+    pip.style.setProperty('--py', `${ty.toFixed(0)}px`);
+    pip.classList.add(kind);
+    at = tx; atY = ty; bubbleSide();
+    legT.push(setTimeout(() => { pip.classList.remove(kind); then(); }, secs * 1000 + 60));
+  }
+  function travel(path) { // a list of [x, y] stops, walked one after another
+    moving = true;
+    const next = () => {
+      const stop = path.shift();
+      if (!stop) { clearMove(); pip.style.setProperty('--face', '1'); face(''); return; }
+      leg(stop[0], stop[1], () => legT.push(setTimeout(next, 120)));
+    };
+    next();
+  }
+  setInterval(() => { // Pip wanders the edges and corners. After a poke Pip rests a few seconds, then wanders again.
+    if (document.hidden || glitching || peeking || moving || root.classList.contains('at-final')) return;
     acts++;
-    if (performance.now() > restUntil && Math.random() < (pokes ? 0.6 : 0.72)) {
+    if (performance.now() > restUntil && Math.random() < (pokes ? 0.45 : 0.55)) {
       const sp = spans();
-      let tx, ty;
-      if (Math.random() < 0.45) { tx = Math.random() < 0.5 ? 0 : -sp.x; ty = Math.random() < 0.5 ? 0 : sp.y; } // a corner
-      else { tx = -Math.random() * sp.x; ty = Math.random() < 0.35 ? 0 : Math.random() * sp.y; } // anywhere, often the floor
-      const d = Math.hypot(tx - at, ty - atY);
-      if (d > 60) {
-        const secs = d / 95;
-        face(tx < at ? 'left' : 'right');
-        pip.style.setProperty('--face', tx < at ? '-1' : '1');
-        pip.style.setProperty('--pt', `${secs.toFixed(2)}s`);
-        pip.style.setProperty('--px', `${tx.toFixed(0)}px`);
-        pip.style.setProperty('--py', `${ty.toFixed(0)}px`);
-        pip.classList.add('walking');
-        at = tx; atY = ty; bubbleSide();
-        clearTimeout(walkT);
-        walkT = setTimeout(() => { pip.classList.remove('walking'); pip.style.setProperty('--face', '1'); face(''); }, secs * 1000);
-        return;
-      }
+      const side = Math.random() < 0.5 ? 0 : -sp.x;
+      const ty = Math.random() < 0.5 ? (Math.random() < 0.5 ? 0 : sp.y) : Math.round(Math.random() * sp.y); // a corner, or anywhere up a side
+      const path = [];
+      if (Math.abs(side - at) > 40) { // changing sides: down to the floor, across, then up
+        if (atY > 0) path.push([at, 0]);
+        path.push([side, 0]);
+        if (ty > 0) path.push([side, ty]);
+      } else path.push([side, ty]); // same side: straight up or down the edge
+      if (Math.hypot(side - at, ty - atY) > 60) { travel(path); return; }
     }
     face(Math.random() < 0.2 ? '' : FACES[(Math.random() * FACES.length) | 0]);
     if (pokes) gesture(GESTURES[(Math.random() * GESTURES.length) | 0]);
@@ -552,10 +580,12 @@ const postEl = $('#post');
 const moreEl = $('#more');
 const story = { warned: false, first: calm(), finale: calm() };
 const finale = { get fired() { return story.finale; } };
-let holdTour = false, pendingNormal = false;
+let holdTour = false, pendingNormal = false, jumped = false, looping = false;
 if (!calm()) postEl.hidden = true;
 function storyTick() {
   if (glitching) return;
+  // After the quick jump, reaching the very bottom again opens the endless loop (infinity.js).
+  if (jumped && !looping && !falling && !tour.glide && !calm() && maxScroll() > 200 && scrollY >= maxScroll() - 3) { enterLoop(); return; }
   if (pendingNormal && !falling && scrollY > innerHeight * 0.55) { pendingNormal = false; glitch(1500, '', null, 'paper'); return; }
   const top = moreEl.getBoundingClientRect().top;
   if (!story.warned && top < innerHeight * 1.15) { story.warned = true; say('Uh oh…'); }
@@ -575,6 +605,20 @@ function storyTick() {
       game.start(); // Pip leaves the corner and becomes the player
     });
   }
+}
+if (/[?&]loop\b/.test(location.search) && !calm()) setTimeout(() => enterLoop(), 1500); // preview: open the loop straight away
+function enterLoop() {
+  looping = true; tourPause(true);
+  import('./infinity.js?v=19').then((m) => m.enter({
+    say, calm, PREFS,
+    pipSvg: () => $('#pip svg')?.outerHTML || '',
+    audio: () => { unlockSound(); return soundOn ? actx : null; },
+    onExit: () => { // back to the light site, at the top, with the tour waiting a moment
+      tour.held = false; tour.done = false; tour.pos = 0; tour.resumeAt = performance.now() + 4000;
+      scrollTo(0, 0);
+      setTimeout(() => { looping = false; say('What a trip. Welcome back.', 3600); }, 1500);
+    },
+  })).catch((err) => { looping = false; tour.held = false; console.warn('[loop]', err); });
 }
 document.addEventListener('click', (e) => {
   if (e.target.closest('[data-act="replay"]')) { tour.done = false; tour.held = false; glideTo(0, 1600, () => { tour.resumeAt = performance.now() + 800; }); }
@@ -1049,7 +1093,7 @@ async function quickJump(ev) {
   snd.chime();
   await fallEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, easing: 'ease-out' }).finished;
   fallEl.hidden = true; fallEl.className = 'fall';
-  falling = false; pendingNormal = true; tour.done = false; tour.held = false; tour.pos = 0; tour.resumeAt = performance.now() + 2500;
+  falling = false; pendingNormal = true; jumped = true; tour.done = false; tour.held = false; tour.pos = 0; tour.resumeAt = performance.now() + 2500;
   say('Phew. Home again.', 3200);
 }
 $('#jumpBtn').addEventListener('click', quickJump);
@@ -1059,7 +1103,7 @@ $('#jumpBtn').addEventListener('click', quickJump);
    Ask Pip, seasons, stickers and the 30-second version.
    Loaded separately, so the site above never depends on it.
    --------------------------------------------------------- */
-import('./chapter.js?v=17').then((m) => m.initChapter({
+import('./chapter.js?v=19').then((m) => m.initChapter({
   root, $, $$, calm, say, pip, visits, tourPause, snd, setMenu,
   refreshTag: () => { $('#editionText').textContent = tagText(); },
   openResume: () => $('[data-resume]')?.click(),

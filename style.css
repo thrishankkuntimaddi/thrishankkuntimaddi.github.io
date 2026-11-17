@@ -1276,3 +1276,32 @@ ol.story-list li::before { counter-increment: dec; content: counter(dec); positi
 .pip.say-down .pip-say { bottom: auto; top: calc(100% + 8px); border-radius: 12px 2px 12px 12px; transform-origin: 100% 0; }
 .pip.say-right .pip-say { right: auto; left: 6px; border-radius: 12px 12px 12px 2px; transform-origin: 0 100%; }
 .pip.say-down.say-right .pip-say { border-radius: 2px 12px 12px 12px; transform-origin: 0 0; }
+
+/* Pip's moves: falls going down, flies or jumps going up, walks along the floor */
+.pip { transition: right var(--pt, 1s) var(--pe, linear), bottom var(--pt, 1s) var(--pe, linear); }
+.pip.falling svg { animation: pip-tumble .5s ease-in-out infinite alternate; }
+.pip.falling::before { content: ""; position: absolute; left: 22%; right: 22%; top: -26px; height: 24px; background: repeating-linear-gradient(90deg, var(--line-2) 0 2px, transparent 2px 9px); opacity: .7; pointer-events: none; }
+.pip.flying svg { animation: pip-hover .35s ease-in-out infinite alternate; }
+.pip.flying::after { content: ""; position: absolute; left: 50%; bottom: -16px; width: 18px; height: 24px; margin-left: -9px; border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  background: radial-gradient(circle at 50% 30%, #fff 0 20%, var(--accent-3) 45%, #ff8a65 75%, transparent 76%); animation: jet .12s steps(2) infinite; pointer-events: none; }
+.pip.jumping svg { animation: pip-hops .42s cubic-bezier(.3,0,.6,1) infinite; }
+.pip.jumping .pip-leg, .pip.flying .pip-leg { animation: none; transform: rotate(18deg); } .pip.jumping .pip-leg.b, .pip.flying .pip-leg.b { transform: rotate(-18deg); }
+.pip.walking .pip-leg { animation: step .2s ease-in-out infinite alternate; } .pip.walking .pip-leg.b { animation-direction: alternate-reverse; }
+@keyframes pip-tumble { from { rotate: -14deg; } to { rotate: 14deg; } }
+@keyframes pip-hover { to { translate: 0 -5px; } }
+@keyframes pip-hops { 0%, 100% { translate: 0 0; scale: 1 1; } 15% { scale: 1.1 .88; } 50% { translate: 0 -18px; scale: .95 1.06; } 85% { scale: 1.08 .9; } }
+@keyframes jet { from { transform: scaleY(.8); opacity: .8; } to { transform: scaleY(1.2); opacity: 1; } }
+
+/* Pip's shades: a tint picked now and then (anger still turns Pip pink) */
+.pip .pip-body { fill: var(--pip-tint, var(--accent)); transition: fill .6s; }
+.pip.angry .pip-body { fill: #ff8fa3; }
+
+/* Pip's get-ups */
+.pip-wear .w-shade { fill: #2c3046; } .pip-wear .w-shine { stroke: #fff; stroke-width: 2.5; }
+.pip-wear .w-hb { stroke: var(--accent-3); stroke-width: 6; }
+.pip[data-getup="sun"] .w-sun, .pip[data-getup="nerd"] .w-nerd, .pip[data-getup="phones"] .w-phones, .pip[data-getup="cap"] .w-cap,
+.pip[data-getup="bow"] .w-bow, .pip[data-getup="flower"] .w-flower, .pip[data-getup="band"] .w-band { display: inline; }
+/* head get-ups give way to an occasion hat, and replace the crown */
+.pip:is([data-wear="party"], [data-wear="santa"], [data-wear="witch"], [data-wear="crescent"]) :is(.w-cap, .w-phones, .w-flower, .w-band) { display: none; }
+.pip:is([data-getup="cap"], [data-getup="phones"], [data-getup="flower"], [data-getup="band"]) .w-lv3 { display: none; }
+.pip[data-getup="sun"] .w-nerd, .pip[data-getup="nerd"] .w-sun { display: none; }

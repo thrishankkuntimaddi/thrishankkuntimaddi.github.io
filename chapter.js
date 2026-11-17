@@ -8,7 +8,7 @@
    5. Traces: stickers on a wall + optional shared counts
    6. The 30-second version for people in a hurry
    ========================================================= */
-import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=17';
+import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=19';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const PIP_FACE = '<svg class="mini-pip" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><circle class="mp-body" cx="60" cy="62" r="44"/><ellipse class="mp-eye" cx="45" cy="56" rx="8" ry="11"/><ellipse class="mp-eye" cx="75" cy="56" rx="8" ry="11"/><circle class="mp-pupil" cx="46" cy="59" r="5"/><circle class="mp-pupil" cx="76" cy="59" r="5"/><path class="mp-mouth" d="M48 80q12 10 24 0"/></svg>';
@@ -26,7 +26,17 @@ export const PIP_WEAR = ''
   + '<g class="w-colour"><circle class="w-c1" cx="40" cy="44" r="6"/><circle class="w-c2" cx="80" cy="76" r="7"/><circle class="w-c3" cx="74" cy="34" r="4"/><circle class="w-c2" cx="34" cy="74" r="4"/></g>'
   + '<g class="w-lv"><ellipse class="w-blush" cx="36" cy="70" rx="7" ry="4"/><ellipse class="w-blush" cx="84" cy="70" rx="7" ry="4"/></g>'
   + '<g class="w-lv2"><path class="w-fill2" d="M93 30l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></g>'
-  + '<g class="w-lv3"><path class="w-fill2" d="M40 24l6-18 9 12 5-16 5 16 9-12 6 18z"/></g>';
+  + '<g class="w-lv3"><path class="w-fill2" d="M40 24l6-18 9 12 5-16 5 16 9-12 6 18z"/></g>'
+  // Get-ups Pip changes into now and then
+  + '<g class="w-sun"><rect class="w-shade" x="35" y="46" width="22" height="15" rx="6"/><rect class="w-shade" x="63" y="46" width="22" height="15" rx="6"/><path d="M57 52h6M35 50l-10-4M85 50l10-4"/><path class="w-shine" d="M40 50h6M68 50h6"/></g>'
+  + '<g class="w-nerd"><circle cx="47" cy="55" r="12"/><circle cx="73" cy="55" r="12"/><path d="M59 54h2M35 53l-9-3M85 53l9-3"/></g>'
+  + '<g class="w-phones"><path d="M26 58q0-44 34-44t34 44" stroke-width="5"/><rect class="w-fill" x="16" y="50" width="14" height="22" rx="6"/><rect class="w-fill" x="90" y="50" width="14" height="22" rx="6"/></g>'
+  + '<g class="w-cap"><path class="w-fill" d="M26 36q2-26 34-26t34 26z"/><path class="w-fill2" d="M86 34q20-2 30 8q-14 2-30-2z"/><circle cx="60" cy="10" r="3"/></g>'
+  + '<g class="w-bow"><path class="w-red" d="M60 97l-14-8v16zM60 97l14-8v16z"/><circle class="w-red" cx="60" cy="97" r="4"/></g>'
+  + '<g class="w-flower"><circle class="w-c1" cx="34" cy="26" r="6"/><circle class="w-c1" cx="44" cy="22" r="6"/><circle class="w-c1" cx="40" cy="33" r="6"/><circle class="w-c1" cx="30" cy="35" r="6"/><circle class="w-fill2" cx="37" cy="29" r="4"/></g>'
+  + '<g class="w-band"><path class="w-hb" d="M24 44q36-18 72 0"/><path class="w-hb" d="M96 44l12-7M96 44l13 3"/></g>';
+export const GETUPS = [['sun', 'Sunglasses'], ['nerd', 'Round glasses'], ['phones', 'Headphones'], ['cap', 'Cap'], ['bow', 'Bow tie'], ['flower', 'Flower'], ['band', 'Headband']];
+export const SHADES = ['#ff8a65', '#6bb6ff', '#a78bfa', '#4fd1b0', '#ffd166', '#ff8fb8', '#7fe0c3', '#f2a51a'];
 
 export function initChapter(ctx) {
   const { root, $, $$, calm, say, pip, visits, tourPause, snd, refreshTag, openResume } = ctx;
@@ -326,6 +336,17 @@ export function initChapter(ctx) {
     else if (moon === 'full') setTimeout(() => say('Full moon today. Look up tonight.', 3400), returning ? 10500 : 6200);
   }
   addPipWear();
+  // Now and then Pip changes colour and puts on a different get-up.
+  const pickOne = (arr) => arr[(Math.random() * arr.length) | 0];
+  const restyle = (talk) => {
+    const g = Math.random() < 0.3 ? '' : pickOne(GETUPS.map(([id]) => id).filter((id) => id !== pip.dataset.getup));
+    pip.dataset.getup = g;
+    if (Math.random() < 0.65) pip.style.setProperty('--pip-tint', pickOne(SHADES)); else pip.style.removeProperty('--pip-tint');
+    if (talk && g && !pip.classList.contains('talk')) say(pickOne(['New look!', 'How do I look?', 'Changed. Better?', 'Fashion.']), 2400);
+  };
+  if (!calm() && !pip.hidden) {
+    setTimeout(() => { restyle(true); setInterval(() => { if (!document.hidden) restyle(Math.random() < 0.4); }, 60000); }, 28000);
+  }
   if (!calm() && prefs.season !== false) seasonSky(season);
 
   function addPipWear() {

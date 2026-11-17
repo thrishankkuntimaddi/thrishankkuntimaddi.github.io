@@ -4,8 +4,8 @@
    visitor's choices in localStorage 'tk-prefs', which
    index.html, main.js and chapter.js read on load.
    ========================================================= */
-import { OCCASIONS } from './content.js?v=17';
-import { PIP_WEAR } from './chapter.js?v=17';
+import { OCCASIONS } from './content.js?v=19';
+import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=19';
 
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
@@ -157,13 +157,14 @@ async function drawPips() {
   } catch { /* offline */ }
   if (!svg) { $('#occGrid').hidden = true; $('#pipSec').hidden = true; return; }
   document.body.insertAdjacentHTML('beforeend', defs);
-  const pip = (cls, wear) => `<span class="pip pip-still${cls ? ` ${cls}` : ''}"${wear ? ` data-wear="${wear}"` : ''} aria-hidden="true">${svg.replace('</svg>', `<g class="pip-wear">${PIP_WEAR}</g></svg>`)}</span>`;
+  const pip = (cls, wear, getup, tint) => `<span class="pip pip-still${cls ? ` ${cls}` : ''}"${wear ? ` data-wear="${wear}"` : ''}${getup ? ` data-getup="${getup}"` : ''}${tint ? ` style="--pip-tint:${tint}"` : ''} aria-hidden="true">${svg.replace('</svg>', `<g class="pip-wear">${PIP_WEAR}</g></svg>`)}</span>`;
   const seen = new Set();
   $('#occGrid').innerHTML = OCCASIONS.map((o) => {
     const key = `${o.wear}-${o.greet}`; if (seen.has(key)) return ''; seen.add(key);
     const nd = nextDate(o);
     return `<li class="card"><a href="./?occasion=${o.id}">${pip('', o.wear)}<b>${esc(o.greet)}</b><span>${nd ? `Next: ${nd}` : 'Dates to come'}</span></a></li>`;
-  }).join('') + `<li class="card"><a href="./?season=winter">${pip('', 'scarf')}<b>Any winter day</b><span>A scarf</span></a></li>`;
+  }).join('') + `<li class="card"><a href="./?season=winter">${pip('', 'scarf')}<b>Any winter day</b><span>A scarf</span></a></li>`
+    + GETUPS.map(([id, name], i) => `<li class="card">${pip('', '', id, SHADES[i % SHADES.length])}<b>${name}</b><span>A get-up Pip changes into now and then, in a new colour</span></li>`).join('');
   let pokes = 0;
   try { pokes = (JSON.parse(localStorage.getItem('tk-mem')) || {}).pokes || 0; } catch { /* private mode */ }
   const LV = [[0, '', 'Just met', 'Pip waves and pulls faces.'], [5, 'lv1', '5 pokes', 'Friends: blush.'], [15, 'lv1 lv2', '15 pokes', 'Best friends: a star.'], [30, 'lv1 lv2 lv3', '30 pokes', 'Favourite visitor: a crown.']];
