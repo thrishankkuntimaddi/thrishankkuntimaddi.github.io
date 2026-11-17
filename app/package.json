@@ -1,8 +1,8 @@
 {
   "name": "studio-app",
   "private": true,
-  "version": "1.0.0",
-  "description": "Studio: the owner's Android app for the portfolio (resume, content, website controls, reports, inbox).",
+  "version": "1.1.0",
+  "description": "myProfile: the owner\u2019s Android app for the portfolio.",
   "scripts": {
     "www": "node scripts/build-www.mjs",
     "sync": "npm run www && npx cap sync android"

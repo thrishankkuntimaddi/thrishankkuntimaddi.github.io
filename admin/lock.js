@@ -25,8 +25,8 @@ export async function setUpLock(email) {
   if (native()) return true;
   const cred = await navigator.credentials.create({ publicKey: {
     challenge: crypto.getRandomValues(new Uint8Array(32)),
-    rp: { name: 'Studio', id: location.hostname },
-    user: { id: crypto.getRandomValues(new Uint8Array(16)), name: email, displayName: 'Studio lock' },
+    rp: { name: 'myProfile', id: location.hostname },
+    user: { id: crypto.getRandomValues(new Uint8Array(16)), name: email, displayName: 'myProfile lock' },
     pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
     authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
     timeout: 60000,
@@ -37,7 +37,7 @@ export async function setUpLock(email) {
 export function removeLock() { localStorage.removeItem(KEY); }
 
 async function verify() {
-  if (native()) return native().verify('Unlock Studio');
+  if (native()) return native().verify('Unlock myProfile');
   const s = saved(); if (!s) return true;
   const r = await navigator.credentials.get({ publicKey: {
     challenge: crypto.getRandomValues(new Uint8Array(32)), rpId: location.hostname,

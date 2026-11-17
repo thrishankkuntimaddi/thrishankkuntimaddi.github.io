@@ -19,7 +19,7 @@ if (Capacitor.isNativePlatform()) {
       async available() { try { return (await NativeBiometric.isAvailable({ useFallback: true })).isAvailable; } catch { return false; } },
       async verify(reason) {
         if (!(await this.available())) return true; // no lock set on the phone: nothing to check against
-        await NativeBiometric.verifyIdentity({ reason, title: 'Unlock Studio', useFallback: true, maxAttempts: 3 });
+        await NativeBiometric.verifyIdentity({ reason, title: 'Unlock myProfile', useFallback: true, maxAttempts: 3 });
         return true;
       },
     },

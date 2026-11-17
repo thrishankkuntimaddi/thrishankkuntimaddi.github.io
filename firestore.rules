@@ -28,6 +28,7 @@ service cloud.firestore {
     // Owner-only: drafts and published history.
     match /private/{doc} { allow read: if isOwner(); allow write: if isFreshOwner(); }
     match /versions/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
+    match /devices/{id} { allow read: if isOwner(); allow write: if isOwner(); }
     match /resumes/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
 
     // Anonymous visit records for the owner's reports: create-only, fixed shape, no personal data.

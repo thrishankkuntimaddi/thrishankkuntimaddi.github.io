@@ -7,6 +7,7 @@ import { loadSDK, loadAuth, OWNER, KINDS } from '../lib/firebase.js?v=1';
 import { loadEngine, toSVG, download, toText, resumeFontCSS } from '../lib/resume.js?v=1';
 import { SEED } from '../lib/resume-seed.js?v=1';
 import { initWebsite } from './website.js?v=1';
+import { initDevices, forgetThisDevice } from './devices.js?v=1';
 import { unlock, watchAway, lockOn, lockAvailable, setUpLock, removeLock } from './lock.js?v=1';
 import { initContent } from './content.js?v=1';
 import { initReports, showReports } from './reports.js?v=1';
@@ -44,7 +45,7 @@ const DEMO = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSear
 async function boot() {
   if (DEMO) { // local preview of the UI: no sign-in, nothing is saved to Firebase
     $('#gate').hidden = true; $('#app').hidden = false; $('#who').textContent = 'Local demo (not saved)';
-    start(); return;
+    start(); initDevices({ F, DEMO, toast, onRevoked: () => {} }); return;
   }
   try {
     [F, A] = await Promise.all([loadSDK(), loadAuth()]);
@@ -76,6 +77,7 @@ async function boot() {
     start();
     watchAway();
     offerLock();
+    initDevices({ F, DEMO, toast, user, onRevoked: revoked });
   });
 }
 async function offerLock() {
@@ -83,7 +85,7 @@ async function offerLock() {
   let asked = false; try { asked = localStorage.getItem('studio-lock-asked'); } catch { /* fine */ }
   if (!asked && await lockAvailable()) {
     try { localStorage.setItem('studio-lock-asked', '1'); } catch { /* fine */ }
-    if (confirm('Protect Studio on this device with fingerprint / face / screen lock?')) await setUpLock(OWNER).then(() => toast('App lock is on')).catch((e) => toast(e.message));
+    if (confirm('Protect myProfile on this device with fingerprint / face / screen lock?')) await setUpLock(OWNER).then(() => toast('App lock is on')).catch((e) => toast(e.message));
   }
   drawLockSetting();
 }
@@ -113,7 +115,15 @@ $('#signIn').addEventListener('click', async () => {
     else toast(e.message, 4000);
   }
 });
-const signOut = () => { window.StudioNative?.signOut?.(); return A.auth.signOut(A.a).then(() => location.reload()); };
+const signOut = async () => { await forgetThisDevice(); window.StudioNative?.signOut?.(); return A.auth.signOut(A.a).then(() => location.reload()); };
+// Signed out from another device: wipe what this device keeps and go back to the sign-in screen.
+async function revoked() {
+  try { Object.keys(localStorage).filter((k) => /^(studio-|mp-lock)/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch { /* fine */ }
+  window.StudioNative?.signOut?.();
+  await A.auth.signOut(A.a).catch(() => {});
+  $('#app').hidden = true; $('#gate').hidden = false; $('#signIn').hidden = false;
+  $('#gateMsg').textContent = 'This device was signed out from your account settings. Sign in again to use it.';
+}
 $('#signOut').addEventListener('click', signOut);
 $('#signOutGate').addEventListener('click', signOut);
 
@@ -121,7 +131,7 @@ let started = false;
 function start() {
   if (started) return; started = true;
   const v = (location.hash.slice(1).split('?')[0] || 'resume');
-  show(['resume', 'content', 'website', 'reports', 'inbox', 'feedback', 'compliment', 'help', 'about'].includes(v) ? v : 'resume');
+  show(['resume', 'account', 'content', 'website', 'reports', 'inbox', 'feedback', 'compliment', 'help', 'about'].includes(v) ? v : 'resume');
   initResume();
   initMessages();
   initWebsite({ F, toast, DEMO });
@@ -143,7 +153,7 @@ async function checkAppUpdate() {
     const apk = rel.assets.find((a) => /\.apk$/.test(a.name));
     const bar = document.createElement('a');
     bar.className = 'update-bar'; bar.href = apk ? apk.browser_download_url : rel.html_url; bar.target = '_blank'; bar.rel = 'noopener';
-    bar.textContent = `Studio ${latest} is out (you have ${mine}). Tap to download.`;
+    bar.textContent = `myProfile ${latest} is out (you have ${mine}). Tap to download.`;
     document.body.prepend(bar);
   } catch { /* offline */ }
 }
@@ -158,7 +168,7 @@ function show(v) {
   $$('.view').forEach((s) => { s.hidden = !(s.dataset.view === v || (isMsg && s.dataset.view === 'messages')); });
   if (isMsg) { msgKind = v === 'inbox' ? 'all' : v; msgFilter = 'open'; drawMessages(); }
   if (v === 'reports' && started) showReports();
-  if (['feedback', 'compliment', 'help', 'about'].includes(v)) $('#moreBtn').setAttribute('aria-current', 'page'); else $('#moreBtn').removeAttribute('aria-current');
+  if (['feedback', 'compliment', 'help', 'about', 'account'].includes(v)) $('#moreBtn').setAttribute('aria-current', 'page'); else $('#moreBtn').removeAttribute('aria-current');
   window.scrollTo(0, 0);
 }
 $$('.side .nav-btn[data-view]').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
@@ -559,7 +569,7 @@ function drawCounts() {
     const n = b.dataset.count === 'all' ? unread.length : b.dataset.count === 'more' ? unread.filter((m) => m.kind !== 'message').length : unread.filter((m) => m.kind === b.dataset.count).length;
     b.textContent = n; b.hidden = !n;
   });
-  document.title = unread.length ? `(${unread.length}) Studio` : 'Studio — Thrishank Kuntimaddi';
+  document.title = unread.length ? `(${unread.length}) myProfile` : 'myProfile';
   if ('setAppBadge' in navigator) (unread.length ? navigator.setAppBadge(unread.length) : navigator.clearAppBadge()).catch(() => {});
 }
 const TITLES = { all: 'Inbox', feedback: 'Feedback', compliment: 'Compliments', help: 'Help center', message: 'Messages' };
@@ -625,7 +635,7 @@ async function initFaq() {
   try {
     const s = await F.fs.getDoc(F.fs.doc(F.db, 'site', 'help'));
     faq = s.exists() ? JSON.parse(s.data().data) : [
-      { q: 'Can I use your themes in my own project?', a: 'Yes. Every theme kit on the Studio page is free: copy the prompt into your AI coding tool, or download the .css, .csv and .md files.' },
+      { q: 'Can I use your themes in my own project?', a: 'Yes. Every theme kit on the themes page is free: copy the prompt into your AI coding tool, or download the .css, .csv and .md files.' },
       { q: 'Are you open to work?', a: 'Yes, frontend and UI roles, freelance work and collaborations. Send a message below or email me.' },
     ];
   } catch { faq = []; }
