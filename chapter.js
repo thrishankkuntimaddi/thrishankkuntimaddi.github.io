@@ -8,16 +8,31 @@
    5. Traces: stickers on a wall + optional shared counts
    6. The 30-second version for people in a hurry
    ========================================================= */
-import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=16';
+import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=17';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const PIP_FACE = '<svg class="mini-pip" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><circle class="mp-body" cx="60" cy="62" r="44"/><ellipse class="mp-eye" cx="45" cy="56" rx="8" ry="11"/><ellipse class="mp-eye" cx="75" cy="56" rx="8" ry="11"/><circle class="mp-pupil" cx="46" cy="59" r="5"/><circle class="mp-pupil" cx="76" cy="59" r="5"/><path class="mp-mouth" d="M48 80q12 10 24 0"/></svg>';
 const SECTIONS = [['hero', 'the top'], ['work', 'Projects'], ['poelys', 'Poelys'], ['more', 'More work'], ['about', 'About me'], ['contact', 'Contact']];
 const STORY_IDS = Object.keys(STORIES);
+// What Pip can wear (occasions, winter, attachment levels). Also used by universes.html.
+export const PIP_WEAR = ''
+  + '<g class="w-party"><path class="w-fill" d="M44 25L60-14l16 39z"/><path d="M50 10l16 6M47 18l22 6" opacity=".6"/><circle class="w-fill2" cx="60" cy="-16" r="6"/></g>'
+  + '<g class="w-santa"><path class="w-red" d="M28 30q8-34 40-34 22 0 28 26l-6 4q-8-14-22-16-16 0-24 22z"/><path class="w-white" d="M24 30q36-14 74-6v10q-38-8-74 6z"/><circle class="w-white" cx="100" cy="24" r="7"/></g>'
+  + '<g class="w-witch"><path class="w-dark" d="M38 26L66-22l12 46z"/><ellipse class="w-dark" cx="60" cy="26" rx="40" ry="7"/><path class="w-band" d="M44 18q16 5 30 1"/></g>'
+  + '<g class="w-scarf"><path class="w-fill" d="M28 84q32 14 64 0l-2 9q-30 12-60 0z"/><path class="w-fill" d="M76 90l6 26-10 2-4-24z"/></g>'
+  + '<g class="w-diya"><path class="w-fill2" d="M98 104q15 10 30 0z"/><path class="w-flame" d="M113 102q-6-8 0-16 6 8 0 16z"/></g>'
+  + '<g class="w-lantern"><path d="M113 10v18"/><rect class="w-red" x="103" y="28" width="20" height="24" rx="9"/><path d="M108 56l5 8 5-8"/></g>'
+  + '<g class="w-crescent"><path class="w-fill2" d="M52 2a13 13 0 1 0 16 18 11 11 0 1 1-16-18z"/></g>'
+  + '<g class="w-colour"><circle class="w-c1" cx="40" cy="44" r="6"/><circle class="w-c2" cx="80" cy="76" r="7"/><circle class="w-c3" cx="74" cy="34" r="4"/><circle class="w-c2" cx="34" cy="74" r="4"/></g>'
+  + '<g class="w-lv"><ellipse class="w-blush" cx="36" cy="70" rx="7" ry="4"/><ellipse class="w-blush" cx="84" cy="70" rx="7" ry="4"/></g>'
+  + '<g class="w-lv2"><path class="w-fill2" d="M93 30l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></g>'
+  + '<g class="w-lv3"><path class="w-fill2" d="M40 24l6-18 9 12 5-16 5 16 9-12 6 18z"/></g>';
 
 export function initChapter(ctx) {
   const { root, $, $$, calm, say, pip, visits, tourPause, snd, refreshTag, openResume } = ctx;
   const params = new URLSearchParams(location.search);
+  let prefs = {};
+  try { prefs = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch { /* private mode */ }
   const ss = (k, v) => { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch { /* private mode */ } return null; };
 
   /* -------------------------------------------------------
@@ -75,10 +90,11 @@ export function initChapter(ctx) {
     if (performance.now() - downAt > 320) return; // that was a hold (peek), not a poke
     const before = level();
     mem.pokes++; save(); showLevel();
-    if (level() > before) setTimeout(() => say(LEVELS[level() - 1][1], 3200), 2700);
-    else if (!pokedThisVisit && stats.poke > 1) setTimeout(() => say(`You and ${(stats.poke - 1).toLocaleString()} others have poked me.`, 3200), 2700);
     if (!pokedThisVisit) { pokedThisVisit = true; count('poke'); loadCounts(); }
     renderWallNote();
+    // A tap opens Ask Pip (after a beat, so the hop is seen). Level-ups are said inside the chat.
+    const extra = level() > before ? LEVELS[level() - 1][1] : '';
+    setTimeout(() => { openAsk(); if (extra) bubble('from-pip', esc(extra)); }, calm() ? 0 : 380);
   });
 
   // How far down the page they got, so a returning visitor can carry on.
@@ -89,6 +105,19 @@ export function initChapter(ctx) {
       if (i > mem.far) { mem.far = i; save(); }
     }), { threshold: 0.35 });
     SECTIONS.forEach(([id]) => { const el = document.getElementById(id); if (el) io.observe(el); });
+  }
+
+  // After the first glitch someone sees, Pip mentions once (ever) that it can be switched off.
+  const gl = $('#glitchLayer');
+  if (gl && !mem.toldSettings && !calm()) {
+    let seen = false;
+    const mo = new MutationObserver(() => {
+      if (!gl.hidden) { seen = true; return; }
+      if (!seen) return;
+      mo.disconnect(); mem.toldSettings = true; save();
+      setTimeout(() => say('Too much? Glitches and motion can be switched off. Settings are at the very bottom.', 5200), 3400);
+    });
+    mo.observe(gl, { attributes: true, attributeFilter: ['hidden'] });
   }
 
   // The final scene: remember it, and greet the game with their best score.
@@ -125,7 +154,7 @@ export function initChapter(ctx) {
     const line = mem.pokes >= 15 ? 'You came back! I missed you.' : days > 30 ? 'Long time no see!' : mem.end ? 'Back again? You know how this ends.' : `Oh, you’re back! Visit №${visits}.`;
     if (!calm()) setTimeout(() => say(line, 3600), 5600);
   } else if (fresh && !calm()) {
-    setTimeout(() => { if (!asked) say(innerWidth < 980 ? 'Got a question? “Ask Pip” is in the menu.' : 'Got a question? Tap “Ask Pip” up top.', 4200); }, 26000);
+    setTimeout(() => { if (!asked) say('Got a question? Tap me.', 4200); }, 26000);
   }
 
   /* -------------------------------------------------------
@@ -213,7 +242,7 @@ export function initChapter(ctx) {
     else for (let i = 0; i < r.a.length; i += 3) { t.textContent = r.a.slice(0, i + 3); if (i % 12 === 0) snd.key?.(); log.scrollTop = log.scrollHeight; await new Promise((res) => setTimeout(res, 12)); }
     if (r.b) {
       const acts = document.createElement('p'); acts.className = 'ask-acts';
-      acts.innerHTML = r.b.map(([label, act]) => (/^https?:/.test(act) ? `<a class="ask-chip" href="${act}" target="_blank" rel="noopener">${esc(label)}</a>` : `<button type="button" class="ask-chip" data-act="${act}">${esc(label)}</button>`)).join('');
+      acts.innerHTML = r.b.map(([label, act]) => (/^https?:/.test(act) ? `<a class="ask-chip" href="${act}" target="_blank" rel="noopener">${esc(label)}</a>` : /\.html$/.test(act) ? `<a class="ask-chip" href="${act}">${esc(label)}</a>` : `<button type="button" class="ask-chip" data-act="${act}">${esc(label)}</button>`)).join('');
       b.append(acts);
     }
     log.scrollTop = log.scrollHeight;
@@ -297,24 +326,13 @@ export function initChapter(ctx) {
     else if (moon === 'full') setTimeout(() => say('Full moon today. Look up tonight.', 3400), returning ? 10500 : 6200);
   }
   addPipWear();
-  if (!calm()) seasonSky(season);
+  if (!calm() && prefs.season !== false) seasonSky(season);
 
   function addPipWear() {
     const svg = pip.querySelector('svg'); if (!svg) return;
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('class', 'pip-wear');
-    g.innerHTML = ''
-      + '<g class="w-party"><path class="w-fill" d="M44 25L60-14l16 39z"/><path d="M50 10l16 6M47 18l22 6" opacity=".6"/><circle class="w-fill2" cx="60" cy="-16" r="6"/></g>'
-      + '<g class="w-santa"><path class="w-red" d="M28 30q8-34 40-34 22 0 28 26l-6 4q-8-14-22-16-16 0-24 22z"/><path class="w-white" d="M24 30q36-14 74-6v10q-38-8-74 6z"/><circle class="w-white" cx="100" cy="24" r="7"/></g>'
-      + '<g class="w-witch"><path class="w-dark" d="M38 26L66-22l12 46z"/><ellipse class="w-dark" cx="60" cy="26" rx="40" ry="7"/><path class="w-band" d="M44 18q16 5 30 1"/></g>'
-      + '<g class="w-scarf"><path class="w-fill" d="M28 84q32 14 64 0l-2 9q-30 12-60 0z"/><path class="w-fill" d="M76 90l6 26-10 2-4-24z"/></g>'
-      + '<g class="w-diya"><path class="w-fill2" d="M98 104q15 10 30 0z"/><path class="w-flame" d="M113 102q-6-8 0-16 6 8 0 16z"/></g>'
-      + '<g class="w-lantern"><path d="M113 10v18"/><rect class="w-red" x="103" y="28" width="20" height="24" rx="9"/><path d="M108 56l5 8 5-8"/></g>'
-      + '<g class="w-crescent"><path class="w-fill2" d="M52 2a13 13 0 1 0 16 18 11 11 0 1 1-16-18z"/></g>'
-      + '<g class="w-colour"><circle class="w-c1" cx="40" cy="44" r="6"/><circle class="w-c2" cx="80" cy="76" r="7"/><circle class="w-c3" cx="74" cy="34" r="4"/><circle class="w-c2" cx="34" cy="74" r="4"/></g>'
-      + '<g class="w-lv"><ellipse class="w-blush" cx="36" cy="70" rx="7" ry="4"/><ellipse class="w-blush" cx="84" cy="70" rx="7" ry="4"/></g>'
-      + '<g class="w-lv2"><path class="w-fill2" d="M93 30l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></g>'
-      + '<g class="w-lv3"><path class="w-fill2" d="M40 24l6-18 9 12 5-16 5 16 9-12 6 18z"/></g>';
+    g.innerHTML = PIP_WEAR;
     svg.append(g);
   }
 

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-edition="morning" data-world="paper">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Universes &amp; settings — Thrishank Kuntimaddi</title>
+  <meta name="description" content="Every universe, colour edition, season and outfit on Thrishank Kuntimaddi's portfolio, plus switches for motion, glitches, sound and the auto-tour.">
+  <meta name="theme-color" content="#fbf8f2">
+  <script>
+    (function () {
+      var d = document.documentElement, h = new Date().getHours(), list = ['morning', 'noon', 'dusk', 'night'];
+      var pr = {}; try { pr = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch (err) {}
+      d.dataset.edition = list.indexOf(pr.edition) >= 0 ? pr.edition : list[h >= 5 && h < 11 ? 0 : h >= 11 && h < 17 ? 1 : h >= 17 && h < 21 ? 2 : 3];
+      if (pr.motion === 'calm') d.classList.add('calm');
+      d.classList.add('js');
+    })();
+  </script>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=17">
+</head>
+<body class="settings-page">
+  <header class="nav scrolled">
+    <div class="wrap nav-inner">
+      <a href="./" class="brand" aria-label="Back to Thrishank Kuntimaddi's portfolio">
+        <span class="brand-mark">TK</span>
+        <span class="brand-name">Thrishank Kuntimaddi</span>
+      </a>
+      <a class="btn btn-gloss btn-sm" href="./">← Back to the site</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section set-hero">
+      <div class="wrap">
+        <p class="edition-tag"><span class="dot"></span> Behind the scenes</p>
+        <h1 class="set-title">Every universe,<br><em>and how you like it.</em></h1>
+        <p class="set-lede">The site changes on its own: a new universe on every refresh, colours from your clock, the season from your time zone. Here is everything it can become, and switches if you would rather it sat still. Your choices are saved in this browser only.</p>
+      </div>
+    </section>
+
+    <section class="section" id="prefs" aria-labelledby="prefsTitle">
+      <div class="wrap">
+        <header class="sec-head">
+          <span class="sec-num">01</span>
+          <h2 id="prefsTitle">Your settings</h2>
+          <p>Changes apply the next time you open the site.</p>
+        </header>
+        <div class="card set-card">
+          <p class="set-os" id="osNote" hidden>Your device asks for reduced motion, so the site is already calm for you, whatever is set here.</p>
+          <div class="set-rows" id="rows"></div>
+          <div class="set-pins" id="pins"></div>
+          <div class="set-foot">
+            <button type="button" class="btn btn-paper btn-sm" id="resetPrefs">Reset to automatic</button>
+            <button type="button" class="btn btn-paper btn-sm" id="forget">Forget everything about me</button>
+            <span class="set-forget-note" id="forgetNote">Visits, Pip’s memory of you, stickers and best scores.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="universes" aria-labelledby="uniTitle">
+      <div class="wrap">
+        <header class="sec-head">
+          <span class="sec-num">02</span>
+          <h2 id="uniTitle">Five universes</h2>
+          <p>Each has its own fonts, shapes and wording. These previews are drawn with the site’s real styles.</p>
+        </header>
+        <div class="uni-grid" id="uniGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="editions" aria-labelledby="edTitle">
+      <div class="wrap">
+        <header class="sec-head">
+          <span class="sec-num">03</span>
+          <h2 id="edTitle">Four colour editions</h2>
+          <p>Picked by your local time on the first visit, then the next one on every refresh. Tap one to try it on the previews above.</p>
+        </header>
+        <div class="ed-grid" id="edGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="occasions" aria-labelledby="occTitle">
+      <div class="wrap">
+        <header class="sec-head">
+          <span class="sec-num">04</span>
+          <h2 id="occTitle">Seasons, moons and occasions</h2>
+          <p>No location is used: the hemisphere comes from your time zone. On these days the greeting changes and Pip dresses up.</p>
+        </header>
+        <ul class="season-row" id="seasonRow"></ul>
+        <ul class="pip-grid" id="occGrid"></ul>
+      </div>
+    </section>
+
+    <section class="section" id="pipSec" aria-labelledby="pipTitle">
+      <div class="wrap">
+        <header class="sec-head">
+          <span class="sec-num">05</span>
+          <h2 id="pipTitle">Pip, and how attached Pip gets</h2>
+          <p>Every poke is remembered across visits.</p>
+        </header>
+        <ul class="pip-grid" id="lvGrid"></ul>
+      </div>
+    </section>
+
+    <section class="section" id="secrets" aria-labelledby="secTitle">
+      <div class="wrap">
+        <header class="sec-head">
+          <span class="sec-num">06</span>
+          <h2 id="secTitle">Things to find</h2>
+          <p>For the curious.</p>
+        </header>
+        <ul class="card find-list">
+          <li><b>Hold Pip down</b>to peek through at the colours you just left.</li>
+          <li><b>Hover a globe</b>in Poelys and its phone-keypad code decodes into a word.</li>
+          <li><b>Read the dots</b>on each project card: they blink its name in Morse code.</li>
+          <li><b>Reach the very end</b>for a resume, two games Pip plays, and a sticker wall.</li>
+          <li><b>Press “Quick jump?”</b>at the end to shatter the screen and fall back through every project.</li>
+          <li><b>Come back</b>and the site remembers you, and tells you what is new.</li>
+          <li><b>Add to the address</b><code>?world=pixel&amp;edition=dusk</code> or <code>?occasion=diwali</code> to jump straight to a look.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>© <span id="year">2026</span> Thrishank Kuntimaddi</span>
+      <a href="./">← Back to the site</a>
+    </div>
+  </footer>
+
+  <p class="set-saved" id="saved" role="status" aria-live="polite"></p>
+  <script type="module" src="universes.js?v=17"></script>
+</body>
+</html>

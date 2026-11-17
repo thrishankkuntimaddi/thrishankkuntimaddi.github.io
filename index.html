@@ -27,12 +27,15 @@
         sessionStorage.setItem('tk-edition', String(i));
       } catch (err) {}
       var q = /[?&]edition=(morning|noon|dusk|night)/.exec(location.search);
-      d.dataset.edition = q ? q[1] : list[i];
+      var pr = {}; try { pr = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch (err) {}
+      // Settings page choices (universes.html): a pinned edition or universe wins over the automatic one.
+      d.dataset.edition = q ? q[1] : list.indexOf(pr.edition) >= 0 ? pr.edition : list[i];
       var wl = ['paper', 'pixel', 'sketch', 'blueprint', 'news'], w = 0;
       // The universe (fonts, shapes, wording): Paper on first open, the next one on every refresh.
       try { var pw = parseInt(sessionStorage.getItem('tk-world'), 10); if (!isNaN(pw)) w = (pw + 1) % 5; sessionStorage.setItem('tk-world', String(w)); } catch (err) {}
       var qw = /[?&]world=(paper|pixel|sketch|blueprint|news)/.exec(location.search);
-      d.dataset.world = qw ? qw[1] : wl[w];
+      d.dataset.world = qw ? qw[1] : wl.indexOf(pr.world) >= 0 ? pr.world : wl[w];
+      if (pr.motion === 'calm') d.classList.add('calm');
       if (d.dataset.world === 'sketch') d.classList.add('sketch');
       d.classList.add('js');
     })();
@@ -42,7 +45,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=16">
+  <link rel="stylesheet" href="style.css?v=17">
 
   <script type="importmap">
     { "imports": {
@@ -530,6 +533,7 @@
   <footer class="footer">
     <div class="wrap footer-inner">
       <span>© <span id="year">2026</span> Thrishank Kuntimaddi</span>
+      <a href="universes.html">Universes &amp; settings ⚙</a>
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
@@ -606,7 +610,7 @@
   <div class="fall" id="fall" hidden aria-hidden="true"><div class="fall-streaks"></div><svg class="fall-cracks" id="fallCracks" preserveAspectRatio="none"></svg><div class="fall-shards" id="fallShards"></div><div class="fall-stage" id="fallStage"></div><div class="fall-pip" id="fallPip" hidden></div><div class="fall-flash" id="fallFlash"></div><pre class="fall-term" id="fallTerm"></pre></div>
 
   <!-- Pip: the site's guide. A poke switches the sound on; holding it peeks at the previous colour edition. -->
-  <button class="pip" id="pip" type="button" hidden aria-label="Pip, the site guide. Hold to peek at the previous colours.">
+  <button class="pip" id="pip" type="button" hidden aria-label="Pip, the site guide. Tap to ask Pip a question; hold to peek at the previous colours.">
     <span class="pip-say" id="pipSay"></span>
     <svg viewBox="-6 0 132 132" aria-hidden="true" focusable="false">
       <g class="pip-legs"><g class="pip-leg a"><path d="M48 94v18"/><path class="pip-shoe" d="M30 123h22a6 6 0 0 0 0-12h-9q-11 2-13 12z"/></g><g class="pip-leg b"><path d="M72 94v18"/><path class="pip-shoe" d="M90 123H68a6 6 0 0 1 0-12h9q11 2 13 12z"/></g></g>
@@ -621,6 +625,6 @@
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=16"></script>
+  <script type="module" src="main.js?v=17"></script>
 </body>
 </html>

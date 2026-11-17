@@ -10,7 +10,10 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const osReduced = matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
-const calm = () => osReduced.matches;
+// Visitor preferences from universes.html (Universes & settings). Missing = the automatic default.
+let PREFS = {};
+try { PREFS = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch { /* private mode */ }
+const calm = () => osReduced.matches || PREFS.motion === 'calm';
 const isSmall = () => innerWidth < 980;
 
 /* ---------------------------------------------------------
@@ -79,7 +82,7 @@ function setEdition(name) {
   try { sessionStorage.setItem('tk-edition', String(EDITION_ORDER.indexOf(name))); } catch { /* private mode */ }
   engine?.setUniverse();
 }
-const nextEdition = () => setEdition(EDITION_ORDER[(EDITION_ORDER.indexOf(settings.universe) + 1) % EDITION_ORDER.length]);
+const nextEdition = () => setEdition(PREFS.edition || EDITION_ORDER[(EDITION_ORDER.indexOf(settings.universe) + 1) % EDITION_ORDER.length]);
 $('#visitText').textContent = `Visit №${visits}`;
 $('meta[name="theme-color"]').content = UNIVERSES[edition].bg;
 $('#year').textContent = new Date().getFullYear();
@@ -130,7 +133,7 @@ copyBtn.addEventListener('click', async () => {
 const IDLE_MS = 5000;
 let falling = false;
 const tourEl = $('#tour'), tourTxt = $('#tourTxt'), tourIco = $('#tourIco'), tourBar = $('#tourBar');
-const tour = { on: false, pos: 0, speed: 0, resumeAt: performance.now() + 2600, held: false, done: false, glide: null };
+const tour = { on: false, pos: 0, speed: 0, resumeAt: performance.now() + 2600, held: PREFS.tour === false, done: false, glide: null };
 const maxScroll = () => Math.max(0, root.scrollHeight - innerHeight);
 const cruise = () => (isSmall() ? 62 : 84); // pixels per second
 
@@ -251,13 +254,21 @@ const sfx = new Audio('assets/glitch.mp3');
 sfx.preload = 'auto';
 let soundOn = false, actx = null, sfxT = 0;
 function unlockSound() {
-  if (soundOn) return;
+  if (soundOn || PREFS.sound === false) return;
   soundOn = true;
   sfx.muted = true;
   sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; sfx.muted = false; }).catch(() => { soundOn = false; });
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch { /* no Web Audio */ }
 }
 ['pointerdown', 'keydown', 'touchend'].forEach((ev) => addEventListener(ev, unlockSound, { passive: true }));
+// Sound on from the start wherever the browser allows it (for example Chrome, for people who visit often).
+// Everywhere else browsers require one tap, click or key press first, and the line above catches that.
+if (PREFS.sound !== false) {
+  try {
+    const probe = new (window.AudioContext || window.webkitAudioContext)();
+    if (probe.state === 'running') { actx = probe; sfx.muted = true; sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; sfx.muted = false; soundOn = true; }).catch(() => { sfx.muted = false; }); } else probe.close();
+  } catch { /* no Web Audio */ }
+}
 function blip(freq = 660, ms = 90) {
   if (!actx || !soundOn) return;
   const o = actx.createOscillator(), g = actx.createGain();
@@ -314,12 +325,15 @@ function viewSection() {
   return $$('main > section, #post').find((el) => { if (el.hidden) return false; const r = el.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; });
 }
 function glitch(ms, label, midpoint, settle) {
-  if (calm() || glitching) { midpoint?.(); return Promise.resolve(); }
+  if (calm() || glitching || PREFS.glitch === false) {
+    if (!glitching && settle) setWorld(PREFS.world || settle, true); // still land in the right universe, just without the effect
+    midpoint?.(); return Promise.resolve();
+  }
   glitching = true;
   if (peeking) stopPeek();
   const from = settings.universe, to = EDITION_ORDER[(EDITION_ORDER.indexOf(from) + 1) % EDITION_ORDER.length];
   playGlitchSound(ms);
-  const targetWorld = settle || WORLDS[(WORLDS.indexOf(root.dataset.world) + 1) % WORLDS.length];
+  const targetWorld = PREFS.world || settle || WORLDS[(WORLDS.indexOf(root.dataset.world) + 1) % WORLDS.length];
   let lastFlash = 0, flashes = 0;
   return new Promise((resolve) => {
     const targets = [$('#universe'), nav, viewSection()].filter(Boolean);
@@ -400,10 +414,10 @@ function pipAngry(ms = 1500) {
   clearTimeout(angryT);
   angryT = setTimeout(() => pip.classList.remove('angry'), ms);
 }
-if (!calm()) {
+if (!calm() && PREFS.pip !== false) {
   pip.hidden = false;
   setTimeout(() => pip.classList.add('in'), 2600); // entrance done; walking and bobbing take over
-  let holdT = 0, held = false, pokes = 0, at = 0, walkT = 0, acts = 0;
+  let holdT = 0, held = false, pokes = 0, at = 0, walkT = 0, acts = 0, restUntil = 0;
   const FACES = ['happy', 'wow', 'left', 'right', 'sleepy', 'wink'];
   const lines = ['You got me.', 'Okay, I will stay here.', 'That tickles.', 'Boop.', 'Hold me down and see.', 'Hehe.'];
   const face = (name) => { FACES.forEach((f) => pip.classList.remove(`ex-${f}`)); if (name) pip.classList.add(`ex-${name}`); };
@@ -416,10 +430,10 @@ if (!calm()) {
     pip.style.setProperty('--pt', '0s'); pip.style.setProperty('--px', `${at.toFixed(0)}px`);
     clearTimeout(walkT); pip.classList.remove('walking'); pip.style.setProperty('--face', '1');
   };
-  setInterval(() => { // Pip wanders the whole width of the window on foot. Once poked, Pip stays put and only pulls faces and moves its hands.
+  setInterval(() => { // Pip wanders the whole width of the window on foot. After a poke Pip rests a few seconds, then wanders again.
     if (document.hidden || glitching || peeking || pip.classList.contains('walking') || root.classList.contains('at-final')) return;
     acts++;
-    if (!pokes && Math.random() < 0.72) {
+    if (performance.now() > restUntil && Math.random() < (pokes ? 0.6 : 0.72)) {
       const span = Math.max(60, innerWidth - pip.offsetWidth - 40);
       const to = -Math.random() * span, d = Math.abs(to - at);
       if (d > 60) {
@@ -453,6 +467,7 @@ if (!calm()) {
     if (held) { held = false; return; }
     unlockSound();
     stopWalking();
+    restUntil = performance.now() + 7000;
     blip(520 + (pokes % 4) * 110);
     face(['happy', 'wow', 'wink'][pokes % 3]);
     gesture(GESTURES[pokes % GESTURES.length]);
@@ -1009,7 +1024,7 @@ async function quickJump(ev) {
   // 4. land in the Pixel universe, in the colours for the local time. It turns back to normal once the page scrolls down.
   const hr = new Date().getHours();
   setWorld('pixel', true);
-  setEdition(hr >= 5 && hr < 11 ? 'morning' : hr >= 11 && hr < 17 ? 'noon' : hr >= 17 && hr < 21 ? 'dusk' : 'night');
+  setEdition(PREFS.edition || (hr >= 5 && hr < 11 ? 'morning' : hr >= 11 && hr < 17 ? 'noon' : hr >= 17 && hr < 21 ? 'dusk' : 'night'));
   snd.chime();
   await fallEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, easing: 'ease-out' }).finished;
   fallEl.hidden = true; fallEl.className = 'fall';
@@ -1023,7 +1038,7 @@ $('#jumpBtn').addEventListener('click', quickJump);
    Ask Pip, seasons, stickers and the 30-second version.
    Loaded separately, so the site above never depends on it.
    --------------------------------------------------------- */
-import('./chapter.js?v=16').then((m) => m.initChapter({
+import('./chapter.js?v=17').then((m) => m.initChapter({
   root, $, $$, calm, say, pip, visits, tourPause, snd, setMenu,
   refreshTag: () => { $('#editionText').textContent = tagText(); },
   openResume: () => $('[data-resume]')?.click(),

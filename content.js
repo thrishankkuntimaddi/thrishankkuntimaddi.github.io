@@ -16,6 +16,7 @@ export const EMAIL = 'thrishankkuntimaddi@gmail.com';
 
 // Newest first. `v` must go up by one with every entry.
 export const CHANGELOG = [
+  { v: 3, date: '2026-11-17', items: ['Universes & settings: see every look, and switch off glitches, motion or sound', 'Tap Pip to ask a question'] },
   { v: 2, date: '2026-11-18', items: ['The story behind each project', 'Ask Pip anything', 'A wall for your stickers', 'The site now follows the seasons and the moon'] },
   { v: 1, date: '2026-11-17', items: ['Five universes, glitches, the quick jump and Pip'] },
 ];
@@ -128,8 +129,9 @@ export const ASK = [
   { k: ['education', 'degree', 'college', 'university', 'study', 'studied', 'gpa', 'btech', 'graduat'], a: 'B.Tech in Computer Science & Engineering (Data Science) at MITS Madanapalle, 2021 to 2025, with a GPA of 8.41 out of 10.' },
   { k: ['award', 'prize', 'hackathon', 'won', 'win', 'achievement'], a: 'First prize at the IISF 2023 Young Scientist Conference, second prize at the ImpactX 2024 Hackathon, and Level 3 at Smart India Hackathon 2023.' },
   { k: ['where', 'location', 'live', 'based', 'city', 'country', 'from', 'relocat', 'remote'], a: 'Bengaluru, India. For remote work or relocation questions, email is best.', b: [['Copy email', 'copy']] },
-  { k: ['site', 'website', 'built this', 'made this', 'gravity', 'glitch', 'universe'], a: 'This site is plain HTML, CSS and JavaScript with no build step. The orbits are a real gravity simulation, and the five universes change on every refresh. I come free with it.' },
-  { k: ['pip', 'your name', 'who are you', 'are you'], a: 'I’m Pip, the guide. I walk around, pull faces and answer questions. Poke me often and I get attached.' },
+  { k: ['site', 'website', 'built this', 'made this', 'gravity', 'universe'], a: 'This site is plain HTML, CSS and JavaScript with no build step. The orbits are a real gravity simulation, and the five universes change on every refresh. I come free with it.' },
+  { k: ['pip', 'your name', 'who are you', 'are you'], a: 'I’m Pip, the guide. I walk around, pull faces and answer questions. Tap me any time to ask something, and the more you do, the more attached I get.' },
+  { k: ['setting', 'disable', 'turn off', 'switch off', 'stop', 'glitch', 'motion', 'animation', 'sound', 'mute', 'theme', 'dark'], a: 'Everything can be tuned on the Universes & settings page: switch off glitches, motion, sound, the auto-tour or me, or pick your favourite universe. (Dark mode isn’t one of them; this site only comes in light.)', b: [['Open settings', 'universes.html']] },
   { k: ['secret', 'easter', 'hidden', 'trick', 'tip'], a: 'Hold me down to peek at the last colours. Hover a globe to decode its keypad code. And at the very end, try the quick jump.' },
   { k: ['salary', 'pay', 'rate', 'price', 'cost', 'age', 'old', 'married', 'religion'], a: 'That one is better asked to Thrishank directly.', b: [['Copy email', 'copy']] },
   { k: ['thank', 'thanks', 'cool', 'nice', 'love', 'awesome', 'great'], a: 'Aw. I’ll tell Thrishank. Want to leave a sticker at the end of the page?' },
