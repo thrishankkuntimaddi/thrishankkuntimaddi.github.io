@@ -13,6 +13,12 @@ A light, pencil-sketch portfolio with retro space styling that runs itself.
 - **One layout per project:** a window, a card, three points and two buttons (Open live, Code).
 - **Coded app previews:** each project window holds a small animated HTML/CSS version of that app's interface, not a screenshot.
 - **Self-updating resume:** run `./update-resume.sh` to preview a new PDF, confirm, and publish it. The site's resume buttons, preview and date update on their own.
+- **Remembers you:** a returning visitor gets a "Welcome back" note with what is new (from `CHANGELOG` in `content.js`) and a button to carry on where they left off. Pip greets them and grows attached the more it is poked across visits (blush, a star, then a crown). Stored only in the visitor's own browser.
+- **Project stories:** a "The story" button on each main project opens the problem, what was built, the decisions and why, what was hard, and the numbers. Text lives in `content.js`.
+- **Ask Pip:** in the nav. Pip answers from the facts in `content.js` only, so it never makes anything up, and offers buttons (copy email, resume, stories).
+- **Seasons, moon and occasions:** leaves, snow, petals or fireflies drift over the hero by season (hemisphere guessed from the time zone, no location asked). Full and new moons show in the label, and on Diwali, Holi, Eid, Christmas and others the greeting changes and Pip dresses up. Preview with `?season=winter&occasion=diwali&moon=full`.
+- **Sticker wall:** at the very end, visitors leave stickers that stay for their next visit.
+- **The 30-second version:** a link under the hero buttons for people in a hurry.
 - Works on phones, respects reduced motion (no tour, no animation), and still shows all content without WebGL.
 
 ## Stack
@@ -23,6 +29,8 @@ Plain HTML, CSS and JavaScript (ES modules) with no build step. Three.js 0.160 i
 index.html   page and content
 style.css    edition tokens, cards, glass windows, stickers, auto-tour pill
 main.js      editions, auto-tour, reveals + the WebGL engine
+chapter.js   memory, stories, Ask Pip, seasons, sticker wall, 30-second version
+content.js   the words for chapter.js (easy to edit)
 assets/      me.jpg, og.jpg (social preview), favicon.svg
 resume/      published resume, preview image and date (written by update-resume.sh)
 update-resume.sh   preview, confirm and publish a new resume
@@ -34,6 +42,18 @@ update-resume.sh   preview, confirm and publish a new resume
 python3 -m http.server 8080
 # open http://localhost:8080  (add ?edition=dusk to preview another edition)
 ```
+
+## Editing the new chapter
+
+All words for the stories, Ask Pip, the "what's new" note and the occasions are in `content.js`. When you ship something new, add an entry at the top of `CHANGELOG` with `v` one higher, and returning visitors will see it.
+
+## Shared counts and analytics (optional, free)
+
+1. Sign up at goatcounter.com (free for personal sites) and pick a code, for example `thrishank`.
+2. In GoatCounter's settings, turn on "Allow adding visitor counts on your website".
+3. Put the code in `GOATCOUNTER` at the top of `content.js` and publish.
+
+The sticker wall then shows how many visitors poked Pip, reached the end and left a sticker, and the GoatCounter dashboard shows your visits. Only anonymous event names are sent (no cookies). With the code empty, nothing is sent anywhere.
 
 ## Updating the resume
 

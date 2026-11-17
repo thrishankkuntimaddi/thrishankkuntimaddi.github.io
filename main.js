@@ -51,7 +51,7 @@ const COPY = {
   blueprint: { h2: 'I engineer <em>interfaces</em>', h3: 'to spec, then make them human.', cta: 'Open the drawings', work: 'Fig. 01: Projects', poelys: 'Fig. 02: Poelys', more: 'Fig. 03: Further work', about: 'Spec sheet: me', contact: 'Request a build. <em>Tolerances: tight.</em>' },
   news:      { h2: 'Developer builds <em>interfaces</em>', h3: 'people actually enjoy using.', cta: 'Read the full story', work: 'Front page: Projects', poelys: 'Business: Poelys', more: 'In other news', about: 'Profile', contact: 'Wanted: a team that <em>ships</em>.' },
 };
-const tagText = () => `${WORLD_NAMES[root.dataset.world] || 'Paper'} universe · ${UNIVERSES[settings.universe].name.replace(' edition', '')}`;
+const tagText = () => `${WORLD_NAMES[root.dataset.world] || 'Paper'} universe · ${UNIVERSES[settings.universe].name.replace(' edition', '')}${root.dataset.sky ? ` · ${root.dataset.sky}` : ''}`;
 function applyCopy(world) {
   const c = COPY[world] || COPY.paper;
   $$('[data-copy]').forEach((el) => { const k = el.dataset.copy; el.innerHTML = k === 'cta' ? `${c[k]} <span aria-hidden="true">↓</span>` : c[k]; });
@@ -188,7 +188,7 @@ if (!calm()) {
         scrollTo(0, tour.pos);
         if (tour.pos >= maxScroll() - 0.5) { tour.on = false; tour.done = finale.fired; }
       }
-    } else if (!falling && !tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open') && !resumeDlg.open) tourPlay();
+    } else if (!falling && !tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open') && !document.querySelector('dialog[open]')) tourPlay();
     storyTick();
     tourUI(now);
     requestAnimationFrame(frame);
@@ -1017,6 +1017,17 @@ async function quickJump(ev) {
   say('Phew. Home again.', 3200);
 }
 $('#jumpBtn').addEventListener('click', quickJump);
+
+/* ---------------------------------------------------------
+   The next chapter (chapter.js): memory, project stories,
+   Ask Pip, seasons, stickers and the 30-second version.
+   Loaded separately, so the site above never depends on it.
+   --------------------------------------------------------- */
+import('./chapter.js?v=16').then((m) => m.initChapter({
+  root, $, $$, calm, say, pip, visits, tourPause, snd, setMenu,
+  refreshTag: () => { $('#editionText').textContent = tagText(); },
+  openResume: () => $('[data-resume]')?.click(),
+})).catch((err) => console.warn('[chapter]', err));
 
 /* =========================================================
    The 3D universe (visuals only). The page works without it.
