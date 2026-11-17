@@ -1,0 +1,17 @@
+Apply the "Newsprint" theme to this project. A broadsheet front page: serif type, double rules, drop caps and halftone dots.
+
+Use the files news.css, news.csv and NEWS-THEME.md (from https://thrishankkuntimaddi.github.io/universes.html#kits). Follow them exactly:
+1. Add news.css after the project's own CSS and the Google Fonts link at the top of it. Put class "t-page" on <body>.
+2. Map components to the theme classes: page width → t-wrap; top bar → t-nav; cards/panels → t-card; app/screens previews → t-window; buttons → t-btn (the one main action per view → t-btn t-btn--primary; quiet actions → t-btn--ghost); text fields → t-input; tags/filters → t-chip; small labels → t-eyebrow; page title → t-title; section titles → t-h2; intro paragraph → t-lede; modals → t-dialog; notifications → t-toast.
+3. Use only the --t-* tokens for colour, type, radius and shadow. Remove hard-coded colours, fonts and radii that fight the theme.
+4. Theme rules:
+   - No radius. Cards are columns ruled with a 4px double line on top and a 1px line below.
+   - Headings: Fraunces 800, tight (-0.03em). Body: Georgia.
+   - First paragraph gets a drop cap.
+   - Primary button is solid ink with white uppercase mono text.
+   - Images in greyscale.
+   - Write headlines like a newspaper: "Developer ships…", "In other news".
+5. Light theme: keep everything light; no dark sections.
+6. Keep it accessible: text contrast AA, visible focus rings, prefers-reduced-motion turns animation off (already in the CSS).
+7. Check it at 390px (phone) and 1440px (desktop) wide and fix anything that overflows.
+Sample voice for headings: "Developer builds interfaces people actually enjoy using."

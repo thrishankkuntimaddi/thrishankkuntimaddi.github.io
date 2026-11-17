@@ -1,0 +1,73 @@
+Category,Token_Name,Variant_Mode,CSS_Property_or_Role,Exact_Value,Usage_Notes
+Theme_Surface,bg-base,Dark,background,#0c0c0c,Page background (the monolith)
+Theme_Surface,bg-base,Light,background,#f8f5f0,Page background (the monolith)
+Theme_Surface,bg-surface,Dark,background,#111111,"Cards, panels, lists"
+Theme_Surface,bg-surface,Light,background,#ffffff,"Cards, panels, lists"
+Theme_Surface,bg-hover,Dark,background,#161616,Row and ghost-button hover
+Theme_Surface,bg-hover,Light,background,#efebe4,Row and ghost-button hover
+Theme_Surface,bg-active,Dark,background,#1c1c1c,"Pressed / selected rows, default buttons"
+Theme_Surface,bg-active,Light,background,#e8e2d8,"Pressed / selected rows, default buttons"
+Component_Input,bg-input,Dark,background,#141414,Text fields
+Component_Input,bg-input,Light,background,#fbf9f6,Text fields
+Lines,border-subtle,Dark,border-color,#191919,Dividers inside panels
+Lines,border-subtle,Light,border-color,#e9e4dc,Dividers inside panels
+Lines,border-default,Dark,border-color,#222222,"Cards, buttons, inputs"
+Lines,border-default,Light,border-color,#ddd6cb,"Cards, buttons, inputs"
+Lines,border-accent,Dark,border-color,#383838,Hover border
+Lines,border-accent,Light,border-color,#c6bdaf,Hover border
+Typography,text-primary,Dark,color,#e4e4e4,Main text
+Typography,text-primary,Light,color,#1a1916,Main text
+Typography,text-secondary,Dark,color,#7a7a7a,Supporting text
+Typography,text-secondary,Light,color,#57524b,Supporting text
+Typography,text-muted,Dark,color,#555555,"Hints, metadata"
+Typography,text-muted,Light,color,#736d64,"Hints, metadata"
+Colour,accent,Dark,color,#b8956a,Gold accent (in light: a deeper gold that passes AA as text)
+Colour,accent,Light,color,#876434,Gold accent (in light: a deeper gold that passes AA as text)
+Colour,accent-dim,Dark,background,"rgba(184,149,106,0.12)",Soft gold fill
+Colour,accent-dim,Light,background,"rgba(135,100,52,0.12)",Soft gold fill
+Colour,accent-hover,Dark,color,#c9a87c,Accent on hover
+Colour,accent-hover,Light,color,#6c4f27,Accent on hover
+Colour,state-danger,Dark,color,#e05252,"Errors, destructive actions"
+Colour,state-danger,Light,color,#c94040,"Errors, destructive actions"
+Colour,state-success,Dark,color,#5aba8a,Success
+Colour,state-success,Light,color,#3a8f6a,Success
+Component_Input,input-ring,Dark,box-shadow,"rgba(184,149,106,0.25)",Focus ring colour
+Component_Input,input-ring,Light,box-shadow,"rgba(150,112,62,0.26)",Focus ring colour
+Overlay,bg-overlay,Dark,background,"rgba(0,0,0,0.7)",Scrim without blur
+Overlay,bg-overlay,Light,background,"rgba(48,38,24,0.32)",Scrim without blur
+Typography,font,Dark,font-family,"'Inter', system-ui, -apple-system, sans-serif",Everything
+Shape,gl-radius-sm,Dark,border-radius,3px,"Rows, inputs, buttons, cards (monolith)"
+Shape,gl-radius-md,Dark,border-radius,7px,"Popovers, menus, toasts"
+Shape,gl-radius-lg,Dark,border-radius,10px,"Dialogs, sheets, command palette"
+Gloss,gl-accent-grad,Dark,background,"linear-gradient(180deg, #d9b98f 0%, #b8956a 55%, #a5835a 100%)",Gold fill of the primary button
+Gloss,gl-accent-grad,Light,background,"linear-gradient(180deg, #dcbd92 0%, #c29d6d 55%, #ad8656 100%)",Gold fill of the primary button
+Gloss,gl-gloss,Dark,background,"linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0) 52%)",Specular top light layered over the gold
+Gloss,gl-gloss,Light,background,"linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0) 52%)",Specular top light layered over the gold
+Gloss,gl-on-accent,Dark,color,#120e08,Text on gold
+Gloss,gl-accent-glow,Dark,box-shadow,"0 8px 24px -10px rgba(200, 162, 116, 0.55)",Warm glow under the primary button
+Gloss,gl-accent-glow,Light,box-shadow,"0 6px 18px -10px rgba(140, 100, 50, 0.6)",Warm glow under the primary button
+Gloss,gl-spec,Dark,box-shadow,"inset 0 1px 0 rgba(255, 255, 255, 0.07)",Top-edge highlight on cards and buttons
+Gloss,gl-spec,Light,box-shadow,"inset 0 1px 0 rgba(255, 255, 255, 0.9)",Top-edge highlight on cards and buttons
+Gloss,gl-glass,Dark,background-image,"linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.012) 100%)",Faint glass gradient on cards
+Gloss,gl-glass,Light,background-image,"linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.55) 100%)",Faint glass gradient on cards
+Elevation,gl-drop,Dark,box-shadow,"0 24px 60px -24px rgba(0, 0, 0, 0.75)",Hover lift shadow
+Elevation,gl-drop,Light,box-shadow,"0 1px 2px rgba(60, 44, 20, 0.06), 0 14px 34px -14px rgba(60, 44, 20, 0.22)",Hover lift shadow
+Liquid_Glass,lg-filter,Dark,backdrop-filter,blur(var(--lg-blur)) saturate(var(--lg-sat)),Frost for floating layers only
+Liquid_Glass,lg-tint,Dark,background-color,"rgba(24, 23, 21, 0.72)",Frosted body of menus/toasts
+Liquid_Glass,lg-tint,Light,background-color,"rgba(255, 255, 255, 0.7)",Frosted body of menus/toasts
+Liquid_Glass,lg-tint-strong,Dark,background-color,"rgba(20, 19, 18, 0.86)",Dialogs and palettes (lots of text)
+Liquid_Glass,lg-tint-strong,Light,background-color,"rgba(255, 254, 252, 0.86)",Dialogs and palettes (lots of text)
+Liquid_Glass,lg-sheen,Dark,background-image,"linear-gradient(180deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.018) 42%, rgba(255, 255, 255, 0) 70%)",Refraction highlight across the top
+Liquid_Glass,lg-sheen,Light,background-image,"linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.35) 40%, rgba(255, 255, 255, 0) 72%)",Refraction highlight across the top
+Liquid_Glass,lg-edge,Dark,box-shadow,"inset 0 1px 0 rgba(255, 255, 255, 0.11), inset 0 0 0 1px rgba(255, 255, 255, 0.025), inset 0 -1px 0 rgba(0, 0, 0, 0.3)",Lit rim
+Liquid_Glass,lg-edge,Light,box-shadow,"inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(80, 60, 30, 0.05)",Lit rim
+Liquid_Glass,lg-shadow,Dark,box-shadow,"0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px -10px rgba(0, 0, 0, 0.6), 0 36px 80px -28px rgba(0, 0, 0, 0.65)",Floating depth
+Liquid_Glass,lg-shadow,Light,box-shadow,"0 1px 2px rgba(60, 44, 20, 0.07), 0 10px 28px -10px rgba(60, 44, 20, 0.18), 0 30px 70px -30px rgba(60, 44, 20, 0.24)",Floating depth
+Overlay,lg-scrim,Dark,background,"rgba(5, 5, 4, 0.58)",Behind dialogs
+Overlay,lg-scrim,Light,background,"rgba(52, 42, 28, 0.2)",Behind dialogs
+Accessibility,lg-solid,Dark,background,#171615,Fallback when backdrop-filter is unsupported
+Accessibility,lg-solid,Light,background,#fdfcfa,Fallback when backdrop-filter is unsupported
+Motion,gl-ease,Dark,transition-timing-function,"cubic-bezier(0.16, 1, 0.3, 1)",All transitions
+Motion,gl-dur-1,Dark,transition-duration,150ms,Hover colour
+Motion,gl-dur-2,Dark,transition-duration,190ms,"Borders, shadows"
+Motion,gl-dur-3,Dark,transition-duration,220ms,"Lifts, dialogs"

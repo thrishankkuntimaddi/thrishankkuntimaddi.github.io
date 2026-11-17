@@ -1,0 +1,28 @@
+{
+ "name": "Liquid Glass",
+ "group": "Signature kits",
+ "mood": "Apple-style Liquid Glass (iOS 26 / macOS Tahoe): colourless frosted glass, lit bevels, content scrolling under floating bars. Light by default, smoked dark on request.",
+ "light": true,
+ "swatch": {
+  "bg": "#EEF0F6",
+  "page": "radial-gradient(circle at 20% 20%, #cfe3ff, transparent 45%), radial-gradient(circle at 80% 30%, #ffd9c7, transparent 45%), radial-gradient(circle at 50% 90%, #dcd3ff, transparent 50%), #EEF0F6",
+  "ink": "#0A0A0C",
+  "surface": "rgba(255,255,255,.45)",
+  "accent": "#ffffff",
+  "accent2": "#007AFF",
+  "accent3": "#34C759",
+  "r": "28px",
+  "display": "-apple-system, system-ui, sans-serif",
+  "glass": true
+ },
+ "files": [
+  "LIQUID-GLASS-THEME.md",
+  "liquid-glass.css",
+  "liquid-glass.js",
+  "liquid-glass-theme.css",
+  "liquid-glass-theme.csv",
+  "prompt.txt"
+ ],
+ "demo": false,
+ "note": "Built and refined in the Expense Tracker app over many rounds of feedback."
+}

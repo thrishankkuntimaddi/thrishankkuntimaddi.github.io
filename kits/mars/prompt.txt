@@ -1,0 +1,14 @@
+Apply the "Planet fall" theme to this project. Landing on Mars: rust dunes, a dusty horizon, mission typography.
+
+Use the files mars.css, mars.csv and MARS-THEME.md (from https://thrishankkuntimaddi.github.io/universes.html#kits). Follow them exactly:
+1. Add mars.css after the project's own CSS and the Google Fonts link at the top of it. Put class "t-page" on <body>.
+2. Map components to the theme classes: page width → t-wrap; top bar → t-nav; cards/panels → t-card; app/screens previews → t-window; buttons → t-btn (the one main action per view → t-btn t-btn--primary; quiet actions → t-btn--ghost); text fields → t-input; tags/filters → t-chip; small labels → t-eyebrow; page title → t-title; section titles → t-h2; intro paragraph → t-lede; modals → t-dialog; notifications → t-toast.
+3. Use only the --t-* tokens for colour, type, radius and shadow. Remove hard-coded colours, fonts and radii that fight the theme.
+4. Theme rules:
+   - Space Mono display type; rust orange accent, sky blue secondary.
+   - Horizon line across the background.
+   - Mission wording: "Samples", "Base camp".
+5. Dark page, light cards: page text uses --t-ink on the dark background; anything inside a card uses --t-surface-ink.
+6. Keep it accessible: text contrast AA, visible focus rings, prefers-reduced-motion turns animation off (already in the CSS).
+7. Check it at 390px (phone) and 1440px (desktop) wide and fix anything that overflows.
+Sample voice for headings: "Interfaces built for new worlds and the first footprints."

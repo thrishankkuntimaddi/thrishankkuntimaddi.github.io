@@ -60,7 +60,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20">
+  <link rel="stylesheet" href="style.css?v=21">
 
   <script type="importmap">
     { "imports": {
@@ -448,6 +448,7 @@
           <div class="contact-actions">
             <a class="btn btn-gloss" href="mailto:thrishankkuntimaddi@gmail.com">Write to me</a>
             <button class="btn btn-paper" id="copyBtn" type="button">Copy email</button>
+            <button class="btn btn-paper" type="button" data-contact>Send a message ✉</button>
             <a class="btn btn-paper" href="resume/Thrishank-Kuntimaddi-Resume.pdf" data-resume data-resume-slot hidden>Resume</a>
           </div>
           <ul class="socials">
@@ -548,7 +549,8 @@
   <footer class="footer">
     <div class="wrap footer-inner">
       <span>© <span id="year">2026</span> Thrishank Kuntimaddi</span>
-      <a href="universes.html">Universes &amp; settings ⚙</a>
+      <a href="universes.html">Free themes, prompts &amp; settings ⚙</a>
+      <a href="#" data-contact data-kind="feedback">Feedback ✉</a>
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
@@ -640,6 +642,7 @@
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=20"></script>
+  <script type="module" src="main.js?v=21"></script>
+  <script type="module" src="lib/contact.js?v=1"></script>
 </body>
 </html>

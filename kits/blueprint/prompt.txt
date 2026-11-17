@@ -1,0 +1,16 @@
+Apply the "Blueprint" theme to this project. Engineering drawings: navy ink, dashed outlines, grid paper and monospaced labels.
+
+Use the files blueprint.css, blueprint.csv and BLUEPRINT-THEME.md (from https://thrishankkuntimaddi.github.io/universes.html#kits). Follow them exactly:
+1. Add blueprint.css after the project's own CSS and the Google Fonts link at the top of it. Put class "t-page" on <body>.
+2. Map components to the theme classes: page width → t-wrap; top bar → t-nav; cards/panels → t-card; app/screens previews → t-window; buttons → t-btn (the one main action per view → t-btn t-btn--primary; quiet actions → t-btn--ghost); text fields → t-input; tags/filters → t-chip; small labels → t-eyebrow; page title → t-title; section titles → t-h2; intro paragraph → t-lede; modals → t-dialog; notifications → t-toast.
+3. Use only the --t-* tokens for colour, type, radius and shadow. Remove hard-coded colours, fonts and radii that fight the theme.
+4. Theme rules:
+   - Every box has a dashed ink border plus a thin outline 6px outside it, like a dimension line.
+   - Headings: Space Mono 700, UPPERCASE, tight letter-spacing; no italics.
+   - Label things like figures: "Fig. 01", "Spec sheet".
+   - No shadows. Accent colour only as translucent fills.
+   - Grid paper background: 24px minor and 120px major lines.
+5. Light theme: keep everything light; no dark sections.
+6. Keep it accessible: text contrast AA, visible focus rings, prefers-reduced-motion turns animation off (already in the CSS).
+7. Check it at 390px (phone) and 1440px (desktop) wide and fix anything that overflows.
+Sample voice for headings: "I engineer interfaces to spec, then make them human."

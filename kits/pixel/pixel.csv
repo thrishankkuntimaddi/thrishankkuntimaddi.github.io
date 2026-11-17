@@ -1,0 +1,47 @@
+Category,Token_Name,Variant_Mode,CSS_Property_or_Role,Exact_Value,Usage_Notes
+Theme_Surface,t-bg,Light,background-color,#fbf8f2,Page background colour
+Theme_Surface,t-tint,Light,background,#ffe9df,"Soft fill for hovers, chips and highlights"
+Typography,t-ink,Light,color,#2c3046,Main text on the page
+Typography,t-muted,Light,color,#646a85,Secondary text
+Typography,t-faint,Light,color,#9096ad,"Hints, captions, disabled"
+Lines,t-line,Light,border-color,"rgba(44, 48, 70, .14)",Hairlines and dividers
+Lines,t-line-2,Light,border-color,"rgba(44, 48, 70, .26)",Stronger borders on cards and controls
+Component_Card,t-surface,Light,background,"rgba(255, 255, 255, .86)","Cards, windows, dialogs"
+Component_Card,t-surface-ink,Light,color,#2c3046,Text inside cards
+Colour,t-accent,Light,color / background,#ff8a65,"Primary action, key highlights (one per view)"
+Colour,t-accent-2,Light,color / background,#6bb6ff,Secondary highlight
+Colour,t-accent-3,Light,color / background,#ffd166,"Third highlight: stickers, marks, selection"
+Typography,t-display,Light,font-family,"""Press Start 2P"", monospace",Headings
+Typography,t-sans,Light,font-family,"""VT323"", monospace",Body text
+Typography,t-mono,Light,font-family,"""VT323"", monospace","Labels, numbers, code"
+Typography,t-hand,Light,font-family,"""VT323"", monospace",Hand-written notes
+Shape,t-r,Light,border-radius,0px,Cards and windows
+Shape,t-r-sm,Light,border-radius,0px,"Buttons, inputs, chips"
+Typography,t-base-size,Light,font-size,20px,Body size
+Typography,t-base-lh,Light,line-height,1.3,Body line height
+Theme_Surface,t-page-bg,Light,background,#fbf8f2,Full page background (gradient / pattern)
+Colour,t-accent-deep,All,color,"color-mix(in oklab, var(--t-accent) 62%, var(--t-ink))",Accent mixed with ink; accent as readable text
+Elevation,t-card-shadow,All,box-shadow,7px 7px 0 var(--t-ink),"Cards, windows, dialogs"
+Lines,t-border,All,border,3px solid var(--t-ink),"Cards, buttons, inputs"
+Motion,t-ease,All,transition-timing-function,"cubic-bezier(.2, .7, .2, 1)",Most transitions
+Motion,t-spring,All,transition-timing-function,"cubic-bezier(.34, 1.56, .64, 1)",Buttons: a little overshoot
+Edition,t-bg,Edition_morning,background-color,#fbf8f2,morning colour edition
+Edition,t-tint,Edition_morning,background,#ffe9df,morning colour edition
+Edition,t-accent,Edition_morning,color / background,#ff8a65,morning colour edition
+Edition,t-accent-2,Edition_morning,color / background,#6bb6ff,morning colour edition
+Edition,t-accent-3,Edition_morning,color / background,#ffd166,morning colour edition
+Edition,t-bg,Edition_noon,background-color,#f6fafe,noon colour edition
+Edition,t-tint,Edition_noon,background,#dff0ff,noon colour edition
+Edition,t-accent,Edition_noon,color / background,#5aa9ff,noon colour edition
+Edition,t-accent-2,Edition_noon,color / background,#ff9b85,noon colour edition
+Edition,t-accent-3,Edition_noon,color / background,#7fe0c3,noon colour edition
+Edition,t-bg,Edition_dusk,background-color,#fbf7fd,dusk colour edition
+Edition,t-tint,Edition_dusk,background,#efe3ff,dusk colour edition
+Edition,t-accent,Edition_dusk,color / background,#a78bfa,dusk colour edition
+Edition,t-accent-2,Edition_dusk,color / background,#ff8fb8,dusk colour edition
+Edition,t-accent-3,Edition_dusk,color / background,#ffcf8a,dusk colour edition
+Edition,t-bg,Edition_night,background-color,#f5fbf9,night colour edition
+Edition,t-tint,Edition_night,background,#dbf5ec,night colour edition
+Edition,t-accent,Edition_night,color / background,#4fd1b0,night colour edition
+Edition,t-accent-2,Edition_night,color / background,#8fa8ff,night colour edition
+Edition,t-accent-3,Edition_night,color / background,#ffc2d6,night colour edition

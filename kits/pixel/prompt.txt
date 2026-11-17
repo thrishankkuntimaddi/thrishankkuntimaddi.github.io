@@ -1,0 +1,16 @@
+Apply the "Pixel" theme to this project. 8-bit arcade: square corners, thick ink borders, hard drop shadows and pixel fonts.
+
+Use the files pixel.css, pixel.csv and PIXEL-THEME.md (from https://thrishankkuntimaddi.github.io/universes.html#kits). Follow them exactly:
+1. Add pixel.css after the project's own CSS and the Google Fonts link at the top of it. Put class "t-page" on <body>.
+2. Map components to the theme classes: page width → t-wrap; top bar → t-nav; cards/panels → t-card; app/screens previews → t-window; buttons → t-btn (the one main action per view → t-btn t-btn--primary; quiet actions → t-btn--ghost); text fields → t-input; tags/filters → t-chip; small labels → t-eyebrow; page title → t-title; section titles → t-h2; intro paragraph → t-lede; modals → t-dialog; notifications → t-toast.
+3. Use only the --t-* tokens for colour, type, radius and shadow. Remove hard-coded colours, fonts and radii that fight the theme.
+4. Theme rules:
+   - Zero border radius everywhere.
+   - Borders are 3px solid ink; shadows are hard 4–7px offsets in ink, never blurred.
+   - Headings in Press Start 2P at small sizes (13–30px) with generous line-height (1.5–1.7).
+   - Body text in VT323 at 20px; it is a pixel font, so go bigger than usual.
+   - Images: image-rendering: pixelated.
+5. Light theme: keep everything light; no dark sections.
+6. Keep it accessible: text contrast AA, visible focus rings, prefers-reduced-motion turns animation off (already in the CSS).
+7. Check it at 390px (phone) and 1440px (desktop) wide and fix anything that overflows.
+Sample voice for headings: "I build interfaces worth pressing START for."

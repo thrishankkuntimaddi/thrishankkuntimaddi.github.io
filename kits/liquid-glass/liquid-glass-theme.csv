@@ -1,0 +1,34 @@
+Category,Token_Name,Variant_Mode,CSS_Property_or_Role,Exact_Value,Usage_Notes
+Theme_Surface,lg-bg-regular-light,Light_Regular,background,"rgba(255, 255, 255, 0.45)",Floating bars and controls over light backgrounds
+Theme_Surface,lg-bg-regular-dark,Dark_Regular,background,"rgba(28, 28, 30, 0.55)",Floating bars and controls over dark backgrounds
+Theme_Surface,lg-bg-clear-light,Light_Clear,background,"rgba(255, 255, 255, 0.14)",Clear overlay over photography or video
+Theme_Surface,lg-bg-clear-dark,Dark_Clear,background,"rgba(18, 18, 20, 0.22)",Clear overlay over dark photography or video
+Theme_Surface,lg-media-scrim,Media_Overlay,background,"rgba(0, 0, 0, 0.35)",Protective scrim under clear glass on bright media
+Lens_Optics,lg-lens-blur-regular,Regular_Variant,backdrop-filter,blur(24px) saturate(180%),Primary frosted diffusion and color boost
+Lens_Optics,lg-lens-blur-clear,Clear_Variant,backdrop-filter,blur(10px) saturate(140%),Low diffusion preserving underlying detail
+Lens_Optics,lg-lens-refraction-filter,SVG_Lensing,filter,url(#liquid-glass-lens),SVG displacement map for edge light bending
+Lens_Optics,lg-lens-rim-light,Light_Mode,border,"1px solid rgba(255, 255, 255, 0.58)",Crisp outer specular edge border
+Lens_Optics,lg-lens-rim-dark,Dark_Mode,border,"1px solid rgba(255, 255, 255, 0.20)",Subtle outer specular edge border in dark mode
+Lens_Optics,lg-lens-specular-top,All_Modes,box-shadow,"inset 0 1.5px 0 0 rgba(255, 255, 255, 0.85)",Top-edge light catch simulating curved glass thickness
+Lens_Optics,lg-lens-specular-bottom,All_Modes,box-shadow,"inset 0 -1px 0 0 rgba(255, 255, 255, 0.25)",Bottom internal caustic light reflection
+Lens_Optics,lg-lens-inner-glow,All_Modes,box-shadow,"inset 0 0 18px 0 rgba(255, 255, 255, 0.16)",Internal ambient light scattering
+Lens_Optics,lg-lens-elevation,All_Modes,box-shadow,"0 12px 32px -4px rgba(0, 0, 0, 0.18)",Floating depth separation from content layer
+Component_Button,lg-btn-radius,Pill_Geometry,border-radius,9999px,Capsule geometry for floating action buttons
+Component_Button,lg-btn-padding,Standard_Size,padding,10px 20px,Touch-friendly pill button spacing
+Component_Button,lg-btn-hover-scale,Hover_State,transform,scale(1.03),Subtle fluid expansion on pointer hover
+Component_Button,lg-btn-active-scale,Pressed_State,transform,scale(0.96),Tactile spring compression on press
+Component_Button,lg-btn-tint-accent,Active_Selected,background,"rgba(0, 122, 255, 0.24)",Translucent Apple system blue tint for selected buttons
+Component_Icon,lg-icon-btn-size,Circular_Button,width / height,40px,Standard circular glass icon container
+Component_Icon,lg-icon-glyph-size,Glyph_Scale,width / height,20px,Crisp vector icon glyph dimension
+Component_Icon,lg-icon-stroke,Vector_Weight,stroke-width,1.75px,Balanced stroke thickness matching SF Symbols
+Component_Icon,lg-icon-glow,Active_Icon,filter,"drop-shadow(0 0 6px rgba(255, 255, 255, 0.45))",Subtle luminous bloom for active glass icons
+Component_Bar,lg-bar-floating-radius,Floating_Bar,border-radius,32px,Concentric capsule radius for floating tab and nav bars
+Component_Bar,lg-bar-height,Tab_Bar,height,64px,Standard floating bottom tab bar height
+Component_Bar,lg-bar-padding,Inner_Track,padding,6px,Inner gutter for sliding active pill indicator
+Component_Bar,lg-bar-pill-active,Active_Tab_Pill,background,"rgba(255, 255, 255, 0.32)",Sliding glass lens indicator behind active tab
+Component_Bar,lg-bar-inset-margin,Viewport_Offset,margin,16px,Floating clearance from screen edges
+Typography,lg-text-light,Light_Mode,color,#0A0A0C,Primary high-contrast label on light glass
+Typography,lg-text-dark,Dark_Mode,color,#F5F5F7,Primary high-contrast label on dark glass
+Motion,lg-spring-transition,All_Interactive,transition,"all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",Fluid gel-like spring physics curve
+Accessibility,lg-fallback-light,Reduced_Transparency,background,#F2F2F7,Solid surface fallback when transparency is reduced
+Accessibility,lg-fallback-dark,Reduced_Transparency,background,#1C1C1E,Dark solid surface fallback when transparency is reduced

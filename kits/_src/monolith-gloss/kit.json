@@ -1,0 +1,10 @@
+{
+ "name": "Monolith Gloss",
+ "group": "Signature kits",
+ "mood": "Calm, premium app UI: solid near-black or warm-ivory slabs with 3px corners, one gold primary button with a specular top light, and liquid glass only on what floats.",
+ "light": false,
+ "swatch": { "bg": "#0c0c0c", "page": "radial-gradient(600px 220px at 50% -60px, rgba(200,162,116,.18), transparent 70%), #0c0c0c", "ink": "#e4e4e4", "surface": "#111111", "accent": "#b8956a", "accent2": "#d9b98f", "accent3": "#5aba8a", "r": "3px", "display": "\"Inter\", system-ui, sans-serif", "mono": true },
+ "files": ["MONOLITH-GLOSS-THEME.md", "monolith-gloss.css", "monolith-gloss.csv", "prompt.txt"],
+ "demo": false,
+ "note": "From the Oruinwan workspace app, in dark and light."
+}

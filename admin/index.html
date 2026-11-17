@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Studio — Thrishank Kuntimaddi</title>
+  <meta name="theme-color" content="#f6f7f9">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Studio">
+  <link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+  <!-- Signed out / not the owner -->
+  <section class="gate" id="gate">
+    <div class="gate-card">
+      <img src="icon.svg" alt="" width="56" height="56">
+      <h1>Studio</h1>
+      <p id="gateMsg">Checking sign-in…</p>
+      <button class="btn primary" id="signIn" type="button" hidden>Sign in with Google</button>
+      <button class="btn" id="signOutGate" type="button" hidden>Use another account</button>
+      <a class="gate-back" href="../">← Back to the site</a>
+    </div>
+  </section>
+
+  <div class="app" id="app" hidden>
+    <nav class="side" aria-label="Studio">
+      <a class="side-brand" href="../" title="Open the site"><img src="icon.svg" alt="" width="28" height="28"><span>Studio</span></a>
+      <button class="nav-btn" data-view="resume" type="button"><span class="ico">▤</span><span>Resume</span></button>
+      <button class="nav-btn" data-view="inbox" type="button"><span class="ico">✉</span><span>Inbox</span><b class="badge" data-count="all" hidden></b></button>
+      <button class="nav-btn" data-view="feedback" type="button"><span class="ico">✎</span><span>Feedback</span><b class="badge" data-count="feedback" hidden></b></button>
+      <button class="nav-btn" data-view="compliment" type="button"><span class="ico">♥</span><span>Compliments</span><b class="badge" data-count="compliment" hidden></b></button>
+      <button class="nav-btn" data-view="help" type="button"><span class="ico">?</span><span>Help center</span><b class="badge" data-count="help" hidden></b></button>
+      <button class="nav-btn" data-view="about" type="button"><span class="ico">i</span><span>About</span></button>
+      <div class="side-foot">
+        <span class="who" id="who"></span>
+        <button class="link" id="signOut" type="button">Sign out</button>
+      </div>
+    </nav>
+
+    <main class="main">
+      <!-- ================= RESUME ================= -->
+      <section class="view" data-view="resume">
+        <header class="top">
+          <div>
+            <h1>Resume</h1>
+            <p class="status" id="rzStatus">Loading…</p>
+          </div>
+          <div class="top-actions">
+            <button class="btn only-phone" id="rzTogglePreview" type="button">Preview</button>
+            <button class="btn" id="rzDownload" type="button">PDF ↓</button>
+            <button class="btn primary" id="rzPublish" type="button">Publish</button>
+          </div>
+        </header>
+        <div class="rz">
+          <div class="rz-edit" id="rzEdit"></div>
+          <aside class="rz-preview" id="rzPreviewWrap">
+            <div class="fit" id="rzFit"></div>
+            <div class="paper" id="rzPreview"></div>
+            <p class="hint">Exactly what visitors download. Links work in the PDF.</p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= MESSAGES (inbox / feedback / compliments / help) ================= -->
+      <section class="view" data-view="messages" hidden>
+        <header class="top">
+          <div>
+            <h1 id="msgTitle">Inbox</h1>
+            <p class="status" id="msgStatus"></p>
+          </div>
+          <div class="top-actions">
+            <button class="btn" id="markAll" type="button">Mark all read</button>
+          </div>
+        </header>
+        <div class="chips" id="msgChips" role="tablist" aria-label="Filter messages"></div>
+        <ul class="msgs" id="msgList"></ul>
+        <div class="faq" id="faqBox" hidden>
+          <header class="faq-head">
+            <div><h2>Help center answers</h2><p>Shown on the site’s Studio page, above the message form. Visitors’ questions arrive above.</p></div>
+            <div class="top-actions"><button class="btn" id="faqAdd" type="button">Add question</button><button class="btn primary" id="faqPublish" type="button">Publish answers</button></div>
+          </header>
+          <ol class="faq-list" id="faqList"></ol>
+        </div>
+      </section>
+
+      <!-- ================= ABOUT ================= -->
+      <section class="view" data-view="about" hidden>
+        <header class="top"><div><h1>About the system</h1><p class="status">How this works, and why it needs Firebase.</p></div><div class="top-actions"><a class="btn" href="../">Open the site</a><button class="btn" type="button" onclick="document.getElementById('signOut').click()">Sign out</button></div></header>
+        <div class="doc">
+          <h2>Why Firebase, for a portfolio?</h2>
+          <p>The portfolio is a static site on GitHub Pages: it can show things, but it can’t <em>receive</em> anything or change without a new commit. Firebase (free Spark plan) adds the two things a static site can’t do:</p>
+          <ul>
+            <li><b>A database</b> (Firestore) that holds your published resume and visitors’ messages, so you can edit from your phone and the site updates without a deploy.</li>
+            <li><b>Sign-in</b> (Firebase Authentication, Google) so only <b>thrishankkuntimaddi@gmail.com</b> can edit or read messages.</li>
+          </ul>
+
+          <h2>How the resume flows</h2>
+          <ol>
+            <li>You edit here. Every change autosaves as a private <b>draft</b> (only you can read it).</li>
+            <li><b>Publish</b> copies the draft to <code>site/resume</code> and keeps a copy in <b>Versions</b> so you can roll back.</li>
+            <li>The site reads <code>site/resume</code> with one small request when someone opens or downloads the resume, then draws the same one-page layout you see here and builds the PDF in the visitor’s browser (selectable text, working links, ATS-friendly).</li>
+            <li>If Firebase can’t be reached, the site falls back to the last PDF in the repo (<code>resume/</code>).</li>
+          </ol>
+
+          <h2>How messages flow</h2>
+          <p>The “Send a message” form on the site (footer, the Studio page, and Ask Pip) writes to <code>messages</code>. Visitors can only <em>create</em> a message of a fixed shape and size; they can’t read, change or delete any. You see them here instantly, sorted into Feedback, Compliments, Help center and plain Messages.</p>
+
+          <h2>Security</h2>
+          <ul>
+            <li>The Firebase web config in the code is public by design. Access is enforced by <code>firestore.rules</code> in the repo, deployed with <code>firebase deploy --only firestore:rules</code>.</li>
+            <li>Owner = a signed-in Google account with the verified email thrishankkuntimaddi@gmail.com. Everyone else is read-only on the published resume and help answers.</li>
+            <li>Messages have a hidden spam trap and a cooldown in the browser. If spam ever becomes a problem, turn on Firebase App Check (free) in the console.</li>
+          </ul>
+
+          <h2>Costs</h2>
+          <p>Free. The Spark plan allows 50,000 reads and 20,000 writes a day. A resume view is one read; a message is one write. No Cloud Functions, no Storage, no billing account needed.</p>
+
+          <h2>Use it as an app</h2>
+          <ul>
+            <li><b>iPhone:</b> open this page in Safari → Share → Add to Home Screen.</li>
+            <li><b>Android:</b> Chrome → ⋮ → Install app (or Add to Home screen).</li>
+            <li><b>Mac / PC:</b> Chrome or Edge → the install icon in the address bar.</li>
+          </ul>
+
+          <h2>Writing tips (the FAANG way)</h2>
+          <ul>
+            <li>One page. The layout shrinks type down to 82% to fit; if it still says “over one page”, cut words, not margins.</li>
+            <li>Bullets: <b>action verb + what you built + measurable result</b>, e.g. “Cut p95 latency from 850ms to 45ms by …”.</li>
+            <li>Bold only the numbers and labels a recruiter should catch in six seconds: <code>**10K+ sessions**</code>.</li>
+            <li>Standard section names (Summary, Experience, Projects, Skills, Education) so ATS parsers find them.</li>
+            <li>Formatting: <code>**bold**</code>, <code>*italic*</code>, <code>[text](https://link)</code>.</li>
+          </ul>
+
+          <h2>One-time setup checklist</h2>
+          <ul id="setupList">
+            <li>Firestore created and rules deployed ✓</li>
+            <li>Google sign-in enabled ✓</li>
+            <li>Authentication → Settings → Authorized domains → add <code>thrishankkuntimaddi.github.io</code> (needed to sign in on the live site).</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="sheet" id="versionsDlg">
+    <header><h2>Published versions</h2><button class="btn" type="button" data-close>Close</button></header>
+    <ul class="versions" id="versionsList"></ul>
+  </dialog>
+
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  <script type="module" src="app.js?v=1"></script>
+</body>
+</html>

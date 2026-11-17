@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Theme demo — Thrishank Kuntimaddi</title>
+  <meta name="description" content="A live demo of one of the free theme kits from Thrishank Kuntimaddi's portfolio.">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" id="kitCss">
+  <style>
+    .demo-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .demo-bar select { min-height: 40px; padding: 0 10px; border-radius: 8px; font: inherit; }
+    .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; margin: 32px 0 60px; }
+    .demo-hero { padding: clamp(40px, 8vw, 96px) 0 24px; display: grid; gap: 18px; }
+    .demo-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .demo-form { display: grid; gap: 10px; }
+    .demo-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .demo-win-body { padding: 18px; display: grid; gap: 8px; }
+    .demo-win-body i { display: block; height: 10px; border-radius: 6px; background: var(--t-tint); }
+    .demo-win-body i:nth-child(2) { width: 70%; } .demo-win-body i:nth-child(3) { width: 45%; background: var(--t-accent); }
+    .demo-foot { padding: 20px 0 40px; font-size: 13px; }
+    .demo-foot a { text-decoration: underline; }
+    .no-anim, .no-anim * { transition: none !important; }
+  </style>
+</head>
+<body class="t-page no-anim">
+  <nav class="t-nav">
+    <b id="kitName" style="font-family:var(--t-display)">Theme</b>
+    <div class="demo-bar">
+      <select id="pick" aria-label="Pick a universe"></select>
+      <a class="t-btn t-btn--ghost" href="../universes.html#kits">← All kits</a>
+    </div>
+  </nav>
+  <main class="t-wrap">
+    <section class="demo-hero">
+      <p class="t-eyebrow" id="eyebrow">Free theme kit</p>
+      <h1 class="t-title" id="title">I build <em>interfaces</em></h1>
+      <p class="t-lede" id="lede">people enjoy using.</p>
+      <div class="demo-actions">
+        <a class="t-btn t-btn--primary" id="getKit" href="../universes.html#kits">Get this kit</a>
+        <button class="t-btn" type="button" id="copyPrompt">Copy the prompt</button>
+        <button class="t-btn t-btn--ghost" type="button" id="openDlg">Open a dialog</button>
+      </div>
+    </section>
+    <div class="demo-grid">
+      <article class="t-card">
+        <p class="t-eyebrow">Card</p>
+        <h2 class="t-h2">A project</h2>
+        <p class="t-muted">Cards hold the content. Their text colour, border and shadow all come from the kit.</p>
+        <div class="demo-chips"><span class="t-chip">React</span><span class="t-chip">Design</span><span class="t-chip">Motion</span></div>
+      </article>
+      <div class="t-window" aria-hidden="true">
+        <div class="t-window-bar"><i></i><i></i><i></i><span style="margin-left:8px">window.app</span></div>
+        <div class="demo-win-body"><i></i><i></i><i></i></div>
+      </div>
+      <form class="t-card demo-form" onsubmit="event.preventDefault()">
+        <p class="t-eyebrow">Form</p>
+        <input class="t-input" placeholder="Your name">
+        <textarea class="t-input" rows="3" placeholder="A message"></textarea>
+        <button class="t-btn t-btn--primary" type="submit">Send</button>
+      </form>
+    </div>
+    <p class="demo-foot t-muted">Every kit uses the same classes, so this page is unchanged between universes; only the stylesheet swaps. From <a href="../">Thrishank Kuntimaddi’s portfolio</a>.</p>
+  </main>
+  <dialog class="t-dialog" id="dlg"><div style="padding:24px;display:grid;gap:12px"><h2 class="t-h2">A dialog</h2><p class="t-muted">Dialogs use t-dialog.</p><button class="t-btn" type="button" onclick="this.closest('dialog').close()">Close</button></div></dialog>
+  <div class="t-toast" id="toast" hidden>Copied ✓</div>
+  <script type="module">
+    const params = new URLSearchParams(location.search);
+    const { kits } = await fetch('kits.json').then((r) => r.json());
+    const list = kits.filter((k) => k.demo);
+    let id = params.get('kit');
+    if (!list.some((k) => k.id === id)) id = 'paper';
+    const pick = document.getElementById('pick');
+    pick.innerHTML = list.map((k) => `<option value="${k.id}">${k.name}</option>`).join('');
+    const VOICE = {};
+    async function load(kid) {
+      const k = list.find((x) => x.id === kid);
+      document.getElementById('kitCss').href = `${kid}/${kid}.css`;
+      pick.value = kid;
+      document.getElementById('kitName').textContent = k.name;
+      document.title = `${k.name} theme demo — Thrishank Kuntimaddi`;
+      document.getElementById('eyebrow').textContent = `${k.group} · free kit`;
+      document.getElementById('getKit').href = `../universes.html#kit-${kid}`;
+      document.documentElement.style.colorScheme = k.light ? 'light' : 'dark';
+      document.body.classList.add('no-anim');
+      document.getElementById('kitCss').onload = () => requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove('no-anim')));
+      VOICE.prompt = await fetch(`${kid}/prompt.txt`).then((r) => r.text());
+      const [a, b] = k.voice || ['I build interfaces', 'people enjoy using.'];
+      document.getElementById('title').innerHTML = a.replace(/(interf\S*?)(?=[ ,.]|$)/i, '<em>$1</em>');
+      document.getElementById('lede').textContent = b;
+      history.replaceState(null, '', `?kit=${kid}`);
+    }
+    pick.addEventListener('change', () => load(pick.value));
+    document.getElementById('openDlg').addEventListener('click', () => document.getElementById('dlg').showModal());
+    document.getElementById('copyPrompt').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(VOICE.prompt); } catch { /* blocked */ }
+      const t = document.getElementById('toast'); t.hidden = false; setTimeout(() => { t.hidden = true; }, 1500);
+    });
+    load(id);
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+Category,Token_Name,Variant_Mode,CSS_Property_or_Role,Exact_Value,Usage_Notes
+Theme_Surface,t-bg,Dark_Page,background-color,#05050a,Page background colour
+Theme_Surface,t-tint,Dark_Page,background,#e6fff9,"Soft fill for hovers, chips and highlights"
+Typography,t-ink,Dark_Page,color,#f0fff9,Main text on the page
+Typography,t-muted,Dark_Page,color,"color-mix(in srgb, #f0fff9 72%, #05050a)",Secondary text
+Typography,t-faint,Dark_Page,color,"color-mix(in srgb, #f0fff9 48%, #05050a)","Hints, captions, disabled"
+Lines,t-line,Dark_Page,border-color,"color-mix(in srgb, #f0fff9 16%, transparent)",Hairlines and dividers
+Lines,t-line-2,Dark_Page,border-color,"color-mix(in srgb, #f0fff9 30%, transparent)",Stronger borders on cards and controls
+Component_Card,t-surface,Dark_Page,background,"rgba(255, 255, 255, .9)","Cards, windows, dialogs"
+Component_Card,t-surface-ink,Dark_Page,color,#2c3046,Text inside cards
+Colour,t-accent,Dark_Page,color / background,#00ffd5,"Primary action, key highlights (one per view)"
+Colour,t-accent-2,Dark_Page,color / background,#ff2a6d,Secondary highlight
+Colour,t-accent-3,Dark_Page,color / background,#f5f500,"Third highlight: stickers, marks, selection"
+Typography,t-display,Dark_Page,font-family,"""VT323"", monospace",Headings
+Typography,t-sans,Dark_Page,font-family,"""Inter"", system-ui, sans-serif",Body text
+Typography,t-mono,Dark_Page,font-family,"""VT323"", monospace","Labels, numbers, code"
+Typography,t-hand,Dark_Page,font-family,"""Caveat"", cursive",Hand-written notes
+Shape,t-r,Dark_Page,border-radius,0px,Cards and windows
+Shape,t-r-sm,Dark_Page,border-radius,0px,"Buttons, inputs, chips"
+Typography,t-base-size,Dark_Page,font-size,16px,Body size
+Typography,t-base-lh,Dark_Page,line-height,1.6,Body line height
+Theme_Surface,t-page-bg,Dark_Page,background,"repeating-linear-gradient(0deg, #05050a 0 3px, #0b0b14 3px 4px)",Full page background (gradient / pattern)
+Colour,t-accent-deep,All,color,"color-mix(in oklab, var(--t-accent) 62%, var(--t-ink))",Accent mixed with ink; accent as readable text
+Elevation,t-card-shadow,All,box-shadow,"0 18px 50px -18px rgba(0, 0, 0, .7)","Cards, windows, dialogs"
+Lines,t-border,All,border,1.5px solid var(--t-line-2),"Cards, buttons, inputs"
+Motion,t-ease,All,transition-timing-function,"cubic-bezier(.2, .7, .2, 1)",Most transitions
+Motion,t-spring,All,transition-timing-function,"cubic-bezier(.34, 1.56, .64, 1)",Buttons: a little overshoot

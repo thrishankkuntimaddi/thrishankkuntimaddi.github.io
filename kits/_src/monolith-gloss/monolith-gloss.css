@@ -1,0 +1,690 @@
+/* ==========================================================================
+   MONOLITH GLOSS — design system (CSS)
+   From Thrishank Kuntimaddi's Oruinwan workspace app. Free to use.
+
+   Monolith = the solid base: near-black (or warm ivory) slabs, sharp 3px
+   corners, hairlines, heavy titles.
+   Gloss    = a specular top light on the one primary action, gold accent.
+   Liquid glass = only on layers that float: menus, dialogs, toasts, docks.
+
+   Dark by default. Light: <html class="light"> or <html data-theme="light">.
+   Font: Inter (https://fonts.google.com/specimen/Inter).
+   Every class is prefixed gl-; nothing restyles bare elements except
+   .gl-root, which you put on <body>.
+   ========================================================================== */
+
+/* ---------- Base tokens (dark) ---------- */
+:root {
+  --bg-base: #0c0c0c;
+  --bg-surface: #111111;
+  --bg-hover: #161616;
+  --bg-active: #1c1c1c;
+  --bg-input: #141414;
+  --border-subtle: #191919;
+  --border-default: #222222;
+  --border-accent: #383838;
+  --text-primary: #e4e4e4;
+  --text-secondary: #7a7a7a;
+  --text-muted: #555555;
+  --accent: #b8956a;
+  --accent-dim: rgba(184,149,106,0.12);
+  --accent-hover: #c9a87c;
+  --state-danger: #e05252;
+  --state-success: #5aba8a;
+  --input-ring: rgba(184,149,106,0.25);
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --bg-overlay: rgba(0,0,0,0.7);
+  --state-warning: #c9a87c;
+  color-scheme: dark;
+}
+
+/* ---------- Base tokens (light: warm ivory) ---------- */
+:is(html.light, [data-theme="light"]) {
+  --bg-base: #f8f5f0;
+  --bg-surface: #ffffff;
+  --bg-hover: #efebe4;
+  --bg-active: #e8e2d8;
+  --bg-input: #fbf9f6;
+  --border-subtle: #e9e4dc;
+  --border-default: #ddd6cb;
+  --border-accent: #c6bdaf;
+  --text-primary: #1a1916;
+  --text-secondary: #57524b;
+  --text-muted: #736d64;
+  --accent: #876434;
+  --accent-dim: rgba(135,100,52,0.12);
+  --accent-hover: #6c4f27;
+  --state-danger: #c94040;
+  --state-success: #3a8f6a;
+  --input-ring: rgba(150,112,62,0.26);
+  --bg-overlay: rgba(48,38,24,0.32);
+  --state-warning: #a07a52;
+  color-scheme: light;
+}
+
+.gl-root {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--gl-shell-bg, var(--bg-base));
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+:root {
+    --ws-panel-w: 272px;          /* side panel width */
+    --ws-panel-head-h: 52px;      /* side panel header height */
+    --gl-radius: 3px;
+    --gl-line: rgba(255, 255, 255, 0.07);
+    --gl-line-2: rgba(255, 255, 255, 0.12);
+    --gl-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.012) 100%);
+    --gl-glass-strong: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    --gl-spec: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    --gl-spec-strong: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    --gl-drop: 0 24px 60px -24px rgba(0, 0, 0, 0.75);
+    --gl-accent-grad: linear-gradient(180deg, #d9b98f 0%, #b8956a 55%, #a5835a 100%);
+    --gl-accent-glow: 0 8px 24px -10px rgba(200, 162, 116, 0.55);
+    --gl-accent-soft: rgba(200, 162, 116, 0.1);
+    --gl-accent-line: rgba(200, 162, 116, 0.35);
+    --gl-grid: rgba(255, 255, 255, 0.03);
+    --gl-aurora: rgba(200, 162, 116, 0.1);
+    --gl-aurora-cool: rgba(142, 166, 255, 0.06);
+    --gl-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ── Hybrid: Liquid glass + Monolith + Gloss ─────────────────────────────
+       Monolith = the solid base (page backgrounds, panels, lists): calm, near-square.
+       Liquid glass = floating and overlay layers only (top bar, icon rail, popovers,
+       menus, dialogs, toasts, palette, docks): translucent, frosted, edge-lit.
+       Gloss = the specular top light on primary buttons and active states. */
+
+    /* Shape: the base stays near-square; floating glass is softened a little. */
+    --gl-radius-sm: 3px;      /* rows, inputs, buttons, cards (monolith) */
+    --gl-radius-md: 7px;      /* popovers, menus, tooltips, toasts, chips on glass */
+    --gl-radius-lg: 10px;     /* dialogs, sheets, command palette, docks */
+    --gl-radius-pill: 999px;
+
+    /* Motion: calm, 150–220ms. */
+    --gl-dur-1: 150ms;
+    --gl-dur-2: 190ms;
+    --gl-dur-3: 220ms;
+    --gl-ease-press: cubic-bezier(0.3, 0.7, 0.4, 1);
+    --gl-lift: translateY(-1px);
+    --gl-focus: rgba(200, 162, 116, 0.75);
+    --gl-focus-ring: 0 0 0 3px var(--input-ring);
+
+    /* Liquid glass material. --lg-tint is the frosted body; --lg-sheen the refraction
+       highlight across the top; --lg-edge the lit rim; --lg-solid the no-blur fallback. */
+    --lg-blur: 22px;
+    --lg-sat: 170%;
+    --lg-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+    --lg-tint: rgba(24, 23, 21, 0.72);
+    --lg-tint-strong: rgba(20, 19, 18, 0.86);
+    --lg-solid: #171615;
+    --lg-chrome: rgba(17, 17, 16, 0.82);       /* top bar + icon rail (no blur needed) */
+    --lg-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.018) 42%, rgba(255, 255, 255, 0) 70%);
+    --lg-border: rgba(255, 255, 255, 0.09);
+    --lg-edge: inset 0 1px 0 rgba(255, 255, 255, 0.11), inset 0 0 0 1px rgba(255, 255, 255, 0.025), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    --lg-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px -10px rgba(0, 0, 0, 0.6), 0 36px 80px -28px rgba(0, 0, 0, 0.65);
+    --lg-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 22px -10px rgba(0, 0, 0, 0.55);
+    --lg-scrim: rgba(5, 5, 4, 0.58);
+    --lg-scrim-filter: blur(4px) saturate(115%);
+    /* Warm ambient light that the chrome glass sits over. */
+    --gl-shell-bg: radial-gradient(900px 260px at 50% -140px, rgba(200, 162, 116, 0.07), transparent 70%), var(--bg-base);
+
+    /* Gloss on primary buttons / active fills. */
+    --gl-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0) 52%);
+    --gl-on-accent: #120e08;
+}
+
+:is(html.light, [data-theme="light"]) {
+    --gl-line: rgba(20, 16, 10, 0.08);
+    --gl-line-2: rgba(20, 16, 10, 0.14);
+    --gl-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.55) 100%);
+    --gl-glass-strong: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+    --gl-spec: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --gl-spec-strong: inset 0 1px 0 #ffffff;
+    --gl-drop: 0 1px 2px rgba(60, 44, 20, 0.06), 0 14px 34px -14px rgba(60, 44, 20, 0.22);
+    --gl-accent-grad: linear-gradient(180deg, #dcbd92 0%, #c29d6d 55%, #ad8656 100%);
+    --gl-accent-glow: 0 6px 18px -10px rgba(140, 100, 50, 0.6);
+    --gl-accent-soft: rgba(176, 136, 86, 0.12);
+    --gl-accent-line: rgba(150, 112, 62, 0.34);
+    --gl-grid: rgba(20, 16, 10, 0.035);
+    --gl-aurora: rgba(200, 162, 116, 0.16);
+    --gl-aurora-cool: rgba(120, 140, 220, 0.07);
+
+    --gl-focus: rgba(136, 101, 53, 0.7);
+    --lg-tint: rgba(255, 255, 255, 0.7);
+    --lg-tint-strong: rgba(255, 254, 252, 0.86);
+    --lg-solid: #fdfcfa;
+    --lg-chrome: rgba(255, 253, 250, 0.72);
+    --lg-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.35) 40%, rgba(255, 255, 255, 0) 72%);
+    --lg-border: rgba(80, 60, 30, 0.12);
+    --lg-edge: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(80, 60, 30, 0.05);
+    --lg-shadow: 0 1px 2px rgba(60, 44, 20, 0.07), 0 10px 28px -10px rgba(60, 44, 20, 0.18), 0 30px 70px -30px rgba(60, 44, 20, 0.24);
+    --lg-shadow-sm: 0 1px 2px rgba(60, 44, 20, 0.06), 0 6px 18px -8px rgba(60, 44, 20, 0.18);
+    --lg-scrim: rgba(52, 42, 28, 0.2);
+    --gl-shell-bg: radial-gradient(900px 300px at 50% -160px, rgba(214, 178, 128, 0.2), transparent 70%), var(--bg-base);
+    --gl-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0) 52%);
+}
+
+/* ── Liquid glass material ──────────────────────────────────────────────────
+   .gl-liquid           frosted floating layer (popovers, menus, toasts, docks)
+   .gl-liquid--strong   denser, for dialogs and the command palette (long text)
+   .gl-liquid--chrome   app chrome (top bar, icon rail): glass look, no blur
+   Blur is only used on overlays, never on long scrolling lists. Without
+   backdrop-filter (old WebViews) every variant falls back to a solid surface. */
+.gl-liquid {
+    background-color: var(--lg-tint);
+    background-image: var(--lg-sheen);
+    border: 1px solid var(--lg-border);
+    box-shadow: var(--lg-edge), var(--lg-shadow);
+    -webkit-backdrop-filter: var(--lg-filter);
+    backdrop-filter: var(--lg-filter);
+}
+.gl-liquid--strong { background-color: var(--lg-tint-strong); }
+.gl-liquid--chrome {
+    background-color: var(--lg-chrome);
+    background-image: var(--lg-sheen);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .gl-liquid, .gl-liquid--strong { background-color: var(--lg-solid); }
+}
+/* Overlay pieces every dialog can share (shared Modal, ConfirmationModal, page-kit Dialog). */
+.gl-scrim {
+    position: fixed;
+    inset: 0;
+    background: var(--lg-scrim);
+    -webkit-backdrop-filter: var(--lg-scrim-filter);
+    backdrop-filter: var(--lg-scrim-filter);
+    animation: gl-fade-in var(--gl-dur-2) ease;
+}
+.gl-dialog {
+    color: var(--text-primary);
+    font-family: var(--font);
+    background-color: var(--lg-tint-strong);
+    background-image: var(--lg-sheen);
+    border: 1px solid var(--lg-border);
+    border-radius: var(--gl-radius-lg);
+    box-shadow: var(--lg-edge), var(--lg-shadow);
+    -webkit-backdrop-filter: var(--lg-filter);
+    backdrop-filter: var(--lg-filter);
+    overflow: hidden;
+    animation: gl-dialog-in var(--gl-dur-3) var(--gl-ease);
+}
+.gl-dialog-head { border-bottom: 1px solid var(--lg-border); }
+.gl-dialog-foot { border-top: 1px solid var(--lg-border); background: var(--bg-active); background: color-mix(in srgb, var(--bg-active) 55%, transparent); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .gl-dialog { background-color: var(--lg-solid); }
+    .gl-scrim { background: var(--bg-overlay); }
+}
+
+/* Toasts (shared/components/ui/Toast.jsx). */
+.gl-toast {
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--text-primary);
+    background-color: var(--lg-tint-strong);
+    background-image: var(--lg-sheen);
+    border: 1px solid var(--lg-border);
+    border-radius: var(--gl-radius-md);
+    box-shadow: var(--lg-edge), var(--lg-shadow);
+    -webkit-backdrop-filter: var(--lg-filter);
+    backdrop-filter: var(--lg-filter);
+    animation: gl-toast-in var(--gl-dur-3) var(--gl-ease);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .gl-toast { background-color: var(--lg-solid); }
+}
+
+@keyframes gl-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gl-dialog-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.975); }
+    to   { opacity: 1; transform: none; }
+}
+@keyframes gl-toast-in {
+    from { opacity: 0; transform: translateX(16px) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .gl-scrim, .gl-dialog, .gl-toast { animation: none; }
+}
+
+/* Windows high-contrast / forced colours: drop the effects. */
+@media (forced-colors: active) {
+    .gl-liquid { background: Canvas; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* ── Ambient light for large empty areas (welcome screens, page backdrops) ── */
+.gl-ambient {
+    position: relative;
+    isolation: isolate;
+}
+.gl-ambient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        linear-gradient(to right, var(--gl-grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--gl-grid) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 25%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 25%, transparent 75%);
+}
+.gl-ambient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(600px 380px at 85% -10%, var(--gl-aurora), transparent 70%),
+        radial-gradient(520px 360px at 5% 20%, var(--gl-aurora-cool), transparent 70%);
+}
+
+/* Heavy display type with the landing's metallic sheen. */
+.gl-display {
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text-primary);
+}
+.gl-sheen {
+    background: linear-gradient(180deg, #f3e2c4 0%, #c8a274 60%, #9c7a50 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+:is(html.light, [data-theme="light"]) .gl-sheen { background: linear-gradient(180deg, #b8895a 0%, #8a6a44 100%); -webkit-background-clip: text; background-clip: text; }
+
+.gl-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+.gl-eyebrow::before { content: ''; width: 18px; height: 1px; background: currentColor; opacity: 0.8; }
+
+/* ── Surfaces ───────────────────────────────────────────────────────────── */
+.gl-card {
+    background: var(--bg-surface);
+    background-image: var(--gl-glass);
+    border: 1px solid var(--border-default);
+    border-radius: var(--gl-radius);
+    box-shadow: var(--gl-spec);
+}
+/* Light: cards sit on the warm base with a soft, warm two-layer shadow instead of a grey line.
+   :where() keeps the specificity of a plain .gl-card so popovers/dialogs built on gl-card still win. */
+:where(html.light, [data-theme="light"]) .gl-card { box-shadow: var(--gl-spec), 0 1px 2px rgba(60, 44, 20, 0.05), 0 4px 14px -8px rgba(60, 44, 20, 0.1); }
+.gl-card--interactive { transition: border-color var(--gl-dur-2) ease, transform var(--gl-dur-3) var(--gl-ease), box-shadow var(--gl-dur-3) ease; cursor: pointer; }
+.gl-card--interactive:hover { border-color: var(--border-accent); transform: translateY(-2px); box-shadow: var(--gl-spec-strong), var(--gl-drop); }
+.gl-card--interactive:active { transform: translateY(0); transition-duration: 90ms; }
+:where(html.light, [data-theme="light"]) .gl-card--interactive:hover { box-shadow: var(--gl-spec-strong), 0 2px 4px rgba(60, 44, 20, 0.05), 0 14px 32px -14px rgba(60, 44, 20, 0.24); }
+.gl-card--interactive:focus-visible { outline: 2px solid var(--gl-focus); outline-offset: 2px; }
+
+.gl-glass-bar {
+    background-color: var(--lg-chrome);
+    background-image: var(--lg-sheen);
+    box-shadow: var(--lg-edge);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.gl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    font: inherit;
+    font-family: var(--font);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--text-primary);
+    background: var(--bg-active);
+    background-image: var(--gl-glass);
+    border: 1px solid var(--border-default);
+    border-radius: var(--gl-radius);
+    box-shadow: var(--gl-spec);
+    cursor: pointer;
+    transition: border-color var(--gl-dur-1) ease, background-color var(--gl-dur-1) ease, box-shadow var(--gl-dur-2) ease, transform var(--gl-dur-2) var(--gl-ease), filter var(--gl-dur-1) ease, outline-offset var(--gl-dur-1) ease;
+}
+.gl-btn:hover:not(:disabled) { border-color: var(--border-accent); }
+.gl-btn:active:not(:disabled) { transform: translateY(1px) scale(0.985); transition-duration: 80ms; }
+.gl-btn:focus-visible { outline: 2px solid var(--gl-focus); outline-offset: 2px; }
+.gl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.gl-btn--sm { height: 28px; padding: 0 10px; font-size: 12px; }
+.gl-btn--lg { height: 40px; padding: 0 18px; font-size: 13.5px; }
+.gl-btn--block { width: 100%; }
+.gl-btn--primary {
+    color: var(--gl-on-accent);
+    background: var(--gl-gloss), var(--gl-accent-grad);
+    border-color: rgba(255, 230, 190, 0.35);
+    box-shadow: var(--gl-spec-strong), inset 0 -1px 0 rgba(90, 60, 20, 0.25), var(--gl-accent-glow);
+    text-shadow: 0 1px 0 rgba(255, 240, 215, 0.35);
+}
+.gl-btn--primary:hover:not(:disabled) { border-color: rgba(255, 236, 205, 0.6); filter: brightness(1.05) saturate(1.05); transform: var(--gl-lift); box-shadow: var(--gl-spec-strong), inset 0 -1px 0 rgba(90, 60, 20, 0.25), 0 10px 26px -10px rgba(200, 162, 116, 0.7); }
+:is(html.light, [data-theme="light"]) .gl-btn--primary { border-color: rgba(140, 100, 50, 0.35); }
+.gl-btn--ghost { background: transparent; background-image: none; border-color: transparent; box-shadow: none; color: var(--text-secondary); }
+.gl-btn--ghost:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); border-color: transparent; }
+
+.gl-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--gl-radius);
+    cursor: pointer;
+    transition: background var(--gl-dur-1) ease, color var(--gl-dur-1) ease, border-color var(--gl-dur-1) ease, transform var(--gl-dur-2) var(--gl-ease);
+}
+.gl-icon-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
+.gl-icon-btn:active:not(:disabled) { transform: scale(0.92); transition-duration: 80ms; }
+.gl-icon-btn[aria-pressed='true'], .gl-icon-btn[aria-expanded='true'], .gl-icon-btn.is-active {
+    color: var(--accent);
+    background: var(--gl-accent-soft);
+    border-color: var(--gl-accent-line);
+    box-shadow: var(--gl-spec);
+}
+.gl-icon-btn:focus-visible { outline: 2px solid var(--gl-focus); outline-offset: 1px; }
+.gl-icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Inputs ─────────────────────────────────────────────────────────────── */
+.gl-input {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    font: inherit;
+    font-family: var(--font);
+    font-size: 12.5px;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: var(--gl-radius);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color var(--gl-dur-1) ease, box-shadow var(--gl-dur-2) ease, background-color var(--gl-dur-1) ease;
+}
+.gl-input:hover:not(:focus):not(:disabled) { border-color: var(--border-accent); }
+.gl-input::placeholder { color: var(--text-secondary); opacity: 0.65; }
+.gl-input:focus { border-color: var(--accent); box-shadow: var(--gl-focus-ring); }
+.gl-search { position: relative; }
+.gl-search > svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; }
+.gl-search > .gl-input { padding-left: 30px; }
+
+/* ── Segmented tabs (panel tabs, view switchers) ────────────────────────── */
+.gl-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: var(--bg-active);
+    border: 1px solid var(--border-default);
+    border-radius: var(--gl-radius);
+    min-width: 0;
+}
+.gl-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 10px;
+    font: inherit;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background var(--gl-dur-1) ease, color var(--gl-dur-1) ease, box-shadow var(--gl-dur-2) ease;
+}
+.gl-tab:hover { color: var(--text-primary); }
+.gl-tab[aria-selected='true'], .gl-tab.is-active {
+    color: var(--text-primary);
+    background: var(--bg-surface);
+    background-image: var(--gl-glass-strong);
+    box-shadow: var(--gl-spec-strong), 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+:is(html.light, [data-theme="light"]) .gl-tab[aria-selected='true'], :is(html.light, [data-theme="light"]) .gl-tab.is-active { box-shadow: var(--gl-spec-strong), 0 1px 2px rgba(60, 44, 20, 0.1), 0 0 0 1px rgba(80, 60, 30, 0.06); }
+.gl-tab:focus-visible { outline: none; box-shadow: inset 0 0 0 1px var(--gl-accent-line, var(--accent)); }
+.gl-tab .gl-count { flex-shrink: 0; }
+/* A label wider than its tab shortens with "…" instead of being cut on both sides. */
+.gl-tab { justify-content: safe center; }
+.gl-tab-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Tabs sized by their labels (narrow side panels): short ones take less room than long ones. */
+.gl-tabs--auto .gl-tab { flex: 1 1 auto; padding: 0 8px; }
+.gl-count {
+    min-width: 18px;
+    height: 16px;
+    padding: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: var(--bg-hover);
+    border-radius: 999px;
+}
+
+/* ── Workspace side panel (see components/layout/WorkspacePanel.jsx) ───── */
+.gl-panel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    font-family: var(--font);
+    color: var(--text-primary);
+    background: var(--bg-base);
+}
+.gl-panel-head {
+    height: var(--ws-panel-head-h);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px 0 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    background-image: var(--gl-glass);
+    box-shadow: var(--gl-spec);
+    position: relative;
+}
+.gl-panel-mark {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    background: var(--gl-accent-soft);
+    border: 1px solid var(--gl-accent-line);
+    border-radius: var(--gl-radius);
+}
+.gl-panel-titles { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.gl-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+}
+button.gl-panel-title {
+    padding: 2px 4px;
+    margin-left: -4px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 650;
+    background: none;
+    border: none;
+    border-radius: var(--gl-radius);
+    cursor: pointer;
+    max-width: 100%;
+}
+button.gl-panel-title:hover { background: var(--bg-hover); }
+button.gl-panel-title:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gl-panel-title > span { overflow: hidden; text-overflow: ellipsis; }
+.gl-panel-sub {
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gl-panel-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.gl-panel-tools {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+.gl-panel-body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 6px 0 12px; }
+.gl-panel-foot {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 11.5px;
+    color: var(--text-secondary);
+}
+
+.gl-section-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+/* A row in a panel list (channel, DM, note, file…). */
+.gl-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: calc(100% - 12px);
+    min-height: 30px;
+    margin: 1px 6px;
+    padding: 4px 8px;
+    font: inherit;
+    font-family: var(--font);
+    font-size: 13px;
+    text-align: left;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--gl-radius);
+    cursor: pointer;
+    transition: background var(--gl-dur-1) ease, color var(--gl-dur-1) ease, border-color var(--gl-dur-1) ease;
+}
+.gl-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.gl-item:active { background: var(--bg-active); }
+.gl-item.is-active, .gl-item[aria-current='page'] {
+    color: var(--text-primary);
+    background: var(--bg-active);
+    background-image: var(--gl-glass);
+    border-color: var(--border-default);
+    box-shadow: var(--gl-spec);
+}
+.gl-item.is-active::before, .gl-item[aria-current='page']::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 7px;
+    bottom: 7px;
+    width: 2px;
+    border-radius: var(--r-sm);
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--gl-accent-line);
+}
+.gl-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* ── Empty / welcome states ─────────────────────────────────────────────── */
+.gl-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 28px 18px;
+    text-align: center;
+    font-family: var(--font);
+}
+.gl-empty-mark {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    background: var(--bg-surface);
+    background-image: var(--gl-glass-strong);
+    border: 1px solid var(--border-default);
+    border-radius: var(--gl-radius);
+    box-shadow: var(--gl-spec-strong);
+}
+.gl-empty-title { margin: 0; font-size: 13.5px; font-weight: 650; color: var(--text-primary); }
+.gl-empty-text { margin: 0; max-width: 260px; font-size: 12px; line-height: 1.55; color: var(--text-secondary); }
+
+/* ── Full-width page header (Apps, Notifications, Tasks…) ───────────────── */
+.gl-page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+.gl-page-title { margin: 6px 0 0; font-size: 22px; font-weight: 750; letter-spacing: -0.025em; color: var(--text-primary); }
+.gl-page-lead { margin: 4px 0 0; font-size: 13px; color: var(--text-secondary); }
+
+@media (max-width: 768px) {
+    .gl-page-head { padding: 18px 16px 14px; }
+    .gl-page-title { font-size: 19px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gl-card--interactive, .gl-btn, .gl-icon-btn, .gl-item, .gl-tab { transition: none; }
+    .gl-card--interactive:hover, .gl-btn:hover:not(:disabled), .gl-btn:active:not(:disabled),
+    .gl-icon-btn:active:not(:disabled) { transform: none; }
+}

@@ -8,8 +8,8 @@
    5. Traces: stickers on a wall + optional shared counts
    6. The 30-second version for people in a hurry
    ========================================================= */
-import { playTune, projectName } from './tunes.js?v=20';
-import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=20';
+import { playTune, projectName } from './tunes.js?v=21';
+import { GOATCOUNTER, EMAIL, CHANGELOG, STORIES, ASK, ASK_SUGGEST, ASK_FALLBACK, OCCASIONS } from './content.js?v=21';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const PIP_FACE = '<svg class="mini-pip" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><circle class="mp-body" cx="60" cy="62" r="44"/><ellipse class="mp-eye" cx="45" cy="56" rx="8" ry="11"/><ellipse class="mp-eye" cx="75" cy="56" rx="8" ry="11"/><circle class="mp-pupil" cx="46" cy="59" r="5"/><circle class="mp-pupil" cx="76" cy="59" r="5"/><path class="mp-mouth" d="M48 80q12 10 24 0"/></svg>';
@@ -265,7 +265,7 @@ export function initChapter(ctx) {
     else for (let i = 0; i < r.a.length; i += 3) { t.textContent = r.a.slice(0, i + 3); if (i % 12 === 0) snd.key?.(); log.scrollTop = log.scrollHeight; await new Promise((res) => setTimeout(res, 12)); }
     if (r.b) {
       const acts = document.createElement('p'); acts.className = 'ask-acts';
-      acts.innerHTML = r.b.map(([label, act]) => (/^https?:/.test(act) ? `<a class="ask-chip" href="${act}" target="_blank" rel="noopener">${esc(label)}</a>` : /\.html$/.test(act) ? `<a class="ask-chip" href="${act}">${esc(label)}</a>` : `<button type="button" class="ask-chip" data-act="${act}">${esc(label)}</button>`)).join('');
+      acts.innerHTML = r.b.map(([label, act]) => (/^https?:/.test(act) ? `<a class="ask-chip" href="${act}" target="_blank" rel="noopener">${esc(label)}</a>` : /\.html(#|$)/.test(act) ? `<a class="ask-chip" href="${act}">${esc(label)}</a>` : `<button type="button" class="ask-chip" data-act="${act}">${esc(label)}</button>`)).join('');
       b.append(acts);
     }
     log.scrollTop = log.scrollHeight;
@@ -279,6 +279,7 @@ export function initChapter(ctx) {
     if (act === 'copy') { try { await navigator.clipboard.writeText(EMAIL); c.textContent = 'Copied ✓'; } catch { c.textContent = EMAIL; } }
     else if (act === 'resume') { askDlg.close(); openResume(); }
     else if (act === 'quick') openQuick();
+    else if (act.startsWith('contact')) { askDlg.close(); import('./lib/contact.js?v=1').then((m) => m.openContact(act.split(':')[1])); }
     else if (act.startsWith('story:')) openStory(act.slice(6));
   });
   function openAsk() {

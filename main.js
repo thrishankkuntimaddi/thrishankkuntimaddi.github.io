@@ -5,9 +5,9 @@
    two glitches change the colours and reveal a final scene, and the
    3D gravity scenes change with each section.
    ========================================================= */
-import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=20';
-import { setWorldBg } from './worldbg.js?v=20';
-import { playTune, PROJECTS } from './tunes.js?v=20';
+import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=21';
+import { setWorldBg } from './worldbg.js?v=21';
+import { playTune, PROJECTS } from './tunes.js?v=21';
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -217,34 +217,81 @@ if (!calm()) {
 }
 
 /* ---------------------------------------------------------
-   Resume: preview in a dialog, always showing the latest
-   published version (see update-resume.sh). The buttons only
-   appear once a resume has been published.
+   Resume: the live version is edited in the Studio app
+   (admin/) and published to Firebase. The site reads it with
+   one small request, draws the one-page preview and builds
+   the PDF in the browser. If that fails, it falls back to the
+   PDF in resume/ (see update-resume.sh).
    --------------------------------------------------------- */
 const resumeDlg = $('#resumeDlg');
 const RESUME = 'resume/Thrishank-Kuntimaddi-Resume.pdf';
 let resumeV = '';
-fetch('resume/meta.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject())).then((m) => {
+let liveResume = null;
+const resumeLib = () => import('./lib/resume.js?v=1');
+const showResumeSlots = (date) => {
+  $('#resumeDate').textContent = `Updated ${date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`;
+  $$('[data-resume-slot]').forEach((el) => { el.hidden = false; });
+};
+const staticResume = () => fetch('resume/meta.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject())).then((m) => {
   resumeV = `?v=${m.updated}`;
-  const d = new Date(`${m.updated}T00:00:00`);
-  $('#resumeDate').textContent = `Updated ${d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`;
   $('#resumeDownload').href = RESUME + resumeV;
   $('#resumeOpen').href = RESUME + resumeV;
   $('#postDownload').href = RESUME + resumeV;
-  $$('[data-resume-slot]').forEach((el) => { el.hidden = false; });
-}).catch(() => {});
+  showResumeSlots(new Date(`${m.updated}T00:00:00`));
+});
+import('./lib/firebase.js?v=1').then((m) => m.readPublic('resume')).then(({ data, updatedAt }) => {
+  if (!data || !data.sections) throw new Error('no live resume');
+  liveResume = data;
+  showResumeSlots(new Date(updatedAt));
+}).catch(() => staticResume().catch(() => {}));
+
+async function drawLiveResume() {
+  const body = $('.resume-body', resumeDlg);
+  if (body.dataset.live === '1') return;
+  body.dataset.live = '1';
+  const img = $('#resumeImg');
+  img.hidden = true;
+  let box = $('.resume-live', body);
+  if (!box) { box = document.createElement('div'); box.className = 'resume-live'; body.appendChild(box); }
+  box.hidden = false;
+  box.textContent = 'Drawing the latest version…';
+  try {
+    const R = await resumeLib();
+    if (!document.getElementById('rz-fonts')) {
+      const st = document.createElement('style'); st.id = 'rz-fonts'; st.textContent = R.resumeFontCSS(); document.head.appendChild(st);
+    }
+    await Promise.all([R.loadEngine(), document.fonts.load('10px Carlito'), document.fonts.load('bold 10px Carlito'), document.fonts.load('italic 10px Carlito')]);
+    box.innerHTML = R.toSVG(liveResume).svg;
+  } catch {
+    box.hidden = true; body.dataset.live = ''; img.hidden = false; img.src = `resume/preview.jpg${resumeV}`;
+  }
+}
+async function liveDownload(openTab) {
+  const w = openTab ? window.open('', '_blank') : null;
+  try {
+    const R = await resumeLib();
+    await R.loadEngine();
+    if (openTab) { const { blob } = R.toPDF(liveResume); w.location = URL.createObjectURL(blob); } else await R.download(liveResume);
+  } catch { if (w) w.location = RESUME; else location.href = RESUME; }
+}
 document.addEventListener('click', (e) => {
+  if (liveResume && e.target.closest('#resumeDownload, #postDownload')) { e.preventDefault(); liveDownload(false); return; }
+  if (liveResume && e.target.closest('#resumeOpen')) { e.preventDefault(); liveDownload(true); return; }
   const a = e.target.closest('[data-resume]');
   if (!a || !resumeDlg.showModal) return; // without <dialog> support the link just opens the PDF
   e.preventDefault();
   setMenu(false);
-  const img = $('#resumeImg');
-  if (!img.getAttribute('src')) img.src = `resume/preview.jpg${resumeV}`;
+  if (liveResume) drawLiveResume();
+  else {
+    const img = $('#resumeImg');
+    if (!img.getAttribute('src')) img.src = `resume/preview.jpg${resumeV}`;
+  }
   tourPause(false);
   resumeDlg.showModal();
 });
 $('#resumeClose').addEventListener('click', () => resumeDlg.close());
-$('#resumeImg').addEventListener('click', () => {
+$('.resume-body', resumeDlg).addEventListener('click', (e) => {
+  if (!e.target.closest('#resumeImg, .resume-live') || e.target.closest('a')) return;
   const zoomed = resumeDlg.classList.toggle('zoom');
   $('#resumeHint').textContent = zoomed ? 'Click the page to fit the screen' : 'Click the page to zoom in';
 });
@@ -626,7 +673,7 @@ function storyTick() {
 if (/[?&]loop\b/.test(location.search) && !calm()) setTimeout(() => enterLoop(), 1500); // preview: open the loop straight away
 function enterLoop() {
   looping = true; tourPause(true);
-  import('./infinity.js?v=20').then((m) => m.enter({
+  import('./infinity.js?v=21').then((m) => m.enter({
     say, calm, PREFS,
     pipSvg: () => $('#pip svg')?.outerHTML || '',
     audio: () => { unlockSound(); return soundOn ? actx : null; },
@@ -1065,8 +1112,8 @@ async function quickJump(ev) {
   // 2. fall. Pip tumbles in the middle the whole way; the universes rush past and Pip is redrawn in each one's style
   const faller = $('#fallPip'), flash = $('#fallFlash'), windows = $$('.project .window');
   // Every universe shows on the way down: the projects in their own, the rest as quick flashes in between.
-  const [inf, chap] = await Promise.all([import('./infinity.js?v=20').catch(() => null), import('./chapter.js?v=20').catch(() => null)]);
-  if (inf && !document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=20'; l.dataset.inf = '1'; document.head.append(l); }
+  const [inf, chap] = await Promise.all([import('./infinity.js?v=21').catch(() => null), import('./chapter.js?v=21').catch(() => null)]);
+  if (inf && !document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=21'; l.dataset.inf = '1'; document.head.append(l); }
   const plan = fallPlan();
   faller.innerHTML = pip.querySelector('svg').outerHTML.replace('</svg>', `<g class="pip-wear">${chap?.PIP_WEAR || ''}</g>${inf?.EMO_SVG || ''}</svg>`);
   faller.hidden = false; faller.className = 'fall-pip';
@@ -1159,7 +1206,7 @@ async function quickJump(ev) {
   snd.chime();
   await fallEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600, easing: 'ease-out' }).finished;
   fallEl.hidden = true; fallEl.className = 'fall';
-  import('./dive.js?v=20').then((m) => m.startDive({ calm, say })).catch(() => {}); // the second scroll dives into each project
+  import('./dive.js?v=21').then((m) => m.startDive({ calm, say })).catch(() => {}); // the second scroll dives into each project
   falling = false; pendingNormal = true; jumped = true; tour.done = false; tour.held = false; tour.pos = 0; tour.resumeAt = performance.now() + 2500;
   say('Phew. Home again.', 3200);
 }
@@ -1170,7 +1217,7 @@ $('#jumpBtn').addEventListener('click', quickJump);
    Ask Pip, seasons, stickers and the 30-second version.
    Loaded separately, so the site above never depends on it.
    --------------------------------------------------------- */
-import('./chapter.js?v=20').then((m) => m.initChapter({
+import('./chapter.js?v=21').then((m) => m.initChapter({
   root, $, $$, calm, say, pip, visits, tourPause, snd, setMenu, audio: () => (soundOn ? actx : null),
   refreshTag: () => { $('#editionText').textContent = tagText(); },
   openResume: () => $('[data-resume]')?.click(),

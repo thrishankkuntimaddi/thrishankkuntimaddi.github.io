@@ -1,0 +1,9 @@
+Apply the Liquid Glass theme described in `LIQUID-GLASS-THEME.md` to this project. Follow its rules exactly — they come from many rounds of owner feedback:
+1. Create `liquid-glass.css` and `liquid-glass.js` from sections 11–12 of the document, unchanged, and load them after the project's own CSS.
+2. Add the pre-paint theme script (section 3) to `<head>`; call `LiquidGlass.init()` once after the app mounts; add `lg-root` to `<body>`.
+3. Map the project's components to the classes in section 6: cards → `lg-tile`; top bar / bottom tab bar / toolbars / toasts → `lg-bar`; modals and bottom sheets → `lg-sheet`; buttons → `lg-btn` (`is-primary` for the main action); icon-only buttons → `lg-icon-btn`; tabs → `lg-segmented`; inputs → `lg-field`; tappable cards → `lg-pressable` (+ `data-lg-nav` if they open a page).
+4. Remove every hard-coded brand colour (blue, indigo, violet, purple gradients, black filled buttons) from the UI. The glass is colourless; colour only for meaning (money in green, money out red, category icons).
+5. Light theme by default on every device; Dark and Auto only when the user picks them.
+6. Page headers and the bottom bar float over the content and content scrolls under them; cards get no live blur.
+7. No visible scrollbars; every tappable thing reacts to hover (mouse) and to touch (sink, then spring back).
+8. Verify in a browser at phone (390×844) and desktop (1440×900) sizes, light and dark, and scroll so content passes under the glass. Keep scrolling at 60 fps.

@@ -1,0 +1,280 @@
+/* ==========================================================================
+   LIQUID GLASS DESIGN SYSTEM (CSS)
+   Includes: Theme Variables, Lens Optics, Buttons, Icons, Floating Bars,
+   and Accessibility Fallbacks.
+   ========================================================================== */
+
+:root {
+  /* Theme Surfaces - Light Mode Default */
+  --lg-bg-regular: rgba(255, 255, 255, 0.45);
+  --lg-bg-clear: rgba(255, 255, 255, 0.14);
+  --lg-media-scrim: rgba(0, 0, 0, 0.35);
+
+  /* Lens Optics & Specular Highlights */
+  --lg-lens-blur-regular: blur(24px) saturate(180%);
+  --lg-lens-blur-clear: blur(10px) saturate(140%);
+  --lg-lens-rim: 1px solid rgba(255, 255, 255, 0.58);
+  --lg-lens-specular:
+    inset 0 1.5px 0 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.25),
+    inset 0 0 18px 0 rgba(255, 255, 255, 0.16),
+    0 12px 32px -4px rgba(0, 0, 0, 0.18);
+
+  /* Typography & Icons */
+  --lg-text-primary: #0A0A0C;
+  --lg-text-secondary: rgba(10, 10, 12, 0.65);
+  --lg-tint-accent: rgba(0, 122, 255, 0.24);
+  --lg-pill-active: rgba(255, 255, 255, 0.42);
+
+  /* Geometry & Motion */
+  --lg-radius-panel: 28px;
+  --lg-radius-bar: 32px;
+  --lg-radius-pill: 9999px;
+  --lg-spring: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  --lg-fallback-bg: #F2F2F7;
+}
+
+/* Dark Theme Overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --lg-bg-regular: rgba(28, 28, 30, 0.55);
+    --lg-bg-clear: rgba(18, 18, 20, 0.22);
+    --lg-lens-rim: 1px solid rgba(255, 255, 255, 0.20);
+    --lg-lens-specular:
+      inset 0 1.5px 0 0 rgba(255, 255, 255, 0.42),
+      inset 0 -1px 0 0 rgba(255, 255, 255, 0.10),
+      inset 0 0 18px 0 rgba(255, 255, 255, 0.08),
+      0 14px 36px -4px rgba(0, 0, 0, 0.45);
+    --lg-text-primary: #F5F5F7;
+    --lg-text-secondary: rgba(245, 245, 247, 0.68);
+    --lg-pill-active: rgba(255, 255, 255, 0.16);
+    --lg-fallback-bg: #1C1C1E;
+  }
+}
+
+/* Explicit Theme Data Attribute Support */
+[data-theme="dark"] {
+  --lg-bg-regular: rgba(28, 28, 30, 0.55);
+  --lg-bg-clear: rgba(18, 18, 20, 0.22);
+  --lg-lens-rim: 1px solid rgba(255, 255, 255, 0.20);
+  --lg-text-primary: #F5F5F7;
+  --lg-text-secondary: rgba(245, 245, 247, 0.68);
+  --lg-pill-active: rgba(255, 255, 255, 0.16);
+  --lg-fallback-bg: #1C1C1E;
+}
+
+/* ==========================================================================
+   1. LENS TYPES (Regular, Clear, and Optical Refraction)
+   ========================================================================== */
+
+.lg-lens-regular {
+  background: var(--lg-bg-regular);
+  -webkit-backdrop-filter: var(--lg-lens-blur-regular);
+  backdrop-filter: var(--lg-lens-blur-regular);
+  border: var(--lg-lens-rim);
+  box-shadow: var(--lg-lens-specular);
+  color: var(--lg-text-primary);
+  transition: var(--lg-spring);
+}
+
+.lg-lens-clear {
+  background: var(--lg-bg-clear);
+  -webkit-backdrop-filter: var(--lg-lens-blur-clear);
+  backdrop-filter: var(--lg-lens-blur-clear);
+  border: var(--lg-lens-rim);
+  box-shadow: var(--lg-lens-specular);
+  color: #FFFFFF;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transition: var(--lg-spring);
+}
+
+/* Optional Edge Refraction Lens (pair with inline SVG filter #liquid-glass-lens) */
+.lg-lens-refractive {
+  position: relative;
+  overflow: hidden;
+}
+
+.lg-lens-refractive::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backdrop-filter: url(#liquid-glass-lens) blur(20px) saturate(185%);
+  -webkit-backdrop-filter: blur(20px) saturate(185%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ==========================================================================
+   2. BUTTONS (Pill, Tinted, and Tactile Spring States)
+   ========================================================================== */
+
+.lg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--lg-radius-pill);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  user-select: none;
+  background: var(--lg-bg-regular);
+  -webkit-backdrop-filter: var(--lg-lens-blur-regular);
+  backdrop-filter: var(--lg-lens-blur-regular);
+  border: var(--lg-lens-rim);
+  box-shadow: var(--lg-lens-specular);
+  color: var(--lg-text-primary);
+  transition: var(--lg-spring);
+}
+
+.lg-btn:hover {
+  transform: scale(1.03);
+  filter: brightness(1.06);
+}
+
+.lg-btn:active {
+  transform: scale(0.96);
+}
+
+.lg-btn-tinted {
+  background: var(--lg-tint-accent);
+  color: #007AFF;
+}
+
+/* ==========================================================================
+   3. ICONS & CIRCULAR ICON BUTTONS
+   ========================================================================== */
+
+.lg-icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  transition: var(--lg-spring);
+}
+
+.lg-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--lg-radius-pill);
+  cursor: pointer;
+  background: var(--lg-bg-regular);
+  -webkit-backdrop-filter: var(--lg-lens-blur-regular);
+  backdrop-filter: var(--lg-lens-blur-regular);
+  border: var(--lg-lens-rim);
+  box-shadow: var(--lg-lens-specular);
+  color: var(--lg-text-primary);
+  transition: var(--lg-spring);
+}
+
+.lg-icon-btn:hover {
+  transform: scale(1.06);
+}
+
+.lg-icon-btn:active {
+  transform: scale(0.94);
+}
+
+.lg-icon-btn.is-active .lg-icon {
+  color: #007AFF;
+  filter: drop-shadow(0 0 6px rgba(0, 122, 255, 0.45));
+}
+
+/* ==========================================================================
+   4. FLOATING NAVIGATION & TAB BARS
+   ========================================================================== */
+
+.lg-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 16px;
+  margin: 16px;
+  border-radius: var(--lg-radius-bar);
+  background: var(--lg-bg-regular);
+  -webkit-backdrop-filter: var(--lg-lens-blur-regular);
+  backdrop-filter: var(--lg-lens-blur-regular);
+  border: var(--lg-lens-rim);
+  box-shadow: var(--lg-lens-specular);
+  color: var(--lg-text-primary);
+}
+
+.lg-tabbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 64px;
+  padding: 6px;
+  margin: 16px;
+  border-radius: var(--lg-radius-bar);
+  background: var(--lg-bg-regular);
+  -webkit-backdrop-filter: var(--lg-lens-blur-regular);
+  backdrop-filter: var(--lg-lens-blur-regular);
+  border: var(--lg-lens-rim);
+  box-shadow: var(--lg-lens-specular);
+}
+
+.lg-tab-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 52px;
+  padding: 0 18px;
+  border-radius: var(--lg-radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lg-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--lg-spring);
+}
+
+.lg-tab-item.is-active {
+  background: var(--lg-pill-active);
+  color: var(--lg-text-primary);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.65);
+}
+
+/* ==========================================================================
+   5. PANELS & ACCESSIBILITY FALLBACKS
+   ========================================================================== */
+
+.lg-panel {
+  border-radius: var(--lg-radius-panel);
+  padding: 20px;
+  background: var(--lg-bg-regular);
+  -webkit-backdrop-filter: var(--lg-lens-blur-regular);
+  backdrop-filter: var(--lg-lens-blur-regular);
+  border: var(--lg-lens-rim);
+  box-shadow: var(--lg-lens-specular);
+  color: var(--lg-text-primary);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lg-lens-regular,
+  .lg-lens-clear,
+  .lg-btn,
+  .lg-icon-btn,
+  .lg-navbar,
+  .lg-tabbar,
+  .lg-panel {
+    background: var(--lg-fallback-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

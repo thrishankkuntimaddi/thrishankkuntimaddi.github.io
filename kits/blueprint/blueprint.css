@@ -1,0 +1,107 @@
+/* ==========================================================================
+   BLUEPRINT THEME — from Thrishank Kuntimaddi's portfolio (https://thrishankkuntimaddi.github.io)
+   Engineering drawings: navy ink, dashed outlines, grid paper and monospaced labels.
+   Free to use in any project. Load after your own CSS:
+     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&display=swap">
+     <link rel="stylesheet" href="blueprint.css">
+   Classes (same in all 27 universe kits, so you can swap the file):
+     t-page t-wrap t-nav t-card t-window t-btn t-btn--primary t-btn--ghost
+     t-input t-chip t-eyebrow t-title t-h2 t-lede t-muted t-dialog t-toast
+   ========================================================================== */
+
+:root {
+  --t-bg: #fbf8f2;
+  --t-tint: #ffe9df;
+  --t-ink: #27437e;
+  --t-muted: #4c6497;
+  --t-faint: #7e93bd;
+  --t-line: rgba(39, 67, 126, .18);
+  --t-line-2: rgba(39, 67, 126, .4);
+  --t-surface: rgba(255, 255, 255, .5);
+  --t-surface-ink: #27437e;
+  --t-accent: #ff8a65;
+  --t-accent-2: #6bb6ff;
+  --t-accent-3: #ffd166;
+  --t-display: "Space Mono", monospace;
+  --t-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --t-mono: "Space Mono", ui-monospace, Menlo, monospace;
+  --t-hand: "Caveat", cursive;
+  --t-r: 3px;
+  --t-r-sm: 2px;
+  --t-base-size: 16px;
+  --t-base-lh: 1.6;
+  --t-page-bg: #fbf8f2;
+  --t-accent-deep: color-mix(in oklab, var(--t-accent) 62%, var(--t-ink));
+  --t-shadow: color-mix(in srgb, var(--t-accent) 38%, transparent);
+  --t-card-shadow: none;
+  --t-border: 1.5px dashed var(--t-ink);
+  --t-ease: cubic-bezier(.2, .7, .2, 1);
+  --t-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --t-wrap: 1160px;
+  color-scheme: light;
+}
+
+/* ---------- Base ---------- */
+.t-page, body.t-page {
+  margin: 0; min-height: 100vh; background: linear-gradient(var(--t-line) 1px, transparent 1px) 0 0 / 120px 120px, linear-gradient(90deg, var(--t-line) 1px, transparent 1px) 0 0 / 120px 120px, linear-gradient(color-mix(in srgb, var(--t-ink) 7%, transparent) 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, color-mix(in srgb, var(--t-ink) 7%, transparent) 1px, transparent 1px) 0 0 / 24px 24px, var(--t-bg); background-attachment: fixed;
+  color: var(--t-ink); font-family: var(--t-sans); font-size: var(--t-base-size); line-height: var(--t-base-lh);
+  -webkit-font-smoothing: antialiased;
+}
+.t-page ::selection { background: var(--t-accent-3); color: #1b1d2a; }
+.t-wrap { max-width: var(--t-wrap); margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); }
+.t-page :focus-visible { outline: 3px solid var(--t-accent); outline-offset: 3px; }
+.t-page a:not(.t-btn) { color: inherit; }
+
+/* ---------- Type ---------- */
+.t-eyebrow { font-family: var(--t-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--t-muted); }
+.t-title { margin: 0; font-family: var(--t-display); font-weight: 600; font-size: clamp(38px, 5vw, 72px); line-height: 1.04; letter-spacing: -.02em; }
+.t-title em, .t-h2 em { font-style: italic; color: var(--t-accent-deep); }
+.t-h2 { margin: 0; font-family: var(--t-display); font-weight: 600; font-size: clamp(28px, 3.6vw, 48px); line-height: 1.1; letter-spacing: -.015em; }
+.t-lede { font-size: 1.12em; color: var(--t-muted); max-width: 60ch; }
+.t-muted { color: var(--t-muted); }
+
+/* ---------- Surfaces ---------- */
+.t-card {
+  position: relative; background: var(--t-surface); color: var(--t-surface-ink);
+  border: var(--t-border); border-radius: var(--t-r); box-shadow: var(--t-card-shadow);
+  padding: clamp(20px, 3vw, 32px); transition: transform .35s var(--t-ease), box-shadow .35s var(--t-ease);
+}
+.t-card .t-muted, .t-card .t-lede { color: color-mix(in srgb, var(--t-surface-ink) 70%, transparent); }
+.t-window { overflow: hidden; background: #fff; color: var(--t-surface-ink); border: var(--t-border); border-radius: var(--t-r); box-shadow: var(--t-card-shadow); }
+.t-window-bar { display: flex; gap: 6px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--t-line-2); font-family: var(--t-mono); font-size: 12px; }
+.t-window-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--t-accent); } .t-window-bar i + i { background: var(--t-accent-3); } .t-window-bar i + i + i { background: var(--t-accent-2); }
+.t-nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px clamp(16px, 4vw, 40px); background: color-mix(in srgb, var(--t-bg) 82%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--t-line); }
+
+/* ---------- Controls ---------- */
+.t-btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 0 22px; border: var(--t-border); border-radius: 999px;
+  background: #fff; color: #1b1d2a; font: 600 15px/1 var(--t-sans); cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: transform .3s var(--t-spring), box-shadow .3s var(--t-ease), background .2s;
+}
+.t-btn:hover { transform: translateY(-2px); }
+.t-btn:active { transform: translateY(1px) scale(.98); }
+.t-btn--primary { background: var(--t-accent); color: #1b1d2a; border-color: color-mix(in srgb, var(--t-accent) 60%, var(--t-ink)); }
+.t-btn--ghost { background: transparent; color: inherit; border-color: transparent; }
+.t-btn--ghost:hover { background: var(--t-tint); color: #1b1d2a; }
+.t-input { width: 100%; min-height: 44px; padding: 10px 14px; border: var(--t-border); border-radius: var(--t-r-sm); background: #fff; color: #1b1d2a; font: 400 15px/1.4 var(--t-sans); box-sizing: border-box; }
+.t-input:focus { outline: none; border-color: var(--t-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--t-accent) 25%, transparent); }
+.t-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--t-line-2); border-radius: 999px; background: var(--t-tint); color: #1b1d2a; font: 500 13px/1.2 var(--t-mono); }
+
+/* ---------- Overlays ---------- */
+.t-dialog { border: var(--t-border); border-radius: var(--t-r); padding: 0; background: var(--t-surface); color: var(--t-surface-ink); box-shadow: var(--t-card-shadow); max-width: min(640px, 94vw); }
+.t-dialog::backdrop { background: color-mix(in srgb, var(--t-bg) 70%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.t-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 12px 18px; border: var(--t-border); border-radius: var(--t-r-sm); background: var(--t-surface); color: var(--t-surface-ink); box-shadow: var(--t-card-shadow); }
+
+/* ---------- Signature: what makes it Blueprint ---------- */
+.t-card, .t-window { outline: 1px solid var(--t-line-2); outline-offset: 6px; }
+.t-title, .t-h2 { text-transform: uppercase; letter-spacing: -.02em; font-style: normal; }
+.t-title em, .t-h2 em { font-style: normal; }
+.t-btn { text-transform: uppercase; font-family: var(--t-mono); font-size: 12.5px; letter-spacing: .06em; background: transparent; }
+.t-btn--primary { background: color-mix(in srgb, var(--t-accent) 40%, transparent); }
+
+/* ---------- Accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .t-page *, .t-page *::before, .t-page *::after { animation: none !important; transition: none !important; }
+}
+@media (forced-colors: active) { .t-card, .t-btn, .t-window { border: 1px solid CanvasText; } }

@@ -108,13 +108,15 @@ export const STORIES = {
 /* ---------------------------------------------------------
    What Pip knows. Each entry: words that trigger it, an
    answer, and optional buttons. Keep answers short.
-   Actions: 'story:<id>', 'resume', 'quick', 'copy', or a URL.
+   Actions: 'story:<id>', 'resume', 'quick', 'copy', 'contact[:kind]', or a URL.
    --------------------------------------------------------- */
 export const ASK = [
   { k: ['hi', 'hello', 'hey', 'yo', 'namaste', 'sup'], a: 'Hi! I know everything on this site. Ask me about Thrishank’s projects, skills, or how to get in touch.' },
   { k: ['who', 'about', 'introduce', 'tell me', 'background'], a: 'Thrishank Kuntimaddi is a frontend developer focused on UI/UX, from Bengaluru, India. Thrishank takes products from the first sketch to a live release on web, Android and desktop, and can build the backend behind them too.', b: [['The 30-second version', 'quick']] },
   { k: ['hire', 'available', 'open', 'job', 'role', 'freelance', 'work with', 'collaborat', 'opportunit', 'looking'], a: 'Yes! Thrishank is open to frontend and UI roles, freelance work and collaborations. The quickest way in is email.', b: [['Copy email', 'copy'], ['See the resume', 'resume']] },
-  { k: ['contact', 'email', 'mail', 'reach', 'touch', 'get in touch', 'talk', 'message', 'linkedin', 'phone'], a: 'Email is best: thrishankkuntimaddi@gmail.com. Thrishank is also on LinkedIn and GitHub.', b: [['Copy email', 'copy'], ['LinkedIn ↗', 'https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/'], ['GitHub ↗', 'https://github.com/thrishankkuntimaddi']] },
+  { k: ['feedback', 'suggest', 'bug', 'broken', 'compliment', 'love this', 'nice site', 'cool site', 'great site'], a: 'Thrishank would love to hear it. Send it straight to the inbox, no email needed.', b: [['Send feedback', 'contact:feedback'], ['Send a compliment', 'contact:compliment']] },
+  { k: ['theme', 'themes', 'prompt', 'prompts', 'css', 'kit', 'design system', 'liquid glass', 'monolith', 'universe'], a: 'Every look on this site is free to use: 30 theme kits, each with a ready prompt for your AI coding tool plus .css, .csv and .md files.', b: [['Get the theme kits ↗', 'universes.html#kits']] },
+  { k: ['contact', 'email', 'mail', 'reach', 'touch', 'get in touch', 'talk', 'message', 'linkedin', 'phone'], a: 'Email is best: thrishankkuntimaddi@gmail.com, or send a message right here. Thrishank is also on LinkedIn and GitHub.', b: [['Send a message', 'contact'], ['Copy email', 'copy'], ['LinkedIn ↗', 'https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/'], ['GitHub ↗', 'https://github.com/thrishankkuntimaddi']] },
   { k: ['resume', 'cv', 'pdf'], a: 'Here it is: always the latest version.', b: [['Open the resume', 'resume']] },
   { k: ['skill', 'stack', 'tech', 'react', 'typescript', 'language', 'know', 'tools', 'frontend'], a: 'Frontend: React 19, TypeScript, Next.js, Tailwind, Vite and modern CSS. Motion and 3D: Three.js, WebGL, Canvas. Beyond the UI: Node.js, WebSockets, Redis, PostgreSQL, MongoDB, Firebase, Capacitor and Tauri.' },
   { k: ['design', 'ux', 'ui', 'figma', 'accessib', 'a11y'], a: 'UI/UX is the focus: design tokens, phone-first layouts, accessibility and motion that feels good the hundredth time. Every interface on this site, including me, was designed and coded by hand.' },

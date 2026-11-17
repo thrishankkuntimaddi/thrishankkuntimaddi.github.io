@@ -1,0 +1,16 @@
+Apply the "Sketch" theme to this project. A pencil sketchbook: hand-lettered headings, wobbly lines and hatching.
+
+Use the files sketch.css, sketch.csv and SKETCH-THEME.md (from https://thrishankkuntimaddi.github.io/universes.html#kits). Follow them exactly:
+1. Add sketch.css after the project's own CSS and the Google Fonts link at the top of it. Put class "t-page" on <body>.
+2. Map components to the theme classes: page width → t-wrap; top bar → t-nav; cards/panels → t-card; app/screens previews → t-window; buttons → t-btn (the one main action per view → t-btn t-btn--primary; quiet actions → t-btn--ghost); text fields → t-input; tags/filters → t-chip; small labels → t-eyebrow; page title → t-title; section titles → t-h2; intro paragraph → t-lede; modals → t-dialog; notifications → t-toast.
+3. Use only the --t-* tokens for colour, type, radius and shadow. Remove hard-coded colours, fonts and radii that fight the theme.
+4. Theme rules:
+   - Headings in Caveat 700, large (44–78px), tight line-height.
+   - Borders look hand-drawn: uneven border-radius on every box.
+   - Shadows are pencil-grey offsets, never coloured blurs.
+   - Background has faint diagonal hatching.
+   - Keep body text in Inter for readability; only display type is hand-written.
+5. Light theme: keep everything light; no dark sections.
+6. Keep it accessible: text contrast AA, visible focus rings, prefers-reduced-motion turns animation off (already in the CSS).
+7. Check it at 390px (phone) and 1440px (desktop) wide and fix anything that overflows.
+Sample voice for headings: "I sketch interfaces, then build every line."

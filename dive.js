@@ -5,15 +5,15 @@
    It flies in from deep space as it comes into view, settles
    in front of you, then dives past as you scroll on.
    ========================================================= */
-import { PROJECTS, projectName } from './tunes.js?v=20';
-import { NAMES, isLoopWorld } from './worlds.js?v=20';
+import { PROJECTS, projectName } from './tunes.js?v=21';
+import { NAMES, isLoopWorld } from './worlds.js?v=21';
 
 let started = false;
 export async function startDive({ calm, say }) {
   if (started || calm()) return;
   started = true;
   let U = null;
-  try { U = (await import('./infinity.js?v=20')).U; } catch { /* no scenes, still 3D */ }
+  try { U = (await import('./infinity.js?v=21')).U; } catch { /* no scenes, still 3D */ }
   const root = document.documentElement;
   root.classList.add('diving');
   const items = [...document.querySelectorAll('#work .project')].map((art, i) => {

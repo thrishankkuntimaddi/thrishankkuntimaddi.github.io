@@ -26,6 +26,10 @@ A light, pencil-sketch portfolio with retro space styling that runs itself.
 - **Quick jump through all 27:** each project falls past in its own universe with its own short tune (`tunes.js`), the other universes flash between them, and Pip changes face and place in every one.
 - **The dive (`dive.js`):** after the quick jump, scrolling down again turns each main project into its own universe, flying in from deep space in 3D, settling in front of you, then diving past.
 - **Project tunes:** every project plays a short, quiet tune once when it scrolls into view (when sound is on).
+- **Studio app (`admin/`):** the owner's app at `/admin/`, installable on a phone or laptop (Add to Home Screen / Install app). Google sign-in, only for thrishankkuntimaddi@gmail.com. Edit the resume (sections for summary, experience, projects, skills, education, achievements and any custom section, reorder, hide, Letter or A4) with a live one-page preview; edits autosave as a private draft and **Publish** makes them live, with every published version kept for roll-back. Also: Inbox, Feedback, Compliments and Help center (visitor messages, plus the help answers shown on the site) and About the system.
+- **Live resume:** the site reads the published resume from Firebase with one small request, draws the same one-page layout and builds a real PDF (selectable text, working links, ATS-friendly) in the visitor's browser (`lib/resume.js`, Carlito font = Calibri metrics). If Firebase can't be reached it falls back to the PDF in `resume/`.
+- **Send a message (`lib/contact.js`):** feedback, compliments, questions and messages from the footer, the contact section, Ask Pip and the Studio page land in the Studio inbox.
+- **Free themes, prompts & settings (`universes.html`):** 29 theme kits (Liquid Glass, Monolith Gloss and all 27 universes), each with `prompt.txt`, a `.css`, a `.csv` of tokens and a `.md` spec, single files or zips, plus a live demo (`kits/demo.html?kit=fire`). Then a help center and the site settings. Rebuild the kits with `node tools/build-kits.mjs` (hand-made kits live in `kits/_src/`).
 - Works on phones, respects reduced motion (no tour, no animation), and still shows all content without WebGL.
 
 ## Stack
@@ -46,7 +50,11 @@ chapter.js   memory, stories, Ask Pip, seasons, sticker wall, 30-second version
 content.js   the words for chapter.js (easy to edit)
 assets/      me.jpg, og.jpg (social preview), favicon.svg
 resume/      published resume, preview image and date (written by update-resume.sh)
-update-resume.sh   preview, confirm and publish a new resume
+update-resume.sh   preview, confirm and publish a new resume (fallback PDF)
+admin/       the Studio app (resume editor, inbox, help center, about)
+lib/         firebase.js, resume.js (layout + PDF), resume-seed.js, contact.js, kits-page.js
+kits/        the theme kits + kits.json + demo.html (built by tools/build-kits.mjs)
+firestore.rules    who can read/write what (deploy: firebase deploy --only firestore:rules)
 ```
 
 ## Run locally
@@ -68,7 +76,13 @@ All words for the stories, Ask Pip, the "what's new" note and the occasions are 
 
 The sticker wall then shows how many visitors poked Pip, reached the end and left a sticker, and the GoatCounter dashboard shows your visits. Only anonymous event names are sent (no cookies). With the code empty, nothing is sent anywhere.
 
+## Firebase (free Spark plan)
+
+Project `myprofile-f29f5`. Firestore holds `site/resume` and `site/help` (public read, owner write), `private/resumeDraft` and `versions` (owner only) and `messages` (anyone can create a well-formed one; only the owner can read). Rules are in `firestore.rules`. To sign in to the Studio on the live site, `thrishankkuntimaddi.github.io` must be in Authentication → Settings → Authorized domains. Locally, `http://localhost:8080/admin/?demo` previews the app without signing in (nothing is saved).
+
 ## Updating the resume
+
+Edit it in the Studio app (`/admin/`) and press Publish. The script below still updates the fallback PDF:
 
 ```
 ./update-resume.sh                      # uses ~/Documents/Thrishank Kuntimaddi Resume.pdf
