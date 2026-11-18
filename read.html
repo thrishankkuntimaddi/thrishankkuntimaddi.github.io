@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" data-edition="morning">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Thrishank Kuntimaddi — Quick read</title>
+  <meta name="description" content="The quick-read version of Thrishank Kuntimaddi's portfolio: resume first, then projects and contact. No animation, loads fast, works with screen readers.">
+  <meta name="theme-color" content="#fbf8f2">
+  <link rel="canonical" href="https://thrishankkuntimaddi.github.io/read.html">
+  <meta property="og:title" content="Thrishank Kuntimaddi — Quick read">
+  <meta property="og:description" content="Frontend developer focused on UI/UX. Resume, projects and contact on one calm page.">
+  <meta property="og:image" content="https://thrishankkuntimaddi.github.io/assets/og.jpg">
+  <script>
+    (function () {
+      var d = document.documentElement, h = new Date().getHours(), list = ['morning', 'noon', 'dusk', 'night'];
+      d.dataset.edition = list[h >= 5 && h < 11 ? 0 : h >= 11 && h < 17 ? 1 : h >= 17 && h < 21 ? 2 : 3];
+    })();
+  </script>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="read.css?v=1">
+</head>
+<body>
+  <a class="skip" href="#resume">Skip to the resume</a>
+  <header class="top wrap">
+    <p class="kicker">Quick read · <a href="./">full experience →</a></p>
+    <h1>Thrishank Kuntimaddi</h1>
+    <p class="role">Frontend developer focused on UI/UX · Bengaluru, India</p>
+    <p class="lede" data-k="hero.p0">I design and build interfaces people enjoy using, and take products from the first sketch to a live release on web, Android and desktop. Open to frontend and UI roles, freelance work and collaborations.</p>
+    <div id="forSlot"></div>
+    <ul class="actions">
+      <li><a class="btn primary" href="resume/Thrishank-Kuntimaddi-Resume.pdf" id="dl" download="Thrishank-Kuntimaddi-Resume.pdf">Download resume (PDF)</a></li>
+      <li><a class="btn" href="mailto:thrishankkuntimaddi@gmail.com">Email me</a></li>
+      <li><a class="btn" href="https://www.linkedin.com/in/thrishank-kuntimaddi-8b64832b6/" rel="noopener">LinkedIn</a></li>
+      <li><a class="btn" href="https://github.com/thrishankkuntimaddi" rel="noopener">GitHub</a></li>
+    </ul>
+  </header>
+
+  <main class="wrap">
+    <section id="resume" aria-labelledby="resumeH" tabindex="-1">
+      <h2 id="resumeH">Resume <small id="resumeDate"></small></h2>
+      <div class="paper loading" id="resumeBox"><p class="muted">Loading the latest version… If it doesn’t appear, <a href="resume/Thrishank-Kuntimaddi-Resume.pdf">open the PDF</a>.</p></div>
+    </section>
+
+    <section id="projects" aria-labelledby="projectsH">
+      <h2 id="projectsH">Projects <small>all live</small></h2>
+      <ul class="projects" id="projectList"></ul>
+    </section>
+
+    <section id="more" aria-labelledby="moreH">
+      <h2 id="moreH">More work</h2>
+      <ul class="more" id="moreList"></ul>
+    </section>
+
+    <section id="kind" class="kind-wall" aria-labelledby="kindH" hidden>
+      <h2 id="kindH">Kind words <small>from people who visited</small></h2>
+      <div class="kind-notes"></div>
+    </section>
+
+    <section id="contact" aria-labelledby="contactH">
+      <h2 id="contactH">Contact</h2>
+      <p><a class="big" href="mailto:thrishankkuntimaddi@gmail.com">thrishankkuntimaddi@gmail.com</a></p>
+      <p class="actions"><button class="btn" type="button" data-contact>Send a message</button> <a class="btn" href="https://poelys.com" rel="noopener">Poelys, my studio</a></p>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <a href="./">The full portfolio (animated, with Pip)</a>
+    <a href="notes.html" id="notesLink" hidden>Notes</a>
+    <a href="universes.html">Free themes</a>
+    <span>© 2026 Thrishank Kuntimaddi</span>
+  </footer>
+
+  <noscript><p class="wrap">This page needs JavaScript only for the live resume. <a href="resume/Thrishank-Kuntimaddi-Resume.pdf">Open the resume PDF</a>.</p></noscript>
+  <script type="module" src="read.js?v=1"></script>
+  <script type="module" src="lib/contact.js?v=1"></script>
+  <script type="module" src="lib/live.js?v=3"></script>
+</body>
+</html>

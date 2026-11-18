@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="myProfile">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="preload" href="fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="app.css?v=4">
+  <link rel="stylesheet" href="app.css?v=5">
 </head>
 <body>
   <!-- Line icons (Lucide, ISC licence) -->
@@ -38,6 +38,7 @@
  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
     <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></symbol>
   </svg>
 
@@ -71,6 +72,8 @@
       <button class="nav-btn" data-view="website" type="button"><svg class="ico"><use href="#i-website"/></svg><span>Website</span></button>
       <button class="nav-btn" data-view="reports" type="button"><svg class="ico"><use href="#i-reports"/></svg><span>Reports</span></button>
       <button class="nav-btn" data-view="inbox" type="button"><svg class="ico"><use href="#i-inbox"/></svg><span>Inbox</span><b class="badge" data-count="all" hidden></b></button>
+      <p class="side-group side-extra">Share</p>
+      <button class="nav-btn side-extra" data-view="links" type="button"><svg class="ico"><use href="#i-link"/></svg><span>Tailored links</span></button>
       <p class="side-group side-extra">Messages</p>
       <button class="nav-btn side-extra" data-view="feedback" type="button"><svg class="ico"><use href="#i-feedback"/></svg><span>Feedback</span><b class="badge" data-count="feedback" hidden></b></button>
       <button class="nav-btn side-extra" data-view="compliment" type="button"><svg class="ico"><use href="#i-heart"/></svg><span>Compliments</span><b class="badge" data-count="compliment" hidden></b></button>
@@ -150,6 +153,16 @@
         </header>
         <div class="chips" id="rpRanges"></div>
         <div id="rpBody"></div>
+      </section>
+
+      <!-- ================= TAILORED LINKS ================= -->
+      <section class="view" data-view="links" hidden>
+        <header class="top">
+          <div><h1>Tailored links</h1><p class="status" id="lkStatus">Loading…</p></div>
+          <div class="top-actions"><button class="btn" id="lkRefresh" type="button">Refresh</button><button class="btn primary" id="lkNew" type="button">+ New link</button></div>
+        </header>
+        <p class="legend lk-legend">One link per company. They see <b>“Hi Acme team”</b> at the top and the resume you pick; you see when they open it, how long they stay and whether they take the resume. Links can’t be guessed or listed by anyone else. Turn one off and it opens the normal site.</p>
+        <div id="lkBody"></div>
       </section>
 
       <!-- ================= MESSAGES (inbox / feedback / compliments / help) ================= -->
@@ -266,6 +279,7 @@
   <dialog class="sheet" id="moreDlg">
     <header><h2>More</h2><button class="btn" type="button" data-close>Close</button></header>
     <div class="more-list">
+      <button class="nav-btn" data-go="links" type="button"><svg class="ico"><use href="#i-link"/></svg><span>Tailored links</span></button>
       <button class="nav-btn" data-go="feedback" type="button"><svg class="ico"><use href="#i-feedback"/></svg><span>Feedback</span><b class="badge" data-count="feedback" hidden></b></button>
       <button class="nav-btn" data-go="compliment" type="button"><svg class="ico"><use href="#i-heart"/></svg><span>Compliments</span><b class="badge" data-count="compliment" hidden></b></button>
       <button class="nav-btn" data-go="help" type="button"><svg class="ico"><use href="#i-help"/></svg><span>Help center</span><b class="badge" data-count="help" hidden></b></button>
@@ -286,6 +300,6 @@
   </dialog>
 
   <p class="toast" id="toast" role="status" aria-live="polite"></p>
-  <script type="module" src="app.js?v=4"></script>
+  <script type="module" src="app.js?v=5"></script>
 </body>
 </html>

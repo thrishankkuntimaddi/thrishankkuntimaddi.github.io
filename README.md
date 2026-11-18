@@ -30,6 +30,11 @@ A light, pencil-sketch portfolio with retro space styling that runs itself.
 - **Live resume:** the site reads the published resume from Firebase with one small request, draws the same one-page layout and builds a real PDF (selectable text, working links, ATS-friendly) in the visitor's browser (`lib/resume.js`, Carlito font = Calibri metrics). If Firebase can't be reached it falls back to the PDF in `resume/`.
 - **Send a message (`lib/contact.js`):** feedback, compliments, questions and messages from the footer, the contact section, Ask Pip and the Studio page land in the Studio inbox.
 - **Free themes, prompts & settings (`universes.html`):** 29 theme kits (Liquid Glass, Monolith Gloss and all 27 universes), each with `prompt.txt`, a `.css`, a `.csv` of tokens and a `.md` spec, single files or zips, plus a live demo (`kits/demo.html?kit=fire`). Then a help center and the site settings. Rebuild the kits with `node tools/build-kits.mjs` (hand-made kits live in `kits/_src/`).
+- **Tailored links (`?for=acme-k3j9x2`, `lib/tailored.js`):** made in the Studio under *Tailored links*. The visitor sees “Hi Acme team” and the resume you picked for them; the Studio shows opens, people, time spent and resume downloads per link. Links live at `links/{code}`: anyone with the exact code can read one, nobody can list them. Local preview: `?for=demo-acme`.
+- **Live project stats (`lib/gh-stats.js`):** each main project card shows GitHub stars, last commit, main language and a “Live now” dot when its live link answers. Free public GitHub API, cached 6 hours in the visitor's browser; a site that doesn't answer just loses the dot.
+- **Kind words wall (`lib/kind-wall.js`):** in the Studio inbox, *Show on website* on a compliment or feedback puts it (name you choose + text, never the email) on sticky notes above Contact (`site/kind`). Local preview: `?kind=demo`.
+- **Quick read (`read.html`, also `?plain`):** a calm, fast page with the resume first as real text (screen-reader friendly), then projects, kind words and contact. No animation, no web fonts. Offered under the hero and up front on data saver or 2G.
+- **Notes (`notes.html`):** short posts written in the Studio (*Content → Notes*, simple Markdown), each shown in its own universe. Stored at `site/notes`; the home page gets a small index for its “Notes” link. Local preview: `notes.html?demo`.
 - Works on phones, respects reduced motion (no tour, no animation), and still shows all content without WebGL.
 
 ## Stack
@@ -47,6 +52,8 @@ tunes.js     each project's universe and signature tune
 dive.js      the 3D project dive after the quick jump
 infinity.js  the endless loop (loaded only when reached)
 chapter.js   memory, stories, Ask Pip, seasons, sticker wall, 30-second version
+read.html    quick-read page (read.js, read.css)
+notes.html   notes (notes.js)
 content.js   the words for chapter.js (easy to edit)
 assets/      me.jpg, og.jpg (social preview), favicon.svg
 resume/      published resume, preview image and date (written by update-resume.sh)

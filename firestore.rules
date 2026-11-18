@@ -46,7 +46,7 @@ service cloud.firestore {
     // Anonymous visit records for the owner's reports: create-only, fixed shape, no personal data.
     match /visits/{id} {
       allow create: if request.resource.data.keys().hasOnly(['type', 'page', 'country', 'city', 'tz', 'device', 'os', 'browser', 'ref', 'lang', 'vid', 'returning', 'world', 'detail', 'at',
-          'region', 'isp', 'lat', 'lon', 'geo', 'screen', 'secs', 'scroll'])
+          'region', 'isp', 'lat', 'lon', 'geo', 'screen', 'secs', 'scroll', 'for'])
         && request.resource.data.type in ['visit', 'resume', 'kit', 'message', 'leave']
         && str(request.resource.data.page, 0, 20) && str(request.resource.data.country, 0, 120) && str(request.resource.data.city, 0, 120)
         && str(request.resource.data.tz, 0, 120) && str(request.resource.data.device, 0, 20) && str(request.resource.data.os, 0, 20)
@@ -57,8 +57,28 @@ service cloud.firestore {
         && str(request.resource.data.get('lat', ''), 0, 12) && str(request.resource.data.get('lon', ''), 0, 12)
         && str(request.resource.data.get('geo', ''), 0, 4) && str(request.resource.data.get('screen', ''), 0, 20)
         && request.resource.data.get('secs', 0) is int && request.resource.data.get('secs', 0) >= 0 && request.resource.data.get('secs', 0) <= 86400
+        && str(request.resource.data.get('for', ''), 0, 48)
         && request.resource.data.get('scroll', 0) is int && request.resource.data.get('scroll', 0) >= 0 && request.resource.data.get('scroll', 0) <= 100;
       allow read, delete: if isOwner();
+    }
+
+    // Tailored links (?for=code): anyone with the exact code can read that one link,
+    // nobody but the owner can list them, so the companies you send links to stay private.
+    match /links/{code} {
+      allow get: if true;
+      allow list: if isOwner();
+      allow create, update: if isFreshOwner() && code.matches('^[a-z0-9-]{4,48}$')
+        && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
+        && str(request.resource.data.data, 2, 400000);
+      allow delete: if isFreshOwner();
+    }
+    // An uploaded PDF chosen for a link: its base64 parts.
+    match /linkFiles/{id} {
+      allow get: if true;
+      allow list: if isOwner();
+      allow create, update: if isFreshOwner() && request.resource.data.keys().hasOnly(['data', 'updatedAt'])
+        && str(request.resource.data.data, 1, 400000);
+      allow delete: if isFreshOwner();
     }
 
     // Visitor messages: anyone may create a well-formed one; only the owner reads or changes them.

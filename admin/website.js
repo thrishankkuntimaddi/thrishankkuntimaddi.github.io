@@ -2,7 +2,7 @@
    Studio → Website: control the live site from the app.
    Saved to site/config as JSON (public read, owner write).
    ========================================================= */
-import { DEFAULTS, withDefaults, effective } from '../lib/site-config.js?v=2';
+import { DEFAULTS, withDefaults, effective } from '../lib/site-config.js?v=3';
 import { BASE, LOOP, NAMES } from '../worlds.js?v=22';
 import { OCCASIONS } from '../content.js?v=22';
 

@@ -15,7 +15,7 @@
 
   --ink: #2c3046;          /* soft slate, never black */
   --muted: #646a85;
-  --faint: #9096ad;
+  --faint: #6b708c;
   --line: rgba(44, 48, 70, .14);
   --line-2: rgba(44, 48, 70, .26);
   --card: rgba(255, 255, 255, .86);
@@ -1347,7 +1347,7 @@ ol.story-list li::before { counter-increment: dec; content: counter(dec); positi
 [data-dark] :is(.hero-title, .hero-sub, .sec-head, .post-title, .facts) { text-shadow: 0 2px 16px rgba(0, 0, 0, .55); }
 /* light surfaces keep the light paper tokens inside, so their text stays dark */
 [data-dark] :is(.card, .window, .mock, dialog, .welcome, .btn, .chips li, .edition-tag, .mini-tag, .ticker, .tour, .pip, .jump, .sticker, .polaroid, .brand-mark, .menu-btn, .sec-num, .skip, .fall-inner, .stk, .ask-chip, .switch, .plaque, .win-tag, .orbit-label, .hud-pc, .hud-chart, .note-b) {
-  --ink: #2c3046; --muted: #646a85; --faint: #9096ad; --line: rgba(44, 48, 70, .14); --line-2: rgba(44, 48, 70, .26); --paper: #fbf8f2;
+  --ink: #2c3046; --muted: #646a85; --faint: #6b708c; --line: rgba(44, 48, 70, .14); --line-2: rgba(44, 48, 70, .26); --paper: #fbf8f2;
   --accent-deep: color-mix(in oklab, var(--accent) 62%, #2c3046); color-scheme: light; color: var(--ink); }
 [data-dark] .nav-links a:not(.btn):hover, [data-dark] .nav-ask:hover { color: #2c3046; }
 [data-dark] .nav { background: color-mix(in srgb, var(--paper) 72%, transparent); }
@@ -1493,3 +1493,67 @@ dialog.resume.zoom .resume-live { width: 100%; max-height: none; height: auto; c
 .mock-new span { color: var(--muted); font-size: 14px; max-width: 34ch; }
 .mock-new ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .mock-new li { padding: 3px 10px; border: 1.5px solid var(--line-2); border-radius: 99px; background: #fff; font-family: var(--mono); font-size: 11.5px; }
+
+/* =========================================================
+   Tailored links, live project stats, kind words, quick read
+   ========================================================= */
+/* "Hi Acme team" note from a tailored link (?for=…) */
+.for-note { position: relative; max-width: 46ch; margin: 18px 0 4px; padding: 14px 18px 14px 20px; background: #fff; color: #2c3046; border: 1.5px solid var(--line-2); border-radius: 6px 14px 10px 16px;
+  box-shadow: 5px 5px 0 var(--shadow); transform: rotate(-1deg); font-size: 15px; line-height: 1.5; }
+.for-note::before { content: ""; position: absolute; left: 50%; top: -11px; width: 86px; height: 22px; transform: translateX(-50%) rotate(3deg); background: color-mix(in srgb, var(--accent-3) 60%, transparent); border: 1px solid rgba(44, 48, 70, .1); }
+.for-note b { display: block; font-family: var(--hand); font-size: 24px; font-weight: 700; line-height: 1.1; color: var(--accent-deep); margin-bottom: 2px; }
+.for-note span { color: #646a85; }
+/* Live stats under each main project's tech chips */
+.p-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 14px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .02em; color: var(--muted); }
+.p-stats i { font-style: normal; color: var(--faint); }
+/* Quick read link beside the 30-second version, and the data-saver note */
+.quick-read { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.quick-read u { text-decoration: underline dashed var(--accent-deep); text-underline-offset: 4px; color: var(--ink); }
+.quick-read:hover u { text-decoration-style: solid; }
+.slow-note { margin-top: 18px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--tint); color: #2c3046; font-size: 14px; max-width: 52ch; }
+.slow-note a { text-decoration: underline; font-weight: 600; }
+/* Kind words: taped sticky notes above the contact card */
+.kind-wall { margin-bottom: clamp(36px, 6vw, 64px); }
+.kind-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 26px; font-family: var(--hand); font-weight: 700; font-size: clamp(30px, 3.6vw, 42px); line-height: 1; color: var(--ink); }
+.kind-title small { font-family: var(--mono); font-weight: 400; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.kind-notes { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: clamp(18px, 2.6vw, 30px); }
+.kind-note { --bg: #fff7c9; position: relative; margin: 0; padding: 26px 20px 16px; background: var(--bg); color: #2c3046; border: 1px solid rgba(44, 48, 70, .12); border-radius: 3px 3px 12px 3px;
+  box-shadow: 4px 6px 0 rgba(44, 48, 70, .08); transform: rotate(var(--tilt, 0deg)); transition: transform .35s var(--spring); }
+.kind-note[style*="--hue:1"] { --bg: #ffe3ea; } .kind-note[style*="--hue:2"] { --bg: #def3ff; } .kind-note[style*="--hue:3"] { --bg: #e2f7ec; }
+.kind-note::before { content: ""; position: absolute; left: 50%; top: -10px; width: 70px; height: 20px; transform: translateX(-50%) rotate(-4deg); background: rgba(255, 255, 255, .62); border: 1px solid rgba(44, 48, 70, .1); }
+.kind-note:hover { transform: rotate(0deg) translateY(-3px); }
+.kind-note blockquote { margin: 0; font-family: var(--hand); font-size: 22px; line-height: 1.25; }
+.kind-note figcaption { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; font-family: var(--mono); font-size: 11.5px; color: #646a85; }
+.kind-note time { color: #6b708c; }
+[data-dark] .kind-title { text-shadow: 0 2px 16px rgba(0, 0, 0, .55); }
+@media (prefers-reduced-motion: reduce) { .kind-note, .kind-note:hover { transition: none; } }
+.calm .kind-note:hover { transform: rotate(var(--tilt, 0deg)); }
+
+/* ---- Notes (notes.html) ---- */
+.note-list { display: grid; gap: 18px; margin: clamp(28px, 5vw, 48px) 0 0; padding: 0; list-style: none; max-width: 820px; }
+.note-item { display: grid; gap: 6px; }
+.note-item b { font-family: var(--display); font-weight: 500; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; letter-spacing: -.01em; }
+.note-sum { color: var(--muted); }
+.note-meta { font-family: var(--mono); font-size: 12px; letter-spacing: .04em; color: var(--muted); }
+.note-empty { color: var(--muted); }
+.note-read { padding-top: clamp(36px, 6vh, 64px); }
+.note-read .wrap { max-width: 860px; }
+.note-back a { font-family: var(--mono); font-size: 13px; text-decoration: underline dashed; text-underline-offset: 4px; }
+.note-head { margin: 22px 0 26px; }
+.note-head h1 { margin-top: 10px; font-family: var(--display); font-weight: 500; font-size: clamp(36px, 5.4vw, 64px); line-height: 1.04; letter-spacing: -.02em; outline: none; }
+.note-line { margin-top: 12px; font-size: 19px; color: var(--muted); max-width: 60ch; }
+[data-dark] :is(.note-head, .note-back, .set-hero) { text-shadow: 0 2px 16px rgba(0, 0, 0, .55); }
+.note-body { font-size: 17.5px; line-height: 1.7; max-width: 68ch; }
+.note-body > * + * { margin-top: 1em; }
+.note-body h2, .note-body h3, .note-body h4 { font-family: var(--display); font-weight: 500; line-height: 1.2; margin-top: 1.5em; }
+.note-body h2 { font-size: 28px; } .note-body h3 { font-size: 23px; } .note-body h4 { font-size: 19px; }
+.note-body ul, .note-body ol { padding-left: 1.3em; list-style: revert; }
+.note-body li + li { margin-top: .35em; }
+.note-body a { color: var(--accent-deep); text-decoration: underline; text-underline-offset: 3px; }
+.note-body blockquote { margin: 1.2em 0; padding: 4px 0 4px 18px; border-left: 4px solid var(--accent); font-family: var(--display); font-style: italic; font-size: 21px; }
+.note-body code { font-family: var(--mono); font-size: .88em; padding: 1px 6px; border-radius: 6px; background: var(--tint); }
+.note-body pre { overflow-x: auto; padding: 14px 16px; border-radius: var(--r-sm); background: #2c3046; color: #fbf8f2; }
+.note-body pre code { padding: 0; background: none; color: inherit; }
+.note-body hr { border: 0; border-top: 1.5px dashed var(--line-2); margin: 2em 0; }
+.note-next { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 28px; }
+.note-next .btn { white-space: normal; height: auto; min-height: 40px; padding: 8px 18px; }

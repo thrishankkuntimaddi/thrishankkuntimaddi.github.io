@@ -10,7 +10,7 @@
    Loaded only when needed; drawn on one 2D canvas.
    ========================================================= */
 import { STORIES, EMAIL } from './content.js?v=22';
-import { PIP_WEAR } from './chapter.js?v=22';
+import { PIP_WEAR } from './chapter.js?v=23';
 
 const TAU = Math.PI * 2;
 const rnd = (a = 1, b) => (b === undefined ? Math.random() * a : a + Math.random() * (b - a));

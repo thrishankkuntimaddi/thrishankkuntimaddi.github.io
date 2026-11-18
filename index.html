@@ -18,6 +18,8 @@
   <!-- The edition (a light colour palette) follows local time on first open and changes on every refresh -->
   <script>
     (function () {
+      // ?plain (or ?read) opens the quick-read page: no animation, resume first.
+      if (/[?&](plain|read)(=|&|$)/.test(location.search)) { location.replace('read.html' + location.search.replace(/([?&])(plain|read)(=[^&]*)?&?/, '$1').replace(/[?&]$/, '')); return; }
       var d = document.documentElement, list = ['morning', 'noon', 'dusk', 'night'], h = new Date().getHours();
       // First open: the edition that matches the visitor's local time. Every refresh after that: the next one.
       var i = h >= 5 && h < 11 ? 0 : h >= 11 && h < 17 ? 1 : h >= 17 && h < 21 ? 2 : 3;
@@ -68,7 +70,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=24">
 
   <script type="importmap">
     { "imports": {
@@ -76,7 +78,15 @@
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
     } }
   </script>
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" crossorigin>
+  <!-- Fetch the 3D engine early only where it pays off: not on data saver, slow networks or reduced motion. -->
+  <script>
+    (function () {
+      var n = navigator.connection || {};
+      if (n.saveData || /(^|-)2g$/.test(n.effectiveType || '') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var l = document.createElement('link'); l.rel = 'modulepreload'; l.crossOrigin = ''; l.href = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+      document.head.appendChild(l);
+    })();
+  </script>
 </head>
 <body>
   <a class="skip" href="#work">Skip to projects</a>
@@ -147,7 +157,7 @@
           </div>
           <figure class="polaroid reveal">
             <span class="tape" aria-hidden="true"></span>
-            <img src="assets/me.jpg" alt="Portrait of Thrishank Kuntimaddi, smiling" width="446" height="574">
+            <img src="assets/me.jpg" alt="Portrait of Thrishank Kuntimaddi, smiling" width="446" height="574" fetchpriority="high" decoding="async">
             <figcaption>that's me :)</figcaption>
           </figure>
           <span class="stamp stamp-a" aria-hidden="true">Frontend<br>UI / UX</span>
@@ -293,7 +303,6 @@
             <ul class="chips"><li>React</li><li>TypeScript</li><li>PWA</li><li>Firebase</li></ul>
             <div class="p-actions">
               <a class="btn btn-gloss" href="https://www.learnvianotes.in/" target="_blank" rel="noopener">Open live ↗</a>
-              <a class="btn btn-paper" href="https://github.com/thrishankkuntimaddi/c-note" target="_blank" rel="noopener">Code</a>
             </div>
           </div>
         </article>
@@ -449,6 +458,10 @@
     <section id="contact" class="section contact" data-scene="figure8" data-frame="top">
       <svg class="doodle d14 gut" aria-hidden="true" focusable="false"><use href="#d-comet"/></svg><svg class="doodle d15 gut" aria-hidden="true" focusable="false"><use href="#d-sparkle"/></svg>
       <div class="wrap">
+        <div class="kind-wall" id="kindWall" hidden>
+          <h2 class="kind-title"><span>Kind words</span> <small>from people who visited</small></h2>
+          <div class="kind-notes"></div>
+        </div>
         <div class="card contact-card reveal">
           <span class="sec-num">05</span>
           <h2 data-copy="contact">Let's build something <em>people love</em>.</h2>
@@ -582,7 +595,7 @@
   </dialog>
 
   <!-- Auto-tour status: the page scrolls itself and yields the moment the visitor takes over -->
-  <button class="tour" id="tour" type="button" hidden aria-live="polite">
+  <button class="tour" id="tour" type="button" hidden aria-label="Pause the auto-tour">
     <span class="tour-ico" id="tourIco" aria-hidden="true">▶</span>
     <span class="tour-txt" id="tourTxt">Auto-tour</span>
     <span class="tour-bar" aria-hidden="true"><i id="tourBar"></i></span>
@@ -651,8 +664,8 @@
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=23"></script>
+  <script type="module" src="main.js?v=24"></script>
   <script type="module" src="lib/contact.js?v=1"></script>
-  <script type="module" src="lib/live.js?v=2"></script>
+  <script type="module" src="lib/live.js?v=3"></script>
 </body>
 </html>

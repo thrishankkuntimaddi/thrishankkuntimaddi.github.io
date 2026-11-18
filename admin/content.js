@@ -7,6 +7,8 @@ import { PROJECTS_SEED } from '../lib/projects-seed.js?v=22';
 import { TEXT_SEED } from '../lib/text-seed.js?v=22';
 import { STORIES, ASK, ASK_SUGGEST, CHANGELOG } from '../content.js?v=22';
 import { keypad } from '../lib/content-live.js?v=22';
+import { BASE, LOOP, NAMES } from '../worlds.js?v=22';
+import { md, readMins } from '../lib/md.js?v=1';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -18,13 +20,14 @@ const unlines = (s) => String(s || '').split('\n').map((x) => x.trim()).filter(B
 const PREVIEWS = ['Oruinwan', 'Expense Tracker', 'SentinelFlight', 'LearnViaNotes'];
 const SCENES = ['lagrange', 'binary', 'debris', 'solar', 'figure8', 'chaos', 'studio'];
 const SECTIONS = { hero: 'Top of the page', work: 'Projects heading', poelys: 'Poelys', more: 'More work heading', about: 'About me', contact: 'Contact', post: 'The end (resume and games)', footer: 'Footer' };
-const TABS = [['projects', 'Projects'], ['text', 'Page text'], ['stories', 'Stories'], ['ask', 'Ask Pip'], ['news', 'What’s new']];
+const TABS = [['projects', 'Projects'], ['text', 'Page text'], ['stories', 'Stories'], ['notes', 'Notes'], ['ask', 'Ask Pip'], ['news', 'What’s new']];
+const WORLDS = [...BASE, ...LOOP];
 
 let F, toast, DEMO, data, saved = '', tab = 'projects';
 const open = new Set();
 
 function defaults() {
-  return { text: {}, projects: clone(PROJECTS_SEED), stories: clone(STORIES), ask: clone(ASK), askSuggest: clone(ASK_SUGGEST), changelog: clone(CHANGELOG) };
+  return { text: {}, projects: clone(PROJECTS_SEED), stories: clone(STORIES), ask: clone(ASK), askSuggest: clone(ASK_SUGGEST), changelog: clone(CHANGELOG), notes: [] };
 }
 
 /* ---------- small builders ---------- */
@@ -86,6 +89,17 @@ function storiesTab() {
     <div class="adders"><button class="btn sm danger" type="button" data-cm="del-story" data-id="${esc(id)}">Delete story</button></div>
   `)).join('') + '<div class="adders"><button class="btn sm" type="button" data-cm="add-story">+ Story</button></div>';
 }
+function notesTab() {
+  const worldOpts = [['', 'Surprise me (changes every visit)'], ...WORLDS.map((w) => [w, `${NAMES[w]}${LOOP.includes(w) ? ' (dark)' : ''}`])];
+  return `<p class="legend">Short posts on the website at <b>notes.html</b>, each shown in its own universe. A “Notes” link appears in the site’s menu once one is on. Formatting: <code>## Heading</code>, <code>**bold**</code>, <code>*italic*</code>, <code>[link](https://…)</code>, <code>- list</code>, <code>&gt; quote</code>, <code>\`code\`</code>.</p>`
+    + data.notes.map((n, i) => box(`w-${n.id}`, n.title, n.hidden ? 'draft' : `${n.date} · ${readMins(n.body)} min`, `
+      <div class="row">${inp(`notes.${i}.title`, n.title, 'Title', 'maxlength="120"')}${inp(`notes.${i}.date`, n.date, 'Date', 'type="date"')}</div>
+      <div class="row">${sel(`notes.${i}.world`, n.world, 'Universe', worldOpts)}<label class="f">Show<span class="check"><input type="checkbox" data-c="notes.${i}.hidden" data-invert ${n.hidden ? '' : 'checked'}> On the website</span></label></div>
+      ${inp(`notes.${i}.line`, n.line, 'One line under the title (optional)', 'maxlength="200"')}
+      ${area(`notes.${i}.body`, n.body, 'The note', 12)}
+      <details class="note-preview"><summary>Preview</summary><div class="doc">${md(n.body)}</div></details>
+    `, n.hidden, tools('notes', i, data.notes.length))).join('') + '<div class="adders"><button class="btn sm" type="button" data-cm="add-note">+ Note</button></div>';
+}
 function askTab() {
   return `<p class="legend">Pip answers only from these. Keywords: words a visitor might type. Buttons: one per line, “Label | action” where action is a link, resume, quick, copy, contact or story:&lt;id&gt;.</p>
     ${area('askSuggest', lines(data.askSuggest), 'Suggested questions', 4, 'one per line')}` +
@@ -104,7 +118,7 @@ function newsTab() {
 
 function draw() {
   $('#ctTabs').innerHTML = TABS.map(([k, n]) => `<button class="chip" type="button" data-tab="${k}" aria-selected="${tab === k}">${n}</button>`).join('');
-  $('#ctBody').innerHTML = { projects: projectsTab, text: textTab, stories: storiesTab, ask: askTab, news: newsTab }[tab]();
+  $('#ctBody').innerHTML = { projects: projectsTab, text: textTab, stories: storiesTab, notes: notesTab, ask: askTab, news: newsTab }[tab]();
   dirty();
 }
 const now = () => JSON.stringify(data);
@@ -142,6 +156,7 @@ function onInput(e) {
     set(p, parse(p, t.value, t));
     if (/\.(word)$/.test(p) || t.type === 'checkbox') { if (e.type === 'change') draw(); }
     if (/^stories\.[^.]+\.word$/.test(p)) set(p.replace(/word$/, 'code'), keypad(t.value));
+    if (/^notes\.\d+\.body$/.test(p)) { const pv = t.closest('.card-body')?.querySelector('.note-preview .doc'); if (pv) pv.innerHTML = md(t.value); }
   }
   dirty();
 }
@@ -162,6 +177,7 @@ function onClick(e) {
   else if (a === 'add-story') { const id = (prompt('Short id for the story (letters only, e.g. parla):') || '').toLowerCase().replace(/[^a-z0-9]/g, ''); if (!id || data.stories[id]) return; data.stories[id] = { name: id, word: '', code: '', line: '', pip: '', problem: '', built: '', decisions: [], hard: [], numbers: [], live: '', repo: '' }; open.add(`s-${id}`); }
   else if (a === 'del-story') { if (!confirm('Delete this story?')) return; delete data.stories[b.dataset.id]; }
   else if (a === 'add-ask') { data.ask.push({ k: [], a: '', b: [] }); open.add(`a-${data.ask.length - 1}`); }
+  else if (a === 'add-note') { const id = uid(); data.notes.unshift({ id, title: 'New note', date: new Date().toISOString().slice(0, 10), world: '', line: '', body: '', hidden: true }); open.add(`w-${id}`); }
   else if (a === 'add-news') { const v = Math.max(0, ...data.changelog.map((c) => c.v)) + 1; data.changelog.unshift({ v, date: new Date().toISOString().slice(0, 10), items: [] }); open.add(`n-${v}`); }
   draw();
 }
@@ -170,9 +186,15 @@ export async function initContent(ctx) {
   ({ F, toast, DEMO } = ctx);
   data = defaults();
   try {
-    if (!DEMO) { const s = await F.fs.getDoc(F.fs.doc(F.db, 'site', 'content')); if (s.exists()) data = { ...defaults(), ...JSON.parse(s.data().data) }; }
+    if (!DEMO) {
+      const [s, n] = await Promise.all([F.fs.getDoc(F.fs.doc(F.db, 'site', 'content')), F.fs.getDoc(F.fs.doc(F.db, 'site', 'notes'))]);
+      if (s.exists()) data = { ...defaults(), ...JSON.parse(s.data().data) };
+      data.notes = n.exists() ? JSON.parse(n.data().data) : [];
+    } else data.notes = [{ id: 'demo1', title: 'Why my portfolio tours itself', date: '2026-11-18', world: 'blueprint', line: 'A short note on autoplay, and handing control back.', body: '## The idea\nRecruiters skim. So the page **scrolls itself** and stops the moment you touch it.\n\n- Any scroll, tap or key hands control back\n- It resumes after five idle seconds\n\n> Motion should invite, never trap.', hidden: false }];
   } catch (e) { toast(`Couldn’t load content: ${e.code || e.message}`); }
+  delete data.notesIndex;
   data.text ||= {};
+  data.notes ||= [];
   saved = now();
   draw();
   const body = $('#ctBody');
@@ -183,7 +205,17 @@ export async function initContent(ctx) {
   body.addEventListener('click', onClick);
   $('#ctSave').addEventListener('click', async () => {
     try {
-      if (!DEMO) await F.fs.setDoc(F.fs.doc(F.db, 'site', 'content'), { data: now(), updatedAt: F.fs.serverTimestamp() });
+      // Notes live in their own document (site/notes) so the home page stays light;
+      // the home page only gets a small index of them for the menu link.
+      const { notes, ...rest } = data;
+      const live = notes.filter((n) => !n.hidden && n.title).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      rest.notesIndex = live.map((n) => ({ id: n.id, title: n.title, date: n.date, world: n.world || '' }));
+      if (!DEMO) {
+        const batch = F.fs.writeBatch(F.db);
+        batch.set(F.fs.doc(F.db, 'site', 'content'), { data: JSON.stringify(rest), updatedAt: F.fs.serverTimestamp() });
+        batch.set(F.fs.doc(F.db, 'site', 'notes'), { data: JSON.stringify(notes), updatedAt: F.fs.serverTimestamp() });
+        await batch.commit();
+      }
       saved = now(); dirty(); toast('Saved. The website shows it on the next page load.');
     } catch (e) { toast(`Couldn’t save: ${e.code || e.message}`, 4000); }
   });

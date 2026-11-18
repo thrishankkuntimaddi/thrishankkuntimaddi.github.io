@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-edition="morning" data-world="paper">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Notes — Thrishank Kuntimaddi</title>
+  <meta name="description" content="Short notes from Thrishank Kuntimaddi, a frontend developer, on building interfaces people enjoy. Each note is shown in its own universe.">
+  <meta name="theme-color" content="#fbf8f2">
+  <meta property="og:title" content="Notes — Thrishank Kuntimaddi">
+  <meta property="og:image" content="https://thrishankkuntimaddi.github.io/assets/og.jpg">
+  <script>
+    (function () {
+      var d = document.documentElement, h = new Date().getHours(), list = ['morning', 'noon', 'dusk', 'night'];
+      var pr = {}; try { pr = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch (err) {}
+      d.dataset.edition = list.indexOf(pr.edition) >= 0 ? pr.edition : list[h >= 5 && h < 11 ? 0 : h >= 11 && h < 17 ? 1 : h >= 17 && h < 21 ? 2 : 3];
+      if (pr.motion === 'calm') d.classList.add('calm');
+      d.classList.add('js');
+    })();
+  </script>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=24">
+</head>
+<body class="settings-page notes-page">
+  <a class="skip" href="#notesMain">Skip to the notes</a>
+  <header class="nav scrolled">
+    <div class="wrap nav-inner">
+      <a href="./" class="brand" aria-label="Back to Thrishank Kuntimaddi's portfolio">
+        <span class="brand-mark">TK</span>
+        <span class="brand-name">Thrishank Kuntimaddi</span>
+      </a>
+      <a class="btn btn-gloss btn-sm" href="./">← Back to the site</a>
+    </div>
+  </header>
+
+  <main id="notesMain" tabindex="-1">
+    <section class="section set-hero" id="notesHome">
+      <div class="wrap">
+        <p class="edition-tag"><span class="dot"></span> Notes</p>
+        <h1 class="set-title">Notes <em>from the workbench.</em></h1>
+        <p class="set-lede">Short things I learned while designing and building. Each one opens in its own universe.</p>
+        <ol class="note-list" id="noteList"><li class="note-empty">Loading…</li></ol>
+      </div>
+    </section>
+
+    <article class="section note-read" id="noteRead" hidden aria-labelledby="noteTitle">
+      <div class="wrap">
+        <p class="note-back"><a href="#" id="noteBack">← All notes</a></p>
+        <header class="note-head">
+          <p class="note-meta" id="noteMeta"></p>
+          <h1 id="noteTitle"></h1>
+          <p class="note-line" id="noteLine"></p>
+        </header>
+        <div class="card note-card"><div class="note-body" id="noteBody"></div></div>
+        <nav class="note-next" id="noteNext" aria-label="More notes"></nav>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>© 2026 Thrishank Kuntimaddi</span>
+      <a href="./">The portfolio</a>
+      <a href="read.html">Quick read</a>
+      <a href="#" data-contact data-kind="message">Write to me ✉</a>
+    </div>
+  </footer>
+
+  <script type="module" src="notes.js?v=1"></script>
+  <script type="module" src="lib/contact.js?v=1"></script>
+  <script type="module" src="lib/live.js?v=3"></script>
+</body>
+</html>

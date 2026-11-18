@@ -18,7 +18,7 @@ const since = (days) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDat
 const tsDate = (t) => (t?.toDate ? t.toDate() : t ? new Date(t) : null);
 const dur = (s) => { s = Math.round(s || 0); if (!s) return '—'; if (s < 60) return `${s}s`; const m = Math.floor(s / 60); return m < 60 ? `${m}m ${String(s % 60).padStart(2, '0')}s` : `${Math.floor(m / 60)}h ${m % 60}m`; };
 const when = (t) => new Date(t).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-const PAGE = { home: 'Home', studio: 'Themes page', demo: 'Theme demo' };
+const PAGE = { home: 'Home', studio: 'Themes page', demo: 'Theme demo', read: 'Quick read', notes: 'Notes' };
 const TYPE = { visit: 'Visit', resume: 'Resume ↓', kit: 'Theme kit ↓', message: 'Message sent' };
 const ipBased = (r) => r.geo === 'ip';
 const place = (r) => {
@@ -73,6 +73,7 @@ function detail(r) {
     ${row('Screen', esc(r.screen))}
     ${row('Language', esc(r.lang))}
     ${row('Came from', esc(r.type === 'visit' ? r.ref || 'Direct' : ''))}
+    ${row('Tailored link', r.for ? `<code>${esc(r.for)}</code>` : '')}
     ${row('Page', esc(PAGE[r.page] || r.page))}
     ${row('Universe', esc(NAMES[r.world] || r.world))}
     ${row('Stayed', r.secs ? `${dur(r.secs)} · scrolled ${r.scroll || 0}%` : '')}
@@ -87,7 +88,7 @@ const recentList = (list, n = 60) => `<ul class="rp-recent">${list.slice(0, n).m
     <span><b>${esc(TYPE[r.type] || r.type)}</b>${r.detail ? ` · ${esc(r.detail)}` : ''}${r.secs ? ` · ${dur(r.secs)}` : ''}</span>
     <span>${esc(place(r))}</span>
     <span>${esc(r.device)} · ${esc(r.os)}</span>
-    <span>${esc(r.type === 'visit' ? r.ref || 'Direct' : '')}</span>
+    <span>${r.for ? `🔗 ${esc(r.for.replace(/-[a-z0-9]{6}$/, ''))}` : esc(r.type === 'visit' ? r.ref || 'Direct' : '')}</span>
   </button>${openId === id ? detail(r) : ''}</li>`;
 }).join('') || '<li class="empty">Nothing in this range yet.</li>'}</ul>`;
 
@@ -129,6 +130,7 @@ function draw() {
       ${bars('Cities', count(ip, (r) => [r.city, r.region].filter(Boolean).join(', ')))}
       ${bars('Internet provider', count(ip, 'isp'))}
       ${bars('Came from', count(visits, (r) => r.ref || 'Direct'))}
+      ${visits.some((r) => r.for) ? bars('Tailored links', count(visits.filter((r) => r.for), (r) => r.for.replace(/-[a-z0-9]{6}$/, '')), 8, 'see Tailored links for each one') : ''}
       ${bars('Device', count(visits, 'device'))}
       ${bars('System', count(visits, 'os'))}
       ${bars('Browser', count(visits, 'browser'))}

@@ -86,7 +86,7 @@ export const STORIES = {
     numbers: [['23,805', 'tracked objects'], ['100%', 'safe on 200 unseen tests'], ['56×', 'fewer screenings'], ['15 ms', 're-screening a plan']],
   },
   learn: {
-    name: 'LearnViaNotes', code: '66837', word: 'NOTES', live: 'https://www.learnvianotes.in/', repo: 'https://github.com/thrishankkuntimaddi/c-note',
+    name: 'LearnViaNotes', code: '66837', word: 'NOTES', live: 'https://www.learnvianotes.in/', repo: '', // private (learnvianotes)
     pip: 'No sign-up. Just learn. I like that.',
     line: 'Interview prep: 22 subjects and 150 coding problems in four languages.',
     problem: 'Interview prep is scattered across tabs, and too often it sits behind a sign-up wall. The goal was one quick, focused sheet you can open and start learning from.',

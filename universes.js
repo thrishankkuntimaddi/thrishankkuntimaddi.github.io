@@ -7,7 +7,7 @@
 import { OCCASIONS } from './content.js?v=22';
 import { LOOP, NAMES, COPY } from './worlds.js?v=22';
 import { U as LOOP_SCENES } from './infinity.js?v=22';
-import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=22';
+import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=23';
 
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);

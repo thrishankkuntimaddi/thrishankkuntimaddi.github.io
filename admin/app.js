@@ -3,14 +3,15 @@
    Resume editor (draft -> publish, versions), inbox of
    visitor messages, help-centre answers, about.
    ========================================================= */
-import { loadSDK, loadAuth, OWNER, KINDS } from '../lib/firebase.js?v=1';
+import { loadSDK, loadAuth, OWNER, KINDS } from '../lib/firebase.js?v=2';
 import { loadEngine, toSVG, download, toText, resumeFontCSS } from '../lib/resume.js?v=1';
 import { SEED } from '../lib/resume-seed.js?v=1';
-import { initWebsite } from './website.js?v=1';
+import { initWebsite } from './website.js?v=2';
 import { initDevices, forgetThisDevice } from './devices.js?v=2';
 import { unlock, watchAway, lockOn, lockAvailable, setUpLock, removeLock } from './lock.js?v=1';
-import { initContent } from './content.js?v=1';
-import { initReports, showReports } from './reports.js?v=2';
+import { initContent } from './content.js?v=2';
+import { initReports, showReports } from './reports.js?v=3';
+import { initLinks, showLinks } from './links.js?v=1';
 import { isPdf, fileToB64, split, b64ToBytes, bytesToBlob, pageCount, renderInto, saveBlob, MAX_BYTES } from '../lib/resume-pdf.js?v=1';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -132,13 +133,15 @@ let started = false;
 function start() {
   if (started) return; started = true;
   const v = (location.hash.slice(1).split('?')[0] || 'resume');
-  show(['resume', 'account', 'content', 'website', 'reports', 'inbox', 'feedback', 'compliment', 'help', 'about'].includes(v) ? v : 'resume');
+  show(['resume', 'account', 'content', 'website', 'reports', 'links', 'inbox', 'feedback', 'compliment', 'help', 'about'].includes(v) ? v : 'resume');
   initResume();
   initMessages();
   initWebsite({ F, toast, DEMO });
   initContent({ F, toast, DEMO });
   initReports({ F, toast, DEMO });
+  initLinks({ F, toast, DEMO });
   if (currentView === 'reports') showReports();
+  if (currentView === 'links') showLinks();
   checkAppUpdate();
 }
 
@@ -169,7 +172,8 @@ function show(v) {
   $$('.view').forEach((s) => { s.hidden = !(s.dataset.view === v || (isMsg && s.dataset.view === 'messages')); });
   if (isMsg) { msgKind = v === 'inbox' ? 'all' : v; msgFilter = 'open'; drawMessages(); }
   if (v === 'reports' && started) showReports();
-  if (['feedback', 'compliment', 'help', 'about', 'account'].includes(v)) $('#moreBtn').setAttribute('aria-current', 'page'); else $('#moreBtn').removeAttribute('aria-current');
+  if (v === 'links' && started) showLinks();
+  if (['links', 'feedback', 'compliment', 'help', 'about', 'account'].includes(v)) $('#moreBtn').setAttribute('aria-current', 'page'); else $('#moreBtn').removeAttribute('aria-current');
   window.scrollTo(0, 0);
 }
 $$('.side .nav-btn[data-view]').forEach((b) => b.addEventListener('click', () => show(b.dataset.view)));
@@ -676,6 +680,7 @@ function initMessages() {
     if (['inbox', 'feedback', 'compliment', 'help'].includes(currentView)) drawMessages();
   }, (e) => { $('#msgStatus').textContent = `Couldn’t load messages: ${e.code || e.message}`; });
   initFaq();
+  initWall();
 }
 function drawCounts() {
   const unread = messages.filter((m) => !m.read && !m.archived);
@@ -714,6 +719,7 @@ function drawMessages() {
         ${reply ? `<a class="btn sm" href="${reply}">Reply by email</a>` : ''}
         <button class="btn sm" type="button" data-m="read">${m.read ? 'Mark unread' : 'Mark read'}</button>
         <button class="btn sm" type="button" data-m="star">${m.starred ? '★ Starred' : '☆ Star'}</button>
+        ${['compliment', 'feedback'].includes(m.kind) ? `<button class="btn sm${onWall(m.id) ? ' on-wall' : ''}" type="button" data-m="wall" title="Kind words wall on the website">${onWall(m.id) ? '✓ On the website' : 'Show on website'}</button>` : ''}
         <button class="btn sm" type="button" data-m="archive">${m.archived ? 'Unarchive' : 'Archive'}</button>
         <button class="btn sm danger" type="button" data-m="delete">Delete</button>
         ${m.page ? `<span class="legend">from ${esc(m.page)}</span>` : ''}
@@ -725,6 +731,8 @@ $('#msgList').addEventListener('click', async (e) => {
   const b = e.target.closest('[data-m]'); const li = e.target.closest('[data-id]');
   if (!li) return;
   const m = messages.find((x) => x.id === li.dataset.id);
+  if (b?.dataset.m === 'wall') { await toggleWall(m); return; }
+  if (DEMO) return;
   const ref = F.fs.doc(F.db, 'messages', m.id);
   try {
     if (!b) { if (!m.read && !e.target.closest('a')) await F.fs.updateDoc(ref, { read: true }); return; }
@@ -742,6 +750,37 @@ $('#markAll').addEventListener('click', async () => {
   todo.slice(0, 450).forEach((m) => batch.update(F.fs.doc(F.db, 'messages', m.id), { read: true }));
   await batch.commit().catch((e) => toast(e.message));
 });
+
+/* ================= Kind words wall (site/kind) =================
+   Compliments (or feedback) you choose, shown on the website as
+   sticky notes above Contact. Only the name you type and the
+   text go public, never the email. */
+let wall = [];
+const onWall = (id) => wall.some((w) => w.id === id);
+async function initWall() {
+  try { const s = await F.fs.getDoc(F.fs.doc(F.db, 'site', 'kind')); wall = s.exists() ? JSON.parse(s.data().data) : []; } catch { wall = []; }
+  if (['inbox', 'feedback', 'compliment', 'help'].includes(currentView)) drawMessages();
+}
+async function toggleWall(m) {
+  let next;
+  if (onWall(m.id)) {
+    if (!confirm('Take this off the website?')) return;
+    next = wall.filter((w) => w.id !== m.id);
+  } else {
+    const first = String(m.name || '').trim().split(/\s+/)[0] || '';
+    const name = prompt('Name to show with it (leave empty for “A visitor”). Their email is never shown.', first);
+    if (name == null) return;
+    const text = prompt('The words to show (you can shorten them):', String(m.text).trim().slice(0, 400));
+    if (text == null || !text.trim()) return;
+    const d = tsDate(m.createdAt) || new Date();
+    next = [{ id: m.id, name: name.trim().slice(0, 40), text: text.trim().slice(0, 400), at: d.toISOString().slice(0, 7) }, ...wall].slice(0, 40);
+  }
+  try {
+    if (!DEMO) await F.fs.setDoc(F.fs.doc(F.db, 'site', 'kind'), { data: JSON.stringify(next), updatedAt: F.fs.serverTimestamp() });
+    wall = next; drawMessages();
+    toast(onWall(m.id) ? 'On the website now (Kind words, above Contact)' : 'Taken off the website');
+  } catch (e) { toast(e.code || e.message, 4000); }
+}
 
 /* ================= Help-centre answers (site/help) ================= */
 let faq = [];

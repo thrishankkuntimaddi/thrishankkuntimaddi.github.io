@@ -8,8 +8,8 @@
 import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=22';
 import { setWorldBg } from './worldbg.js?v=22';
 import { playTune, PROJECTS } from './tunes.js?v=22';
-import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=2';
-import { loadContent, applyContent } from './lib/content-live.js?v=1';
+import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=3';
+import { loadContent, applyContent } from './lib/content-live.js?v=2';
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -173,6 +173,8 @@ function tourUI(now) {
   else { txt = `Resumes in ${Math.max(1, Math.ceil((tour.resumeAt - now) / 1000))}s`; ico = '▶'; }
   if (tourTxt.textContent !== txt) tourTxt.textContent = txt;
   if (tourIco.textContent !== ico) tourIco.textContent = ico;
+  const name = tour.on ? 'Pause the auto-tour' : tour.done ? 'Replay the tour' : 'Play the auto-tour';
+  if (tourEl.getAttribute('aria-label') !== name) tourEl.setAttribute('aria-label', name);
   tourEl.style.display = tour.done ? 'none' : ''; // the final scene has its own replay link
   root.classList.toggle('at-final', !postEl.hidden && !falling && postEl.getBoundingClientRect().top < innerHeight * 0.5);
   const m = maxScroll();
@@ -242,8 +244,11 @@ const resumeLib = () => import('./lib/resume.js?v=1');
 const pdfLib = () => import('./lib/resume-pdf.js?v=1');
 // An uploaded PDF resume: its parts are in site/resumePdf{n}.
 let pdfBytesP = null;
-const uploadedPdf = () => (pdfBytesP ||= Promise.all([import('./lib/firebase.js?v=1'), pdfLib()]).then(([fb, P]) =>
-  Promise.all([...Array(liveResume.parts)].map((_, n) => fb.readPublic(`resumePdf${n}`).then((r) => r.data))).then((parts) => P.b64ToBytes(parts.join('')))));
+let forLink = null; // a tailored link (?for=…) whose own resume is showing
+const uploadedPdf = () => (pdfBytesP ||= forLink
+  ? Promise.all([import('./lib/tailored.js?v=1'), pdfLib()]).then(([T, P]) => T.linkPdfB64(forLink).then((b) => P.b64ToBytes(b)))
+  : Promise.all([import('./lib/firebase.js?v=2'), pdfLib()]).then(([fb, P]) =>
+    Promise.all([...Array(liveResume.parts)].map((_, n) => fb.readPublic(`resumePdf${n}`).then((r) => r.data))).then((parts) => P.b64ToBytes(parts.join('')))));
 const showResumeSlots = (date) => {
   $('#resumeDate').textContent = `Updated ${date.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}`;
   $$('[data-resume-slot]').forEach((el) => { el.hidden = false; });
@@ -255,7 +260,13 @@ const staticResume = () => fetch('resume/meta.json', { cache: 'no-store' }).then
   $('#postDownload').href = RESUME + resumeV;
   showResumeSlots(new Date(`${m.updated}T00:00:00`));
 });
-import('./lib/firebase.js?v=1').then((m) => m.readPublic('resume')).then(({ data, updatedAt }) => {
+// A tailored link (Studio → Links) can bring its own resume and a hello note; otherwise the website's resume.
+const tailored = import('./lib/tailored.js?v=1').then((T) => T.loadLink().then((l) => {
+  if (l) { T.helloNote(l, $('.hero .edition-tag')); if (!SITE.pip.greeting) SITE.pip.greeting = `Hi, ${l.company}! Have a look around.`; }
+  return T.linkResume(l) ? l : null;
+})).catch(() => null);
+Promise.all([tailored, import('./lib/firebase.js?v=2').then((m) => m.readPublic('resume')).catch(() => ({}))]).then(([l, { data, updatedAt }]) => {
+  if (l) { forLink = l; liveResume = l.resume; showResumeSlots(new Date(l.updatedAt)); return; }
   if (!data || !(data.sections || (data.kind === 'pdf' && data.parts))) throw new Error('no live resume');
   liveResume = data;
   showResumeSlots(new Date(updatedAt));
@@ -1140,7 +1151,7 @@ async function quickJump(ev) {
   // 2. fall. Pip tumbles in the middle the whole way; the universes rush past and Pip is redrawn in each one's style
   const faller = $('#fallPip'), flash = $('#fallFlash'), windows = $$('.project .window');
   // Every universe shows on the way down: the projects in their own, the rest as quick flashes in between.
-  const [inf, chap] = await Promise.all([import('./infinity.js?v=22').catch(() => null), import('./chapter.js?v=22').catch(() => null)]);
+  const [inf, chap] = await Promise.all([import('./infinity.js?v=22').catch(() => null), import('./chapter.js?v=23').catch(() => null)]);
   if (inf && !document.querySelector('link[data-inf]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'infinity.css?v=22'; l.dataset.inf = '1'; document.head.append(l); }
   const plan = fallPlan();
   faller.innerHTML = pip.querySelector('svg').outerHTML.replace('</svg>', `<g class="pip-wear">${chap?.PIP_WEAR || ''}</g>${inf?.EMO_SVG || ''}</svg>`);
@@ -1245,11 +1256,38 @@ $('#jumpBtn').addEventListener('click', quickJump);
    Ask Pip, seasons, stickers and the 30-second version.
    Loaded separately, so the site above never depends on it.
    --------------------------------------------------------- */
-import('./chapter.js?v=22').then((m) => m.initChapter({
+import('./chapter.js?v=23').then((m) => m.initChapter({
   root, $, $$, calm, say, pip, visits, PREFS, SITE, tourPause, snd, setMenu, audio: () => (soundOn ? actx : null),
   refreshTag: () => { $('#editionText').textContent = tagText(); },
   openResume: () => $('[data-resume]')?.click(),
 })).catch((err) => console.warn('[chapter]', err));
+
+/* ---------------------------------------------------------
+   Extras that never hold up the page: live GitHub stats on the
+   project cards, the kind words wall, notes and quick read.
+   --------------------------------------------------------- */
+const whenIdle = (fn) => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 1500));
+whenIdle(() => {
+  import('./lib/gh-stats.js?v=1').then((m) => m.initStats()).catch(() => {});
+  import('./lib/kind-wall.js?v=1').then((m) => m.drawKind($('#kindWall'))).catch(() => {});
+});
+// Notes: a nav and footer link once there is at least one, plus the newest in the hero's small print.
+const notes = (siteContent?.notesIndex || []).filter((n) => n && n.id && n.title);
+if (notes.length) {
+  const li = document.createElement('li'); li.innerHTML = '<a href="notes.html">Notes</a>';
+  $('#navLinks .nav-themes')?.closest('li').before(li);
+  $('.footer-inner a[href="universes.html"]')?.insertAdjacentHTML('beforebegin', '<a href="notes.html">Notes ✎</a>');
+}
+// Quick read: always offered beside the 30-second version; offered up front on data saver or a slow connection.
+{
+  const net = navigator.connection || {};
+  if ((net.saveData || /(^|-)2g$/.test(net.effectiveType || '')) && !document.querySelector('.slow-note')) {
+    const el = document.createElement('p');
+    el.className = 'slow-note';
+    el.innerHTML = 'On a slow connection? <a href="read.html">Open the quick-read page</a> (no animation, loads in a blink).';
+    $('.hero-actions')?.before(el);
+  }
+}
 
 /* =========================================================
    The 3D universe (visuals only). The page works without it.

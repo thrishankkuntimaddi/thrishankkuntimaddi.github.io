@@ -318,7 +318,7 @@ export function initChapter(ctx) {
   function openQuick() { if (open(quickDlg)) count('quick'); }
   const quickLink = document.createElement('p');
   quickLink.className = 'quick-link';
-  quickLink.innerHTML = '<button type="button" data-quick>In a hurry? <u>The 30-second version</u> →</button>';
+  quickLink.innerHTML = '<button type="button" data-quick>In a hurry? <u>The 30-second version</u> →</button> <a class="quick-read" href="read.html">or the <u>quick-read page</u></a>';
   $('.hero-actions').after(quickLink);
   document.addEventListener('click', (e) => { if (e.target.closest('[data-quick]')) { e.preventDefault(); openQuick(); } });
   if (params.has('quick')) openQuick();
