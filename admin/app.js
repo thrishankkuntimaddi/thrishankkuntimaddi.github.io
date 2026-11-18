@@ -12,6 +12,7 @@ import { unlock, watchAway, lockOn, lockAvailable, setUpLock, removeLock } from 
 import { initContent } from './content.js?v=2';
 import { initReports, showReports } from './reports.js?v=3';
 import { initLinks, showLinks } from './links.js?v=1';
+import { initUpdates } from './update.js?v=1';
 import { isPdf, fileToB64, split, b64ToBytes, bytesToBlob, pageCount, renderInto, saveBlob, MAX_BYTES } from '../lib/resume-pdf.js?v=1';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -80,7 +81,16 @@ async function boot() {
     watchAway();
     offerLock();
     initDevices({ F, DEMO, toast, user, onRevoked: revoked });
+    drawUpdateSetting();
   });
+}
+let checkNow = null;
+function drawUpdateSetting() { // Account → App version (only in the Android app)
+  const row = $('#updSetting'); if (!row || !window.StudioNative?.version) return;
+  if (!checkNow) checkNow = initUpdates();
+  row.hidden = false;
+  $('#updVersion').textContent = `myProfile ${window.StudioNative.version} for Android. New versions are offered here automatically.`;
+  $('#updCheck').onclick = async () => { $('#updCheck').disabled = true; toast(await checkNow()); $('#updCheck').disabled = false; };
 }
 async function offerLock() {
   if (lockOn() || DEMO) { drawLockSetting(); return; }

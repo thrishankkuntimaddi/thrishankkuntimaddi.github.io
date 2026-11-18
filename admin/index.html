@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-title" content="myProfile">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="preload" href="fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="app.css?v=5">
+  <link rel="stylesheet" href="app.css?v=6">
 </head>
 <body>
   <!-- Line icons (Lucide, ISC licence) -->
@@ -202,6 +202,7 @@
           <section class="card">
             <h2>Security</h2>
             <div class="acct-row"><span id="lockSetting">App lock</span></div>
+            <div class="acct-row" id="updSetting" hidden><span id="updVersion">App version</span><button class="btn" id="updCheck" type="button">Check for updates</button></div>
             <p class="legend">Only thrishankkuntimaddi@gmail.com, signed in with Google, can open this app. Any other account is signed out at once and the database refuses it. Edits need a sign-in from the last 30 days.</p>
           </section>
           <section class="card">
@@ -300,6 +301,6 @@
   </dialog>
 
   <p class="toast" id="toast" role="status" aria-live="polite"></p>
-  <script type="module" src="app.js?v=5"></script>
+  <script type="module" src="app.js?v=6"></script>
 </body>
 </html>

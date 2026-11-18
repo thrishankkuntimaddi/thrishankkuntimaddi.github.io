@@ -1,26 +1,48 @@
 name: Studio app (Android)
 
-# Builds the private Studio app for Android phones and tablets.
-#  - Push a tag like studio-v1.0.1 (after raising "version" in app/package.json)
-#    to publish Studio-Android.apk on a GitHub Release.
-#  - Or run it by hand from the Actions tab (the APK is attached to the run).
+# Builds the private myProfile app for Android and publishes it as a GitHub
+# Release, which the installed app finds and offers as an update (admin/update.js).
+#  - Automatic: every push to main that changes the app's files releases the
+#    next version (1.3.0 -> 1.3.1 ...). Put [no app] in a commit message to skip.
+#  - For a bigger jump, raise "version" in app/package.json (e.g. 1.4.0); it is
+#    used when it is higher than the last release.
+#  - Or run it by hand from the Actions tab.
 # Needs two repository secrets: STUDIO_KEYSTORE_BASE64 and STUDIO_KEYSTORE_PASSWORD.
 on:
   workflow_dispatch:
   push:
-    tags: ['studio-v*']
+    branches: [main]
+    paths:
+      - 'admin/**'
+      - 'lib/**'
+      - 'worlds.js'
+      - 'content.js'
+      - 'assets/fonts/**'
+      - 'app/native.js'
+      - 'app/scripts/**'
+      - 'app/package.json'
+      - 'app/capacitor.config.json'
+      - 'app/android/**'
+      - '.github/workflows/studio-app.yml'
 
 permissions:
   contents: write
 
+concurrency:
+  group: studio-release
+  cancel-in-progress: false
+
 jobs:
   android:
+    if: ${{ !contains(github.event.head_commit.message, '[no app]') }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: app
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v5
         with:
           node-version: 22
@@ -28,6 +50,21 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Pick the version and write the release notes
+        run: |
+          git fetch --tags --force
+          LAST=$(git tag -l 'studio-v*' --sort=-v:refname | head -1)
+          LASTV=${LAST#studio-v}; LASTV=${LASTV:-0.0.0}
+          PKG=$(node -p "require('./package.json').version")
+          HIGHER=$(printf '%s\n%s\n' "$PKG" "$LASTV" | sort -V | tail -1)
+          if [ "$PKG" != "$LASTV" ] && [ "$HIGHER" = "$PKG" ]; then V=$PKG
+          else IFS=. read -r MA MI PA <<< "$LASTV"; V="$MA.$MI.$((PA + 1))"; fi
+          node -e "const f='package.json',p=require('./'+f);p.version='$V';require('fs').writeFileSync(f,JSON.stringify(p,null,2)+'\n')"
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+          RANGE=${LAST:+$LAST..HEAD}
+          git log ${RANGE:-HEAD~20..HEAD} --no-merges --pretty='- %s' -- ../admin ../lib ../app ../worlds.js ../content.js | grep -v '\[no app\]' | head -12 > "$RUNNER_TEMP/notes.md" || true
+          [ -s "$RUNNER_TEMP/notes.md" ] || echo '- Small fixes and improvements' > "$RUNNER_TEMP/notes.md"
+          echo "Releasing $V (last: ${LAST:-none})"; cat "$RUNNER_TEMP/notes.md"
       - run: npm install --no-audit --no-fund
       - run: npm run sync
       # The same key every time, so a new APK installs over the old one.
@@ -58,13 +95,16 @@ jobs:
           name: Studio-Android
           path: Studio-Android.apk
       - name: Publish the release
-        if: startsWith(github.ref, 'refs/tags/studio-v')
         working-directory: .
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" Studio-Android.apk \
-            --title "Studio ${GITHUB_REF_NAME#studio-v}" \
-            --notes "Private owner app for the portfolio. Only thrishankkuntimaddi@gmail.com can sign in.
-
-          Install on an Android phone or tablet: download Studio-Android.apk below and open it (allow installing from your browser if asked). New versions install over the old one."
+          {
+            echo "## What's new"
+            cat "$RUNNER_TEMP/notes.md"
+            echo
+            echo "Private owner app for the portfolio. Only the owner's Google account can sign in."
+            echo
+            echo "The installed app offers this update by itself. First install: download Studio-Android.apk below and open it (allow installing from your browser if asked). New versions install over the old one."
+          } > "$RUNNER_TEMP/body.md"
+          gh release create "studio-v$VERSION" Studio-Android.apk --target "$GITHUB_SHA" --title "myProfile $VERSION" --notes-file "$RUNNER_TEMP/body.md"
