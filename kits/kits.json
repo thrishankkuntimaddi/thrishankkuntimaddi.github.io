@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-17",
+ "updated": "2026-11-21",
  "kits": [
   {
    "id": "liquid-glass",
@@ -56,6 +56,58 @@
    ],
    "demo": false,
    "note": "From the Oruinwan workspace app, in dark and light."
+  },
+  {
+   "id": "unslop",
+   "name": "Unslop",
+   "group": "Signature kits",
+   "mood": "The household hisaab notebook: paper-warm neutrals, one blue-ink accent, totals in a serif closed with an accountant's double rule. Quiet chrome, one signature detail.",
+   "light": true,
+   "swatch": {
+    "bg": "#F7F5F0",
+    "page": "#F7F5F0",
+    "ink": "#1F1B16",
+    "surface": "#FDFCF9",
+    "accent": "#2A4BB0",
+    "accent2": "#1E7B45",
+    "accent3": "#C4362C",
+    "r": "14px",
+    "display": "\"Newsreader\", Georgia, serif"
+   },
+   "files": [
+    "UNSLOP-THEME.md",
+    "unslop.css",
+    "unslop.csv",
+    "prompt.txt"
+   ],
+   "demo": false,
+   "note": "From the Expense Tracker app (Look → Unslop). Made with the unslop method by Damir Sokolovsky (github.com/heydamir/unslop, CC BY 4.0)."
+  },
+  {
+   "id": "unsloped",
+   "name": "Unsloped",
+   "group": "Signature kits",
+   "mood": "The red cloth bahi-khata: cream ledger paper and ink, one cover stamped in gold per screen, lists ruled with the red double margin, a ribbon on the current tab.",
+   "light": true,
+   "swatch": {
+    "bg": "#F2ECE0",
+    "page": "#F2ECE0",
+    "ink": "#1E1A15",
+    "surface": "#FAF6EE",
+    "accent": "#7A1D1C",
+    "accent2": "#DDB866",
+    "accent3": "#24438F",
+    "r": "4px",
+    "display": "\"Newsreader\", Georgia, serif"
+   },
+   "files": [
+    "UNSLOPED-THEME.md",
+    "unsloped.css",
+    "unsloped.csv",
+    "prompt.txt"
+   ],
+   "demo": false,
+   "note": "From the Expense Tracker app (Look → Unsloped). Made with the unslop method by Damir Sokolovsky (github.com/heydamir/unslop, CC BY 4.0)."
   },
   {
    "id": "paper",
@@ -216,12 +268,12 @@
     "bg": "#03090c",
     "page": "radial-gradient(circle at 50% 45%, #2a3a2a 0, #0d2a30 25%, #03090c 70%)",
     "ink": "#e9fbff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "rgba(255, 255, 255, .035)",
     "accent": "#ffc46b",
     "accent2": "#7ff0f6",
     "accent3": "#ffe2a8",
     "r": "18px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "display": "\"Unbounded\", system-ui, sans-serif"
    },
    "files": [
     "core.css",
@@ -245,12 +297,12 @@
     "bg": "#04040d",
     "page": "radial-gradient(circle at 30% 30%, #3a1d6e 0, transparent 45%), radial-gradient(circle at 75% 70%, #0f4a55 0, transparent 40%), #04040d",
     "ink": "#eef0ff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 5%, var(--t-bg))",
     "accent": "#a78bfa",
     "accent2": "#5ad1e6",
     "accent3": "#ffb38a",
-    "r": "18px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "2px",
+    "display": "\"Space Grotesk\", system-ui, sans-serif"
    },
    "files": [
     "space.css",
@@ -274,12 +326,12 @@
     "bg": "#0d0221",
     "page": "linear-gradient(#0d0221, #2a0845 60%, #120020)",
     "ink": "#fbeaff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 9%, var(--t-bg))",
     "accent": "#ff3dd8",
     "accent2": "#3df5ff",
     "accent3": "#fff36b",
-    "r": "4px",
-    "display": "\"Space Mono\", ui-monospace, monospace"
+    "r": "30px",
+    "display": "\"Syne\", system-ui, sans-serif"
    },
    "files": [
     "future.css",
@@ -303,12 +355,12 @@
     "bg": "#06090d",
     "page": "linear-gradient(#0b1218, #06090d)",
     "ink": "#e3fffa",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "var(--t-bg)",
     "accent": "#4fd1c5",
     "accent2": "#ff6b6b",
     "accent3": "#b4ff6b",
-    "r": "6px",
-    "display": "\"VT323\", monospace"
+    "r": "0",
+    "display": "\"IBM Plex Mono\", ui-monospace, monospace"
    },
    "files": [
     "robots.css",
@@ -332,12 +384,12 @@
     "bg": "#160000",
     "page": "radial-gradient(circle at 50% 60%, #4a0000 0, #0a0000 80%)",
     "ink": "#fff0ee",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "var(--t-bg)",
     "accent": "#ff3b3b",
     "accent2": "#ff9a3b",
     "accent3": "#ffd23b",
-    "r": "10px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "0",
+    "display": "\"Archivo Black\", Impact, sans-serif"
    },
    "files": [
     "rage.css",
@@ -361,12 +413,12 @@
     "bg": "#1d0b36",
     "page": "linear-gradient(#1d0b36, #3a1060)",
     "ink": "#fff4ff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 10%, var(--t-bg))",
     "accent": "#ffd166",
     "accent2": "#ff5fa2",
     "accent3": "#4fd1b0",
-    "r": "24px",
-    "display": "\"Caveat\", cursive"
+    "r": "30px",
+    "display": "\"Bricolage Grotesque\", system-ui, sans-serif"
    },
    "files": [
     "joy.css",
@@ -390,12 +442,12 @@
     "bg": "#0b1220",
     "page": "linear-gradient(#0b1220, #1b2a42)",
     "ink": "#e9f0ff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "rgba(255, 255, 255, .025)",
     "accent": "#6b8cff",
     "accent2": "#9fb8ff",
     "accent3": "#ffd28a",
-    "r": "18px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "14px",
+    "display": "\"Newsreader\", Georgia, serif"
    },
    "files": [
     "sad.css",
@@ -419,11 +471,11 @@
     "bg": "#12002b",
     "page": "linear-gradient(#12002b, #5a0a5e 60%, #ff3d81)",
     "ink": "#fff0fa",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "var(--t-bg)",
     "accent": "#ff3d81",
     "accent2": "#3df5ff",
     "accent3": "#ffe66b",
-    "r": "0px",
+    "r": "0",
     "display": "\"Press Start 2P\", monospace"
    },
    "files": [
@@ -448,12 +500,12 @@
     "bg": "#08070f",
     "page": "radial-gradient(circle at 50% 45%, #2a1d4a 0, #08070f 70%)",
     "ink": "#f2edff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 7%, var(--t-bg))",
     "accent": "#a78bfa",
     "accent2": "#ff5fa2",
     "accent3": "#7fe0c3",
-    "r": "18px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "24px",
+    "display": "\"Bebas Neue\", Impact, sans-serif"
    },
    "files": [
     "music.css",
@@ -477,12 +529,12 @@
     "bg": "#141014",
     "page": "linear-gradient(135deg, #141014, #241a24)",
     "ink": "#fff6ee",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 6%, var(--t-bg))",
     "accent": "#ff8a65",
     "accent2": "#6bb6ff",
     "accent3": "#ffd166",
-    "r": "24px",
-    "display": "\"Caveat\", cursive"
+    "r": "26px 10px 30px 12px",
+    "display": "\"Playfair Display\", Georgia, serif"
    },
    "files": [
     "paint.css",
@@ -506,12 +558,12 @@
     "bg": "#0b0d16",
     "page": "linear-gradient(#0b0d16, #161a2b)",
     "ink": "#edf2ff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 7%, var(--t-bg))",
     "accent": "#5aa9ff",
     "accent2": "#a78bfa",
     "accent3": "#4fd1b0",
-    "r": "0px",
-    "display": "\"Space Mono\", ui-monospace, monospace"
+    "r": "4px",
+    "display": "\"Unbounded\", system-ui, sans-serif"
    },
    "files": [
     "box.css",
@@ -535,12 +587,12 @@
     "bg": "#0b1026",
     "page": "linear-gradient(#0b1026, #22335c 70%, #14304a)",
     "ink": "#fff8e8",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 5%, var(--t-bg))",
     "accent": "#ffcf6b",
     "accent2": "#7fd18b",
     "accent3": "#ff9f7a",
-    "r": "18px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "6px",
+    "display": "\"Cormorant Garamond\", Georgia, serif"
    },
    "files": [
     "village.css",
@@ -564,12 +616,12 @@
     "bg": "#050814",
     "page": "linear-gradient(#050814, #141c38)",
     "ink": "#f3f6ff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "var(--t-bg)",
     "accent": "#ffd27a",
     "accent2": "#8ec5ff",
     "accent3": "#ff6b8b",
-    "r": "12px",
-    "display": "\"Inter\", system-ui, sans-serif"
+    "r": "0",
+    "display": "\"Instrument Sans\", system-ui, sans-serif"
    },
    "files": [
     "city.css",
@@ -593,12 +645,12 @@
     "bg": "#2b1b54",
     "page": "linear-gradient(#2b1b54, #c0477d 60%, #ff9e6d)",
     "ink": "#fff3f7",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "rgba(255, 255, 255, .07)",
     "accent": "#ff9e6d",
     "accent2": "#ffb3d1",
     "accent3": "#ffe066",
-    "r": "24px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "28px",
+    "display": "\"Figtree\", system-ui, sans-serif"
    },
    "files": [
     "sky.css",
@@ -622,12 +674,12 @@
     "bg": "#021b2c",
     "page": "linear-gradient(#04425e, #032a40 50%, #010d17)",
     "ink": "#e8fbff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 6%, rgba(255, 255, 255, .03))",
     "accent": "#39c6e6",
     "accent2": "#7fe0c3",
     "accent3": "#ffd28a",
-    "r": "22px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "24px",
+    "display": "\"Sora\", system-ui, sans-serif"
    },
    "files": [
     "water.css",
@@ -651,12 +703,12 @@
     "bg": "#0a0300",
     "page": "radial-gradient(ellipse at 50% 100%, #6b1f00 0, #0a0300 70%)",
     "ink": "#fff1e8",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "var(--t-bg)",
     "accent": "#ff7a1a",
     "accent2": "#ff3b3b",
     "accent3": "#ffd23b",
-    "r": "10px",
-    "display": "\"Fraunces\", Georgia, serif"
+    "r": "6px",
+    "display": "\"Archivo Black\", Impact, sans-serif"
    },
    "files": [
     "fire.css",
@@ -680,12 +732,12 @@
     "bg": "#020617",
     "page": "linear-gradient(#020617, #0b1d3a)",
     "ink": "#eef8ff",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 5%, rgba(255, 255, 255, .03))",
     "accent": "#7fd8ff",
     "accent2": "#8affc1",
     "accent3": "#b39bff",
-    "r": "14px",
-    "display": "\"Inter\", system-ui, sans-serif"
+    "r": "3px",
+    "display": "\"Instrument Serif\", Georgia, serif"
    },
    "files": [
     "ice.css",
@@ -709,12 +761,12 @@
     "bg": "#10141a",
     "page": "linear-gradient(#10141a, #1b222c)",
     "ink": "#f7f7f2",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 8%, var(--t-bg))",
     "accent": "#ffcd03",
     "accent2": "#e3242b",
     "accent3": "#6bb6ff",
-    "r": "6px",
-    "display": "\"Inter\", system-ui, sans-serif"
+    "r": "8px",
+    "display": "\"Bricolage Grotesque\", system-ui, sans-serif"
    },
    "files": [
     "brick.css",
@@ -738,12 +790,12 @@
     "bg": "#0d1117",
     "page": "linear-gradient(#0d1117, #1b2230)",
     "ink": "#f6f8fa",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "var(--t-bg)",
     "accent": "#ff7a00",
     "accent2": "#3df5ff",
     "accent3": "#ffd166",
-    "r": "8px",
-    "display": "\"Space Mono\", ui-monospace, monospace"
+    "r": "16px",
+    "display": "\"Unbounded\", system-ui, sans-serif"
    },
    "files": [
     "racer.css",
@@ -767,12 +819,12 @@
     "bg": "#0b0b0b",
     "page": "linear-gradient(#141414, #050505)",
     "ink": "#f2f2f2",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "transparent",
     "accent": "#d9d9d9",
     "accent2": "#9a9a9a",
     "accent3": "#ffffff",
-    "r": "2px",
-    "display": "Georgia, \"Times New Roman\", serif"
+    "r": "0",
+    "display": "\"Cormorant Garamond\", Georgia, serif"
    },
    "files": [
     "noir.css",
@@ -796,12 +848,12 @@
     "bg": "#05050a",
     "page": "repeating-linear-gradient(0deg, #05050a 0 3px, #0b0b14 3px 4px)",
     "ink": "#f0fff9",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "var(--t-bg)",
     "accent": "#00ffd5",
     "accent2": "#ff2a6d",
     "accent3": "#f5f500",
-    "r": "0px",
-    "display": "\"VT323\", monospace"
+    "r": "0",
+    "display": "\"JetBrains Mono\", ui-monospace, monospace"
    },
    "files": [
     "glitch.css",
@@ -825,12 +877,12 @@
     "bg": "#1a0805",
     "page": "linear-gradient(#1a0805, #6b2414 55%, #a8442a 56%, #4a160a)",
     "ink": "#fff2ea",
-    "surface": "rgba(255, 255, 255, .9)",
+    "surface": "color-mix(in srgb, var(--t-accent) 6%, var(--t-bg))",
     "accent": "#ff7a4d",
     "accent2": "#6bb6ff",
     "accent3": "#ffd166",
-    "r": "12px",
-    "display": "\"Space Mono\", ui-monospace, monospace"
+    "r": "10px",
+    "display": "\"Space Grotesk\", system-ui, sans-serif"
    },
    "files": [
     "mars.css",

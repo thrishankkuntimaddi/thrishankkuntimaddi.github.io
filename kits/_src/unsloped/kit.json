@@ -1,0 +1,25 @@
+{
+ "name": "Unsloped",
+ "group": "Signature kits",
+ "mood": "The red cloth bahi-khata: cream ledger paper and ink, one cover stamped in gold per screen, lists ruled with the red double margin, a ribbon on the current tab.",
+ "light": true,
+ "swatch": {
+  "bg": "#F2ECE0",
+  "page": "#F2ECE0",
+  "ink": "#1E1A15",
+  "surface": "#FAF6EE",
+  "accent": "#7A1D1C",
+  "accent2": "#DDB866",
+  "accent3": "#24438F",
+  "r": "4px",
+  "display": "\"Newsreader\", Georgia, serif"
+ },
+ "files": [
+  "UNSLOPED-THEME.md",
+  "unsloped.css",
+  "unsloped.csv",
+  "prompt.txt"
+ ],
+ "demo": false,
+ "note": "From the Expense Tracker app (Look → Unsloped). Made with the unslop method by Damir Sokolovsky (github.com/heydamir/unslop, CC BY 4.0)."
+}

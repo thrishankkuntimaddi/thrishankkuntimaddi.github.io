@@ -58,8 +58,8 @@ Arcade sunset: hot pink to purple, chrome text, square pixels and neon.
 | `--t-faint` | `color-mix(in srgb, #fff0fa 48%, #12002b)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #fff0fa 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #fff0fa 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `var(--t-bg)` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#fff0fa` | Text inside cards |
 | `--t-accent` | `#ff3d81` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#3df5ff` | Secondary highlight |
 | `--t-accent-3` | `#ffe66b` | Third highlight: stickers, marks, selection |
@@ -67,8 +67,8 @@ Arcade sunset: hot pink to purple, chrome text, square pixels and neon.
 | `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
 | `--t-mono` | `"VT323", monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `0px` | Cards and windows |
-| `--t-r-sm` | `0px` | Buttons, inputs, chips |
+| `--t-r` | `0` | Cards and windows |
+| `--t-r-sm` | `0` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#12002b, #5a0a5e 60%, #ff3d81)` | Full page background (gradient / pattern) |

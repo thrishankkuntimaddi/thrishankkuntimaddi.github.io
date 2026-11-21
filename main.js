@@ -5,7 +5,7 @@
    two glitches change the colours and reveal a final scene, and the
    3D gravity scenes change with each section.
    ========================================================= */
-import { ALL, NAMES, COPY, isLoopWorld } from './worlds.js?v=22';
+import { ALL, NAMES, COPY, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=23';
 import { setWorldBg } from './worldbg.js?v=22';
 import { playTune, PROJECTS } from './tunes.js?v=22';
 import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=3';
@@ -57,7 +57,7 @@ let visits = 1;
 try { visits = (parseInt(localStorage.getItem('tk-visits'), 10) || 0) + 1; localStorage.setItem('tk-visits', String(visits)); } catch { /* private mode */ }
 const hour = new Date().getHours();
 $('#greeting').textContent = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 22 ? 'Good evening' : 'Hello, night owl';
-/* Universes: 27 of them (worlds.js). Each has its own fonts, shapes and wording; the 22 from the
+/* Universes: 31 of them (worlds.js). Each has its own fonts, shapes and wording; the 22 from the
    endless loop also turn the page dark and draw their scene behind it (worldbg.js). */
 const WORLDS = SITE.universes?.length ? ALL.filter((w) => SITE.universes.includes(w) || w === 'paper') : ALL, WORLD_NAMES = NAMES;
 const tagText = () => `${WORLD_NAMES[root.dataset.world] || 'Paper'} universe · ${UNIVERSES[settings.universe].name.replace(' edition', '')}${root.dataset.sky ? ` · ${root.dataset.sky}` : ''}`;
@@ -81,8 +81,9 @@ function setWorld(name, save) {
 // Dark pages, the hidden 3D scene and the drawn background for the 22 loop universes.
 function markWorld(name) {
   const loop = isLoopWorld(name);
-  root.toggleAttribute('data-dark', loop); root.toggleAttribute('data-loop', loop);
-  if (engineReady) engine?.setPaused?.(loop);
+  root.toggleAttribute('data-dark', isDarkWorld(name)); root.toggleAttribute('data-loop', loop);
+  root.toggleAttribute('data-design', isDesigned(name));   // a whole-website design (design.css)
+  if (engineReady) { engine?.setPaused?.(loop); engine?.setUniverse?.(); }   // the scene takes the universe's page colour
   const m = $('meta[name="theme-color"]'); if (m) m.content = loop ? getComputedStyle(root).getPropertyValue('--paper').trim() || '#000' : UNIVERSES[settings.universe].bg;
   setWorldBg(name, calm());
 }
@@ -96,12 +97,22 @@ function nextWorld() {
   try { sessionStorage.setItem('tk-bag', JSON.stringify(bag)); } catch { /* private mode */ }
   return w;
 }
-if (!WORLDS.includes(root.dataset.world)) root.dataset.world = 'paper';
+// ?world= previews any universe, even one the Studio left out of the shuffle
+const PREVIEW_WORLD = (/[?&]world=([a-z]+)/.exec(location.search) || [])[1];
+if (!WORLDS.includes(root.dataset.world) && !(PREVIEW_WORLD === root.dataset.world && ALL.includes(PREVIEW_WORLD))) root.dataset.world = 'paper';
 if (PREFS.world && WORLDS.includes(PREFS.world) && root.dataset.world !== PREFS.world && !/[?&]world=/.test(location.search)) { root.dataset.world = PREFS.world; root.classList.toggle('sketch', PREFS.world === 'sketch'); }
 if (PREFS.motion === 'calm') root.classList.add('calm');
 markWorld(root.dataset.world);
 applyCopy(root.dataset.world);
 const EDITION_ORDER = ['morning', 'noon', 'dusk', 'night'];
+/* Live from the Studio (lib/live.js): a universe or colours pinned there apply to this open page
+   at once — unless the visitor pinned their own on the settings page, or is previewing ?world= */
+addEventListener('tk:site', (e) => {
+  const eff = e.detail || {};
+  let mine = {}; try { mine = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch { /* private mode */ }
+  if (eff.world && ALL.includes(eff.world) && !mine.world && !PREVIEW_WORLD && eff.world !== root.dataset.world) setWorld(eff.world, true);
+  if (eff.edition && UNIVERSES[eff.edition] && !mine.edition && !/[?&]edition=/.test(location.search) && eff.edition !== root.dataset.edition) setEdition(eff.edition);
+});
 function setEdition(name) {
   root.dataset.edition = name;
   settings.universe = name;
@@ -1465,8 +1476,10 @@ function createEngine(THREE, PP) {
 
   function uni() { return UNIVERSES[settings.universe]; }
   function palette() { const s = [...uni().stars]; if (settings.accent) s[0] = settings.accent; return s; }
-  function bgColor() { return new THREE.Color(uni().bg); }
-  function additive() { return !uni().light; }
+  // A designed universe (design.css) paints the page in its own colour: the scene sits on it
+  const designedPaper = () => root.hasAttribute('data-design') && !root.hasAttribute('data-loop') && getComputedStyle(root).getPropertyValue('--paper').trim();
+  function bgColor() { const p = designedPaper(); try { return new THREE.Color(p || uni().bg); } catch { return new THREE.Color(uni().bg); } }
+  function additive() { return !uni().light || root.hasAttribute('data-dark'); }
 
   function trailLength(b) { return Math.max(8, Math.round(MAX_TRAIL * settings.trail * (b.trailScale || 1))); }
 

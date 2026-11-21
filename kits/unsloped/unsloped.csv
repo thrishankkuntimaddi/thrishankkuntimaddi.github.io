@@ -1,0 +1,39 @@
+Category,Token_Name,Variant_Mode,Exact_Value
+Theme_Surface,kh-canvas,Light,#F2ECE0
+Theme_Surface,kh-canvas,Dark,#13110E
+Theme_Surface,kh-surface,Light,#FAF6EE
+Theme_Surface,kh-surface,Dark,#1A1713
+Theme_Surface,kh-sunken,Light,#E9E1D2
+Theme_Surface,kh-sunken,Dark,#27221C
+Theme_Surface,kh-sunken-2,Light,#EFE8DB
+Theme_Surface,kh-sunken-2,Dark,#201C17
+Theme_Line,kh-line,Light,"rgba(45, 30, 15, .09)"
+Theme_Line,kh-line,Dark,"rgba(238, 229, 211, .08)"
+Theme_Line,kh-line-2,Light,"rgba(45, 30, 15, .17)"
+Theme_Line,kh-line-2,Dark,"rgba(238, 229, 211, .15)"
+Theme_Text,kh-ink,Light,#1E1A15
+Theme_Text,kh-ink,Dark,#EEE5D3
+Theme_Text,kh-ink-2,Light,#5A4F42
+Theme_Text,kh-ink-2,Dark,#B2A792
+Theme_Text,kh-ink-3,Light,#7D7062
+Theme_Text,kh-ink-3,Dark,#8C8170
+Theme_Accent,kh-pen,Light,#24438F
+Theme_Accent,kh-pen,Dark,#9DB2EE
+Theme_Surface,kh-cloth,Light,#7A1D1C
+Theme_Surface,kh-cloth,Dark,#6A1918
+Theme_Surface,kh-cloth-2,Light,#65171A
+Theme_Surface,kh-cloth-2,Dark,#561315
+Theme_Accent,kh-gold,Light,#DDB866
+Theme_Accent,kh-gold-dim,Light,"rgba(221, 184, 102, .62)"
+Theme_Text,kh-cream,Light,#F5EAD0
+Theme_Line,kh-margin,Light,"rgba(176, 38, 34, .5)"
+Theme_Line,kh-margin,Dark,"rgba(214, 92, 80, .42)"
+Theme_Accent,kh-ribbon,Light,#A12A27
+Theme_Accent,kh-ribbon,Dark,#C2453E
+Theme_Accent,kh-positive,Light,#1E7B45
+Theme_Accent,kh-positive,Dark,#4CC38A
+Theme_Accent,kh-negative,Light,#C4362C
+Theme_Accent,kh-negative,Dark,#E8665C
+Type,kh-sans,Light,"""Instrument Sans"", -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, system-ui, sans-serif"
+Type,kh-serif,Light,"""Newsreader"", ""Iowan Old Style"", Georgia, serif"
+Motion,kh-ease,Light,"cubic-bezier(.22, 1, .36, 1)"

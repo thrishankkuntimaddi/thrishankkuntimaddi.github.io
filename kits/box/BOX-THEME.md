@@ -56,17 +56,17 @@ Everything is a block: square corners and stacked isometric shadows.
 | `--t-faint` | `color-mix(in srgb, #edf2ff 48%, #0b0d16)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #edf2ff 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #edf2ff 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 7%, var(--t-bg))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#edf2ff` | Text inside cards |
 | `--t-accent` | `#5aa9ff` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#a78bfa` | Secondary highlight |
 | `--t-accent-3` | `#4fd1b0` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Space Mono", ui-monospace, monospace` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
-| `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
+| `--t-display` | `"Unbounded", system-ui, sans-serif` | Headings |
+| `--t-sans` | `"IBM Plex Mono", ui-monospace, monospace` | Body text |
+| `--t-mono` | `"IBM Plex Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `0px` | Cards and windows |
-| `--t-r-sm` | `0px` | Buttons, inputs, chips |
+| `--t-r` | `4px` | Cards and windows |
+| `--t-r-sm` | `4px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#0b0d16, #161a2b)` | Full page background (gradient / pattern) |
@@ -78,10 +78,10 @@ Everything is a block: square corners and stacked isometric shadows.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Space Mono", ui-monospace, monospace` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Unbounded", system-ui, sans-serif` · Body: `"IBM Plex Mono", ui-monospace, monospace` · Labels: `"IBM Plex Mono", ui-monospace, monospace`
 
 ## 5. Components
 

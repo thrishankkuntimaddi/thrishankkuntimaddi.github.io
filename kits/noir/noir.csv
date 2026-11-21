@@ -6,17 +6,17 @@ Typography,t-muted,Dark_Page,color,"color-mix(in srgb, #f2f2f2 72%, #0b0b0b)",Se
 Typography,t-faint,Dark_Page,color,"color-mix(in srgb, #f2f2f2 48%, #0b0b0b)","Hints, captions, disabled"
 Lines,t-line,Dark_Page,border-color,"color-mix(in srgb, #f2f2f2 16%, transparent)",Hairlines and dividers
 Lines,t-line-2,Dark_Page,border-color,"color-mix(in srgb, #f2f2f2 30%, transparent)",Stronger borders on cards and controls
-Component_Card,t-surface,Dark_Page,background,"rgba(255, 255, 255, .9)","Cards, windows, dialogs"
-Component_Card,t-surface-ink,Dark_Page,color,#2c3046,Text inside cards
+Component_Card,t-surface,Dark_Page,background,transparent,"Cards, windows, dialogs"
+Component_Card,t-surface-ink,Dark_Page,color,#f2f2f2,Text inside cards
 Colour,t-accent,Dark_Page,color / background,#d9d9d9,"Primary action, key highlights (one per view)"
 Colour,t-accent-2,Dark_Page,color / background,#9a9a9a,Secondary highlight
 Colour,t-accent-3,Dark_Page,color / background,#ffffff,"Third highlight: stickers, marks, selection"
-Typography,t-display,Dark_Page,font-family,"Georgia, ""Times New Roman"", serif",Headings
-Typography,t-sans,Dark_Page,font-family,"Georgia, ""Times New Roman"", serif",Body text
-Typography,t-mono,Dark_Page,font-family,"""Space Mono"", ui-monospace, monospace","Labels, numbers, code"
+Typography,t-display,Dark_Page,font-family,"""Cormorant Garamond"", Georgia, serif",Headings
+Typography,t-sans,Dark_Page,font-family,"""IBM Plex Mono"", ui-monospace, monospace",Body text
+Typography,t-mono,Dark_Page,font-family,"""IBM Plex Mono"", ui-monospace, monospace","Labels, numbers, code"
 Typography,t-hand,Dark_Page,font-family,"""Caveat"", cursive",Hand-written notes
-Shape,t-r,Dark_Page,border-radius,2px,Cards and windows
-Shape,t-r-sm,Dark_Page,border-radius,0px,"Buttons, inputs, chips"
+Shape,t-r,Dark_Page,border-radius,0,Cards and windows
+Shape,t-r-sm,Dark_Page,border-radius,0,"Buttons, inputs, chips"
 Typography,t-base-size,Dark_Page,font-size,16px,Body size
 Typography,t-base-lh,Dark_Page,line-height,1.6,Body line height
 Theme_Surface,t-page-bg,Dark_Page,background,"linear-gradient(#141414, #050505)",Full page background (gradient / pattern)

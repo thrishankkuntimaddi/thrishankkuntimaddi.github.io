@@ -1,0 +1,25 @@
+{
+ "name": "Unslop",
+ "group": "Signature kits",
+ "mood": "The household hisaab notebook: paper-warm neutrals, one blue-ink accent, totals in a serif closed with an accountant's double rule. Quiet chrome, one signature detail.",
+ "light": true,
+ "swatch": {
+  "bg": "#F7F5F0",
+  "page": "#F7F5F0",
+  "ink": "#1F1B16",
+  "surface": "#FDFCF9",
+  "accent": "#2A4BB0",
+  "accent2": "#1E7B45",
+  "accent3": "#C4362C",
+  "r": "14px",
+  "display": "\"Newsreader\", Georgia, serif"
+ },
+ "files": [
+  "UNSLOP-THEME.md",
+  "unslop.css",
+  "unslop.csv",
+  "prompt.txt"
+ ],
+ "demo": false,
+ "note": "From the Expense Tracker app (Look → Unslop). Made with the unslop method by Damir Sokolovsky (github.com/heydamir/unslop, CC BY 4.0)."
+}

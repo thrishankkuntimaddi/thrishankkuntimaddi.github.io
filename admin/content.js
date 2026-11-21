@@ -7,7 +7,7 @@ import { PROJECTS_SEED } from '../lib/projects-seed.js?v=22';
 import { TEXT_SEED } from '../lib/text-seed.js?v=22';
 import { STORIES, ASK, ASK_SUGGEST, CHANGELOG } from '../content.js?v=22';
 import { keypad } from '../lib/content-live.js?v=22';
-import { BASE, LOOP, NAMES } from '../worlds.js?v=22';
+import { BASE, LOOP, KITS, NAMES, isDarkWorld } from '../worlds.js?v=23';
 import { md, readMins } from '../lib/md.js?v=1';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -21,7 +21,7 @@ const PREVIEWS = ['Oruinwan', 'Expense Tracker', 'SentinelFlight', 'LearnViaNote
 const SCENES = ['lagrange', 'binary', 'debris', 'solar', 'figure8', 'chaos', 'studio'];
 const SECTIONS = { hero: 'Top of the page', work: 'Projects heading', poelys: 'Poelys', more: 'More work heading', about: 'About me', contact: 'Contact', post: 'The end (resume and games)', footer: 'Footer' };
 const TABS = [['projects', 'Projects'], ['text', 'Page text'], ['stories', 'Stories'], ['notes', 'Notes'], ['ask', 'Ask Pip'], ['news', 'What’s new']];
-const WORLDS = [...BASE, ...LOOP];
+const WORLDS = [...BASE, ...LOOP, ...KITS];
 
 let F, toast, DEMO, data, saved = '', tab = 'projects';
 const open = new Set();
@@ -90,7 +90,7 @@ function storiesTab() {
   `)).join('') + '<div class="adders"><button class="btn sm" type="button" data-cm="add-story">+ Story</button></div>';
 }
 function notesTab() {
-  const worldOpts = [['', 'Surprise me (changes every visit)'], ...WORLDS.map((w) => [w, `${NAMES[w]}${LOOP.includes(w) ? ' (dark)' : ''}`])];
+  const worldOpts = [['', 'Surprise me (changes every visit)'], ...WORLDS.map((w) => [w, `${NAMES[w]}${isDarkWorld(w) ? ' (dark)' : ''}`])];
   return `<p class="legend">Short posts on the website at <b>notes.html</b>, each shown in its own universe. A “Notes” link appears in the site’s menu once one is on. Formatting: <code>## Heading</code>, <code>**bold**</code>, <code>*italic*</code>, <code>[link](https://…)</code>, <code>- list</code>, <code>&gt; quote</code>, <code>\`code\`</code>.</p>`
     + data.notes.map((n, i) => box(`w-${n.id}`, n.title, n.hidden ? 'draft' : `${n.date} · ${readMins(n.body)} min`, `
       <div class="row">${inp(`notes.${i}.title`, n.title, 'Title', 'maxlength="120"')}${inp(`notes.${i}.date`, n.date, 'Date', 'type="date"')}</div>

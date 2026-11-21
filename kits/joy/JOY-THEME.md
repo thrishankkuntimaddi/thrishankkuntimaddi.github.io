@@ -58,17 +58,17 @@ Confetti and sunshine: round corners, bouncy motion, hand-written headings.
 | `--t-faint` | `color-mix(in srgb, #fff4ff 48%, #1d0b36)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #fff4ff 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #fff4ff 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 10%, var(--t-bg))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#fff4ff` | Text inside cards |
 | `--t-accent` | `#ffd166` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#ff5fa2` | Secondary highlight |
 | `--t-accent-3` | `#4fd1b0` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Caveat", cursive` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
+| `--t-display` | `"Bricolage Grotesque", system-ui, sans-serif` | Headings |
+| `--t-sans` | `"Figtree", system-ui, sans-serif` | Body text |
 | `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `24px` | Cards and windows |
-| `--t-r-sm` | `18px` | Buttons, inputs, chips |
+| `--t-r` | `30px` | Cards and windows |
+| `--t-r-sm` | `999px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#1d0b36, #3a1060)` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ Confetti and sunshine: round corners, bouncy motion, hand-written headings.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Figtree:wght@300;400;600&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Caveat", cursive` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Bricolage Grotesque", system-ui, sans-serif` · Body: `"Figtree", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
 
 ## 5. Components
 

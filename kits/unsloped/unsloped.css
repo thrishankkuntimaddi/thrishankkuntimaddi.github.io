@@ -1,0 +1,102 @@
+/* ==========================================================================
+   UNSLOPED — design system (CSS)
+   The red cloth-bound bahi-khata: cream ledger paper, ink actions, one red
+   cloth cover stamped in gold, ledger pages with the red double margin rule,
+   and a ribbon that keeps your page.
+   From Thrishank Kuntimaddi's Expense Tracker app (Look → Unsloped). Free to use.
+
+   Made with the unslop method by Damir Sokolovsky (@heydamir) —
+   https://github.com/heydamir/unslop (CC BY 4.0).
+
+   Stand-alone (it does not need unslop.css). Light by default; dark:
+   <html data-theme="dark"> or class "dark". Fonts: Instrument Sans + Newsreader.
+   Every class is prefixed kh-; .kh-root goes on <body>.
+   ========================================================================== */
+
+/* ---------- Tokens (light: cream ledger paper) ---------- */
+:root {
+  --kh-canvas: #F2ECE0; --kh-surface: #FAF6EE; --kh-sunken: #E9E1D2; --kh-sunken-2: #EFE8DB;
+  --kh-line: rgba(45, 30, 15, .09); --kh-line-2: rgba(45, 30, 15, .17);
+  --kh-ink: #1E1A15; --kh-ink-2: #5A4F42; --kh-ink-3: #7D7062;
+  --kh-pen: #24438F;                 /* the pen: selection, links */
+  --kh-cloth: #7A1D1C; --kh-cloth-2: #65171A;  /* the cover */
+  --kh-gold: #DDB866; --kh-gold-dim: rgba(221, 184, 102, .62);  /* foil */
+  --kh-cream: #F5EAD0;               /* text on the cover */
+  --kh-margin: rgba(176, 38, 34, .5);  /* the red margin rule */
+  --kh-ribbon: #A12A27;
+  --kh-positive: #1E7B45; --kh-negative: #C4362C;
+  --kh-sans: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --kh-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --kh-ease: cubic-bezier(.22, 1, .36, 1);
+  color-scheme: light;
+}
+/* ---------- Tokens (dark: the book by lamplight) ---------- */
+:root[data-theme="dark"], :root.dark {
+  --kh-canvas: #13110E; --kh-surface: #1A1713; --kh-sunken: #27221C; --kh-sunken-2: #201C17;
+  --kh-line: rgba(238, 229, 211, .08); --kh-line-2: rgba(238, 229, 211, .15);
+  --kh-ink: #EEE5D3; --kh-ink-2: #B2A792; --kh-ink-3: #8C8170; --kh-pen: #9DB2EE;
+  --kh-cloth: #6A1918; --kh-cloth-2: #561315; --kh-margin: rgba(214, 92, 80, .42); --kh-ribbon: #C2453E;
+  --kh-positive: #4CC38A; --kh-negative: #E8665C;
+  color-scheme: dark;
+}
+
+/* ---------- Base & type ---------- */
+.kh-root { margin: 0; background: var(--kh-canvas); color: var(--kh-ink); font: 400 15px/1.55 var(--kh-sans); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+.kh-root :focus-visible { outline: 2px solid var(--kh-pen); outline-offset: 2px; border-radius: 4px; }
+.kh-title { font: 500 clamp(30px, 4.6vw, 40px)/1.1 var(--kh-serif); letter-spacing: -.015em; margin: 0; }
+.kh-section { font: 500 18px/1.25 var(--kh-serif); margin: 0; }          /* serif section heads */
+.kh-label { font-size: 13px; font-weight: 500; color: var(--kh-ink-2); }
+.kh-figure { font: 500 clamp(36px, 7vw, 48px)/1.05 var(--kh-serif); letter-spacing: -.02em; font-variant-numeric: lining-nums tabular-nums; }
+.kh-total { display: inline-block; padding-bottom: 4px; border-bottom: 3px double currentColor; }   /* totals only */
+
+/* ---------- The moment: the cover ----------
+   One per screen — the month, the account, the thing that matters. Red cloth over
+   boards, a gold foil frame stamped inside the edge, the spine on the left. */
+.kh-cover {
+  position: relative; overflow: hidden; color: var(--kh-cream);
+  padding: 22px 22px 18px 34px; border-radius: 6px 16px 16px 6px;
+  background: linear-gradient(155deg, rgba(255, 255, 255, .07), rgba(0, 0, 0, .12) 75%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px), var(--kh-cloth);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 2px 3px rgba(20, 10, 5, .18), 0 16px 32px -16px rgba(20, 10, 5, .55);
+}
+.kh-cover::before { content: ""; position: absolute; inset: 9px 9px 9px 23px; border: 3px double var(--kh-gold-dim); border-radius: 4px 10px 10px 4px; pointer-events: none; }
+.kh-cover::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 15px; background: linear-gradient(90deg, rgba(0, 0, 0, .32), rgba(0, 0, 0, .1) 70%, rgba(255, 255, 255, .07)); pointer-events: none; }
+.kh-cover > * { position: relative; z-index: 1; }
+.kh-cover .kh-figure { color: var(--kh-gold); text-shadow: 0 1px 0 rgba(0, 0, 0, .25); }
+.kh-cover .kh-label { color: rgba(245, 234, 208, .72); }
+.kh-cover .kh-meter { background: rgba(0, 0, 0, .22); } .kh-cover .kh-meter > i { background: var(--kh-gold); }
+
+/* ---------- The signature: ledger pages ----------
+   A list on cream paper with the red double margin rule; the category dot sits left of it. */
+.kh-ledger { background-color: var(--kh-surface); border-radius: 4px 14px 14px 4px; box-shadow: 0 0 0 1px var(--kh-line), 0 1px 2px rgba(45, 30, 15, .06); overflow: hidden;
+  background-image: linear-gradient(90deg, transparent 57px, var(--kh-margin) 57px 58px, transparent 58px 60px, var(--kh-margin) 60px 61px, transparent 61px); }
+.kh-entry { position: relative; display: flex; align-items: center; gap: 22px; padding: 12px 14px 12px 16px; }
+.kh-entry + .kh-entry::after { content: ""; position: absolute; top: 0; right: 0; left: 61px; height: 1px; background: var(--kh-line); }
+.kh-entry-mark { position: relative; width: 30px; height: 30px; flex: none; display: grid; place-items: center; color: var(--kh-ink-2); }
+.kh-entry-mark::after { content: ""; position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot, var(--kh-ink-3)); box-shadow: 0 0 0 2px var(--kh-surface); }
+.kh-entry-amount { margin-left: auto; font: 500 18px var(--kh-serif); font-variant-numeric: lining-nums tabular-nums; }
+.kh-day { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 4px 8px; font: 500 18px var(--kh-serif); }
+.kh-day .kh-total { font: 500 13px var(--kh-sans); }
+
+/* Contents page: numbered entries, no boxes, no icons */
+.kh-contents { counter-reset: kh-page; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 20px; }
+.kh-contents > a { counter-increment: kh-page; display: flex; gap: 10px; padding: 12px 2px; color: inherit; text-decoration: none; box-shadow: inset 0 -1px 0 var(--kh-line); }
+.kh-contents > a::before { content: counter(kh-page, decimal-leading-zero); width: 22px; font: 400 15px var(--kh-serif); color: rgba(160, 40, 36, .72); }
+.kh-contents > a:hover { color: var(--kh-pen); }
+
+/* ---------- Controls ---------- */
+.kh-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 0; border-radius: 8px; font: 500 14px var(--kh-sans); cursor: pointer; color: var(--kh-ink); background: transparent; box-shadow: inset 0 0 0 1px var(--kh-line-2); transition: transform 140ms var(--kh-ease); }
+.kh-btn:active { transform: scale(.97); }
+.kh-btn--primary { background: var(--kh-ink); color: var(--kh-surface); box-shadow: none; }   /* actions are written in ink */
+.kh-line-input { width: 100%; border: 0; border-bottom: 1px solid var(--kh-line-2); background: transparent; padding: 10px 0; font: 400 16px var(--kh-sans); color: var(--kh-ink); }   /* written on a line */
+.kh-line-input:focus { outline: none; border-bottom-color: var(--kh-pen); }
+.kh-meter { height: 3px; border-radius: 99px; background: var(--kh-sunken); overflow: hidden; } .kh-meter > i { display: block; height: 100%; width: var(--value, 0%); background: var(--kh-ink); }
+
+/* The ribbon bookmark on the current tab */
+.kh-tabbar { position: fixed; inset: auto 0 0 0; display: flex; justify-content: space-around; padding: 4px 8px calc(4px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--kh-surface) 92%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 var(--kh-line); }
+.kh-tabbar a { position: relative; display: grid; justify-items: center; gap: 2px; padding: 6px 10px; font-size: 11px; color: var(--kh-ink-3); text-decoration: none; }
+.kh-tabbar a[aria-current="page"] { color: var(--kh-ink); font-weight: 500; }
+.kh-tabbar a[aria-current="page"]::before { content: ""; position: absolute; top: -4px; left: 50%; width: 12px; height: 15px; margin-left: -6px; background: var(--kh-ribbon); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%); }
+
+@media (prefers-reduced-motion: reduce) { .kh-root * { transition: none !important; } }

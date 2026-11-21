@@ -56,17 +56,17 @@ Race day: checkered flags, speed stripes and italic numbers.
 | `--t-faint` | `color-mix(in srgb, #f6f8fa 48%, #0d1117)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #f6f8fa 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #f6f8fa 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `var(--t-bg)` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#f6f8fa` | Text inside cards |
 | `--t-accent` | `#ff7a00` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#3df5ff` | Secondary highlight |
 | `--t-accent-3` | `#ffd166` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Space Mono", ui-monospace, monospace` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
+| `--t-display` | `"Unbounded", system-ui, sans-serif` | Headings |
+| `--t-sans` | `"Space Grotesk", system-ui, sans-serif` | Body text |
 | `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `8px` | Cards and windows |
-| `--t-r-sm` | `2px` | Buttons, inputs, chips |
+| `--t-r` | `16px` | Cards and windows |
+| `--t-r-sm` | `999px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#0d1117, #1b2230)` | Full page background (gradient / pattern) |
@@ -78,10 +78,10 @@ Race day: checkered flags, speed stripes and italic numbers.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Space Mono", ui-monospace, monospace` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Unbounded", system-ui, sans-serif` · Body: `"Space Grotesk", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
 
 ## 5. Components
 

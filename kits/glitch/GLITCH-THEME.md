@@ -58,17 +58,17 @@ Corrupted signal: RGB split text, scanlines, flickers. Used sparingly.
 | `--t-faint` | `color-mix(in srgb, #f0fff9 48%, #05050a)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #f0fff9 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #f0fff9 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `var(--t-bg)` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#f0fff9` | Text inside cards |
 | `--t-accent` | `#00ffd5` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#ff2a6d` | Secondary highlight |
 | `--t-accent-3` | `#f5f500` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"VT323", monospace` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
-| `--t-mono` | `"VT323", monospace` | Labels, numbers, code |
+| `--t-display` | `"JetBrains Mono", ui-monospace, monospace` | Headings |
+| `--t-sans` | `"Space Grotesk", system-ui, sans-serif` | Body text |
+| `--t-mono` | `"JetBrains Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `0px` | Cards and windows |
-| `--t-r-sm` | `0px` | Buttons, inputs, chips |
+| `--t-r` | `0` | Cards and windows |
+| `--t-r-sm` | `0` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `repeating-linear-gradient(0deg, #05050a 0 3px, #0b0b14 3px 4px)` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ Corrupted signal: RGB split text, scanlines, flickers. Used sparingly.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"VT323", monospace` · Body: `"Inter", system-ui, sans-serif` · Labels: `"VT323", monospace`
+Display: `"JetBrains Mono", ui-monospace, monospace` · Body: `"Space Grotesk", system-ui, sans-serif` · Labels: `"JetBrains Mono", ui-monospace, monospace`
 
 ## 5. Components
 

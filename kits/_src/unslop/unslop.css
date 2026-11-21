@@ -1,0 +1,112 @@
+/* ==========================================================================
+   UNSLOP — design system (CSS)
+   The household hisaab notebook: paper-warm neutrals, one blue-ink accent,
+   ledger figures set in a serif and closed with an accountant's double rule.
+   From Thrishank Kuntimaddi's Expense Tracker app (Look → Unslop). Free to use.
+
+   Made with the unslop method by Damir Sokolovsky (@heydamir) —
+   https://github.com/heydamir/unslop (CC BY 4.0): one character, one world,
+   quiet chrome, one signature detail.
+
+   Light by default. Dark: <html data-theme="dark"> or class "dark".
+   Fonts: Instrument Sans (interface) + Newsreader (large figures and titles).
+   Every class is prefixed us-; nothing restyles bare elements except
+   .us-root, which you put on <body>.
+   ========================================================================== */
+
+/* ---------- Tokens (light) ---------- */
+:root {
+  --us-canvas: #F7F5F0;      /* page: paper, warm but neutral */
+  --us-surface: #FDFCF9;     /* cards */
+  --us-sunken: #EFEAE1;      /* wells, tracks, active rows */
+  --us-sunken-2: #F3F0E9;    /* inputs */
+  --us-line: rgba(31, 27, 22, .08);   /* the one hairline */
+  --us-line-2: rgba(31, 27, 22, .15);
+  --us-ink: #1F1B16;         /* primary text */
+  --us-ink-2: #5E554A;       /* secondary */
+  --us-ink-3: #7B7266;       /* muted, meta, icons */
+  --us-accent: #2A4BB0;      /* blue ballpoint ink: primary action, selection, the key figure */
+  --us-accent-bg: rgba(42, 75, 176, .08);
+  --us-on-accent: #FFFFFF;
+  --us-positive: #1E7B45;
+  --us-negative: #C4362C;
+  --us-rule: rgba(42, 75, 176, .075); /* notebook ruling, for charts only */
+  --us-shadow: 0 1px 2px rgba(31, 27, 22, .05);
+  --us-float: 0 8px 24px rgba(31, 27, 22, .08), 0 0 0 1px var(--us-line);
+  --us-sans: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --us-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --us-mono: "DM Mono", ui-monospace, Menlo, monospace;
+  --us-r-control: 10px; --us-r-card: 14px; --us-r-sheet: 20px;
+  --us-ease: cubic-bezier(.22, 1, .36, 1);
+  --us-dur-1: 140ms; --us-dur-2: 180ms; --us-dur-3: 320ms;
+  color-scheme: light;
+}
+/* ---------- Tokens (dark: a notebook read by lamplight) ---------- */
+:root[data-theme="dark"], :root.dark {
+  --us-canvas: #161513; --us-surface: #1C1A18; --us-sunken: #282623; --us-sunken-2: #22201D;
+  --us-line: rgba(239, 233, 222, .08); --us-line-2: rgba(239, 233, 222, .15);
+  --us-ink: #EFE9DE; --us-ink-2: #AAA398; --us-ink-3: #8A847A;
+  --us-accent: #93A9F2; --us-accent-bg: rgba(147, 169, 242, .12); --us-on-accent: #161513;
+  --us-positive: #4CC38A; --us-negative: #E8665C; --us-rule: rgba(147, 169, 242, .07);
+  --us-shadow: none; --us-float: 0 12px 32px -12px rgba(0, 0, 0, .7), 0 0 0 1px var(--us-line);
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+.us-root { margin: 0; background: var(--us-canvas); color: var(--us-ink); font: 400 15px/1.55 var(--us-sans); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+.us-root ::selection { background: var(--us-accent-bg); }
+.us-root :focus-visible { outline: 2px solid var(--us-accent); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- Type ---------- */
+.us-title { font: 500 clamp(28px, 4vw, 36px)/1.15 var(--us-serif); letter-spacing: -.01em; margin: 0; }
+.us-h2 { font: 500 22px/1.2 var(--us-serif); margin: 0; }
+.us-label { font-size: 13px; font-weight: 500; color: var(--us-ink-2); }          /* sentence case, never ALL CAPS */
+.us-meta { font-size: 12px; color: var(--us-ink-3); }
+.us-figure { font: 500 clamp(32px, 6vw, 48px)/1.05 var(--us-serif); letter-spacing: -.02em; font-variant-numeric: lining-nums tabular-nums; }
+/* The signature: a total is closed off with the accountant's double rule. Totals only. */
+.us-total { display: inline-block; padding-bottom: 4px; border-bottom: 3px double currentColor; }
+.us-positive { color: var(--us-positive); } .us-negative { color: var(--us-negative); }
+
+/* ---------- Surfaces ---------- */
+.us-card { background: var(--us-surface); border-radius: var(--us-r-card); box-shadow: 0 0 0 1px var(--us-line), var(--us-shadow); padding: 20px; }
+.us-card--ruled { background-image: repeating-linear-gradient(180deg, transparent 0 27px, var(--us-rule) 27px 28px); }
+.us-header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--us-canvas) 88%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 -1px 0 var(--us-line); padding: 16px 20px 12px; }
+.us-sheet { background: var(--us-surface); border-radius: var(--us-r-sheet) var(--us-r-sheet) 0 0; box-shadow: var(--us-float); padding: 20px; }
+.us-dialog { background: var(--us-surface); border-radius: var(--us-r-sheet); box-shadow: var(--us-float); padding: 24px; }
+
+/* Grouped list: one card, inset hairlines, a category shown as a small dot */
+.us-list { background: var(--us-surface); border-radius: var(--us-r-card); box-shadow: 0 0 0 1px var(--us-line), var(--us-shadow); overflow: hidden; }
+.us-row { position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+.us-row + .us-row::after { content: ""; position: absolute; top: 0; right: 0; left: 62px; height: 1px; background: var(--us-line); }
+.us-row:hover { background: color-mix(in srgb, var(--us-surface), var(--us-ink) 3%); }
+.us-tile { position: relative; width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 10px; background: var(--us-sunken); color: var(--us-ink-2); }
+/* the category as a small dot: <span class="us-tile us-tile--dot" style="--dot:#C4362C"> */
+.us-tile--dot::after { content: ""; position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--dot, var(--us-ink-3)); box-shadow: 0 0 0 2px var(--us-surface); }
+.us-row-amount { margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* ---------- Controls ---------- */
+.us-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 0; border-radius: var(--us-r-control); font: 500 14px var(--us-sans); color: var(--us-ink); background: var(--us-surface); box-shadow: 0 0 0 1px var(--us-line-2); cursor: pointer; transition: transform var(--us-dur-1) var(--us-ease), background-color var(--us-dur-2) ease; }
+.us-btn:active { transform: scale(.97); }
+.us-btn--primary { background: var(--us-accent); color: var(--us-on-accent); box-shadow: none; }
+.us-btn--ghost { background: transparent; box-shadow: none; color: var(--us-ink-2); }
+.us-segmented { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--us-r-control); background: var(--us-sunken); }
+.us-segmented > button { border: 0; background: transparent; padding: 7px 12px; border-radius: 7px; font: 500 13px var(--us-sans); color: var(--us-ink-2); cursor: pointer; }
+.us-segmented > button[aria-checked="true"], .us-segmented > button.on { background: var(--us-surface); color: var(--us-ink); box-shadow: 0 1px 2px rgba(31, 27, 22, .08), 0 0 0 1px var(--us-line); }
+.us-input { width: 100%; height: 42px; padding: 0 12px; border: 0; border-radius: var(--us-r-control); background: var(--us-sunken-2); box-shadow: inset 0 0 0 1px var(--us-line); color: var(--us-ink); font: 400 15px var(--us-sans); }
+.us-input:focus { outline: none; box-shadow: inset 0 0 0 1.5px var(--us-accent); }
+.us-switch { width: 44px; height: 26px; border-radius: 99px; border: 0; background: var(--us-line-2); position: relative; cursor: pointer; }
+.us-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .2); transition: transform var(--us-dur-2) var(--us-ease); }
+.us-switch[aria-checked="true"] { background: var(--us-accent); } .us-switch[aria-checked="true"]::after { transform: translateX(18px); }
+.us-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 6px; font-size: 12px; color: var(--us-ink-2); box-shadow: inset 0 0 0 1px var(--us-line-2); }
+
+/* A budget line: a ruled line that fills with ink; amber near the limit, red past it */
+.us-meter { height: 4px; border-radius: 99px; background: var(--us-sunken); overflow: hidden; }
+.us-meter > i { display: block; height: 100%; width: var(--value, 0%); background: var(--us-accent); }
+.us-meter[data-state="near"] > i { background: #9A5B12; } .us-meter[data-state="over"] > i { background: var(--us-negative); }
+
+/* Tab bar: flush; the selection is written in blue ink */
+.us-tabbar { position: fixed; inset: auto 0 0 0; display: flex; justify-content: space-around; padding: 4px 8px calc(4px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--us-surface) 92%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 var(--us-line); }
+.us-tabbar a { display: grid; justify-items: center; gap: 2px; padding: 6px 10px; font-size: 11px; color: var(--us-ink-3); text-decoration: none; }
+.us-tabbar a[aria-current="page"] { color: var(--us-accent); font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) { .us-root * { transition: none !important; } }

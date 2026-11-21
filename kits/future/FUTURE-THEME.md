@@ -58,17 +58,17 @@ Synthwave future: neon magenta and cyan, a glowing grid horizon, monospaced type
 | `--t-faint` | `color-mix(in srgb, #fbeaff 48%, #0d0221)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #fbeaff 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #fbeaff 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 9%, var(--t-bg))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#fbeaff` | Text inside cards |
 | `--t-accent` | `#ff3dd8` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#3df5ff` | Secondary highlight |
 | `--t-accent-3` | `#fff36b` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Space Mono", ui-monospace, monospace` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
-| `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
+| `--t-display` | `"Syne", system-ui, sans-serif` | Headings |
+| `--t-sans` | `"Sora", system-ui, sans-serif` | Body text |
+| `--t-mono` | `"JetBrains Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `4px` | Cards and windows |
-| `--t-r-sm` | `0px` | Buttons, inputs, chips |
+| `--t-r` | `30px` | Cards and windows |
+| `--t-r-sm` | `999px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#0d0221, #2a0845 60%, #120020)` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ Synthwave future: neon magenta and cyan, a glowing grid horizon, monospaced type
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=Sora:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Space Mono", ui-monospace, monospace` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Syne", system-ui, sans-serif` · Body: `"Sora", system-ui, sans-serif` · Labels: `"JetBrains Mono", ui-monospace, monospace`
 
 ## 5. Components
 

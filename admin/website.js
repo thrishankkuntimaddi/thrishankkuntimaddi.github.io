@@ -3,12 +3,12 @@
    Saved to site/config as JSON (public read, owner write).
    ========================================================= */
 import { DEFAULTS, withDefaults, effective } from '../lib/site-config.js?v=3';
-import { BASE, LOOP, NAMES } from '../worlds.js?v=22';
+import { BASE, LOOP, KITS, NAMES, isDarkWorld } from '../worlds.js?v=23';
 import { OCCASIONS } from '../content.js?v=22';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const WORLDS = [...BASE, ...LOOP];
+const WORLDS = [...BASE, ...LOOP, ...KITS];
 const EDITIONS = { morning: 'Coral (morning)', noon: 'Sky (noon)', dusk: 'Lilac (dusk)', night: 'Mint (night)' };
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MOTION = [
@@ -65,9 +65,10 @@ function draw() {
       <label class="f">Colours<select data-p="theme.edition">${edOpts(c.theme.edition)}</select></label>
     </div>
     <div class="row"><label class="f">First universe of a new visit<select data-p="theme.firstWorld">${WORLDS.map((w) => opt(w, NAMES[w], c.theme.firstWorld || 'paper')).join('')}</select></label><span></span></div>
+    <p class="legend">Saved changes reach pages visitors already have open within about 20 seconds — no refresh. Each universe is a whole website: its own fonts, cards, buttons and layout.</p>
     <p class="legend">Universes in the shuffle (none ticked = all ${WORLDS.length}). Paper always stays in.</p>
-    <div class="ws-chips">${WORLDS.map((w) => `<label class="ws-chip${LOOP.includes(w) ? ' dark' : ''}"><input type="checkbox" data-uni="${w}" ${c.theme.universes.includes(w) || w === 'paper' ? 'checked' : ''} ${w === 'paper' ? 'disabled' : ''}><span>${esc(NAMES[w])}</span></label>`).join('')}</div>
-    <div class="adders"><button class="btn sm" type="button" data-ws="uni-all">All</button><button class="btn sm" type="button" data-ws="uni-light">Light only</button><button class="btn sm" type="button" data-ws="uni-dark">Dark only</button></div>
+    <div class="ws-chips">${WORLDS.map((w) => `<label class="ws-chip${isDarkWorld(w) ? ' dark' : ''}"><input type="checkbox" data-uni="${w}" ${c.theme.universes.includes(w) || w === 'paper' ? 'checked' : ''} ${w === 'paper' ? 'disabled' : ''}><span>${esc(NAMES[w])}</span></label>`).join('')}</div>
+    <div class="adders"><button class="btn sm" type="button" data-ws="uni-all">All</button><button class="btn sm" type="button" data-ws="uni-light">Light only</button><button class="btn sm" type="button" data-ws="uni-dark">Dark only</button><button class="btn sm" type="button" data-ws="uni-kits">Signature looks</button></div>
   </div></section>`);
 
   h.push(`<section class="card ws"><h2>Animations <small>visitors can still turn things off for themselves</small></h2><div class="card-body">
@@ -155,6 +156,7 @@ export async function initWebsite(ctx) {
     if (a === 'uni-all') cfg.theme.universes = [];
     else if (a === 'uni-light') cfg.theme.universes = [...BASE];
     else if (a === 'uni-dark') cfg.theme.universes = ['paper', ...LOOP];
+    else if (a === 'uni-kits') cfg.theme.universes = ['paper', ...KITS];
     else if (a === 'tpl') cfg.automations = [...(cfg.automations || []), JSON.parse(JSON.stringify(TEMPLATES[+b.dataset.i]))];
     else if (a === 'auto-add') cfg.automations = [...(cfg.automations || []), { name: 'New automation', do: {} }];
     else if (a === 'auto-del') { if (!confirm('Delete this automation?')) return; cfg.automations.splice(+b.dataset.i, 1); }

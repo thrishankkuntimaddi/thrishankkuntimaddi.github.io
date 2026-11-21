@@ -32,6 +32,14 @@ const GF = {
   Caveat: 'family=Caveat:wght@500;700',
   VT323: 'family=VT323',
   'Press Start 2P': 'family=Press+Start+2P',
+  // the design engine's families (design.css)
+  Unbounded: 'family=Unbounded:wght@400;600;700', Sora: 'family=Sora:wght@300;400;600', 'Space Grotesk': 'family=Space+Grotesk:wght@400;500;700',
+  'JetBrains Mono': 'family=JetBrains+Mono:wght@400;700', Syne: 'family=Syne:wght@700', 'IBM Plex Mono': 'family=IBM+Plex+Mono:wght@400;600',
+  'Archivo Black': 'family=Archivo+Black', 'Bricolage Grotesque': 'family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800',
+  Figtree: 'family=Figtree:wght@300;400;600', Newsreader: 'family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400',
+  'Bebas Neue': 'family=Bebas+Neue', 'DM Sans': 'family=DM+Sans:wght@400;500;700', 'DM Mono': 'family=DM+Mono:wght@400;500',
+  'Playfair Display': 'family=Playfair+Display:ital,wght@0,600;1,600', 'Cormorant Garamond': 'family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500',
+  'Instrument Sans': 'family=Instrument+Sans:wght@400;500;600', 'Instrument Serif': 'family=Instrument+Serif:ital@0;1',
 };
 const famOf = (stack) => (stack.match(/"([^"]+)"/) || [])[1];
 const fontsURL = (stacks) => {
@@ -49,6 +57,27 @@ function tokensOf(id) {
     t[d.slice(0, i).trim().slice(2)] = d.slice(i + 1).trim().replace(/;$/, '');
   });
   return t;
+}
+
+/* ---------------- The design engine's recipes (design.css) ----------------
+   Each designed universe is a block of tokens in design.css. The kit takes the same
+   fonts, card surface, border, shadow, radii, title style and buttons, with the
+   site's token names mapped onto the kit's --t-* names. */
+const design = readFileSync(join(ROOT, 'design.css'), 'utf8');
+const VMAP = { paper: 'bg', 'pg-paper': 'bg', ink: 'ink', 'pg-ink': 'ink', muted: 'muted', faint: 'faint', line: 'line', 'pg-line': 'line',
+  'line-2': 'line-2', 'pg-line-2': 'line-2', tint: 'tint', accent: 'accent', 'accent-2': 'accent-2', 'accent-3': 'accent-3', surface: 'surface',
+  display: 'display', sans: 'sans', mono: 'mono', 'on-accent': 'on-accent', r: 'r', 'r-sm': 'r-sm' };
+const kitVar = (v) => v && v.replace(/var\(--([a-z0-9-]+)/g, (_, n) => `var(--t-${VMAP[n] || n}`);
+function recipeOf(id) {
+  const m = design.match(new RegExp(`^\\[data-world="${id}"\\] \\{([\\s\\S]*?)^\\}`, 'm'));
+  if (!m) return null;
+  const r = {};
+  m[1].replace(/\/\*[\s\S]*?\*\//g, '').split(/;(?![^(]*\))/).forEach((d) => {
+    const i = d.indexOf(':'); if (i < 0) return;
+    const k = d.slice(0, i).trim(); if (!k.startsWith('--')) return;
+    r[k.slice(2)] = d.slice(i + 1).trim().replace(/\s*!important$/, '');
+  });
+  return r;
 }
 
 /* ---------------- Universe definitions ---------------- */
@@ -220,11 +249,14 @@ function tokenSet(id) {
       'base-size': t['base-size'] || '16px', 'base-lh': t['base-lh'] || '1.6', 'page-bg': t.paper,
     };
   }
-  const t = tokensOf(id);
+  const t = tokensOf(id), d = recipeOf(id) || {};
   return {
     bg: t.paper, tint: t.tint, ink: t.ink, muted: t.muted, faint: t.faint, line: t.line, 'line-2': t['line-2'],
-    surface: t.card, 'surface-ink': '#2c3046', accent: t.accent, 'accent-2': t['accent-2'], 'accent-3': t['accent-3'],
-    display: t.display, sans: t.sans, mono: t.mono, hand: t.hand, r: t.r, 'r-sm': t['r-sm'],
+    // designed universes keep their cards dark, in the universe's own ink
+    surface: kitVar(d['c-bg']) || 'color-mix(in srgb, var(--t-bg) 86%, var(--t-ink) 8%)', 'surface-ink': t.ink,
+    accent: t.accent, 'accent-2': t['accent-2'], 'accent-3': t['accent-3'],
+    display: d.display || t.display, sans: d.sans || t.sans, mono: d.mono || t.mono, hand: t.hand,
+    r: d['c-r'] || t.r, 'r-sm': d['b-r'] || t['r-sm'],
     'base-size': '16px', 'base-lh': '1.6', 'page-bg': t['world-bg'],
   };
 }
@@ -256,9 +288,19 @@ const TOKEN_DOC = {
 
 /* ---------------- Stylesheet ---------------- */
 function stylesheet(id) {
-  const u = U[id], t = tokenSet(id);
-  const shadow = u.shadow || (u.light ? '7px 7px 0 var(--t-shadow)' : '0 18px 50px -18px rgba(0, 0, 0, .7)');
-  const border = u.border || '1.5px solid var(--t-line-2)';
+  const u = U[id], t = tokenSet(id), d = u.light ? {} : (recipeOf(id) || {});
+  const shadow = kitVar(d['c-shadow']) || u.shadow || (u.light ? '7px 7px 0 var(--t-shadow)' : '0 18px 50px -18px rgba(0, 0, 0, .7)');
+  const border = kitVar(d['c-border']) || u.border || '1.5px solid var(--t-line-2)';
+  // title and buttons from the recipe (design.css); the template falls back to its defaults
+  const extra = Object.entries({
+    'title-w': d['t-w'], 'title-case': d['t-case'], 'title-track': d['t-track'], 'title-style': d['em-style'],
+    'btn-r': d['b-r'], 'btn-bg': kitVar(d['b-bg']) || (Object.keys(d).length ? 'var(--t-accent)' : ''), 'btn-ink': kitVar(d['b-ink']) || (Object.keys(d).length ? '#0b0b0b' : ''),
+    'btn-shadow': kitVar(d['b-shadow']), 'btn-case': d['b-case'], 'btn2-bg': kitVar(d['b2-bg']) || (Object.keys(d).length ? 'transparent' : ''),
+    'btn2-ink': Object.keys(d).length ? 'var(--t-ink)' : '', 'btn2-border': kitVar(d['b2-border']) || (Object.keys(d).length ? '1px solid var(--t-line-2)' : ''),
+    'chip-bg': Object.keys(d).length ? 'transparent' : '', 'chip-ink': Object.keys(d).length ? 'var(--t-ink)' : '',
+    'input-bg': Object.keys(d).length ? 'color-mix(in srgb, var(--t-bg) 70%, var(--t-ink) 6%)' : '', 'input-ink': Object.keys(d).length ? 'var(--t-ink)' : '',
+    'window-bg': Object.keys(d).length ? 'var(--t-surface)' : '',
+  }).filter(([, v]) => v).map(([k, v]) => `  --t-${k}: ${v};`).join('\n');
   const pageBg = u.bg || (u.bgExtra ? `${u.bgExtra}, ${t['page-bg']}` : t['page-bg']);
   const fonts = fontsURL([t.display, t.sans, t.mono, t.hand]);
   const editions = u.light && !u.tokens.ink ? Object.entries(EDITIONS).map(([e, v]) => `[data-edition="${e}"] { --t-bg: ${v.paper}; --t-tint: ${v.tint}; --t-accent: ${v.accent}; --t-accent-2: ${v['accent-2']}; --t-accent-3: ${v['accent-3']}; }`).join('\n') : '';
@@ -282,6 +324,7 @@ ${Object.entries(t).map(([k, v]) => `  --t-${k}: ${v};`).join('\n')}
   --t-ease: cubic-bezier(.2, .7, .2, 1);
   --t-spring: cubic-bezier(.34, 1.56, .64, 1);
   --t-wrap: 1160px;
+${extra}
   color-scheme: ${u.light ? 'light' : 'dark'};
 }
 ${editions ? `\n/* Colour editions: <html data-edition="morning|noon|dusk|night"> */\n${editions}\n` : ''}
@@ -298,9 +341,9 @@ ${editions ? `\n/* Colour editions: <html data-edition="morning|noon|dusk|night"
 
 /* ---------- Type ---------- */
 .t-eyebrow { font-family: var(--t-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--t-muted); }
-.t-title { margin: 0; font-family: var(--t-display); font-weight: 600; font-size: clamp(38px, 5vw, 72px); line-height: 1.04; letter-spacing: -.02em; }
-.t-title em, .t-h2 em { font-style: italic; color: var(--t-accent-deep); }
-.t-h2 { margin: 0; font-family: var(--t-display); font-weight: 600; font-size: clamp(28px, 3.6vw, 48px); line-height: 1.1; letter-spacing: -.015em; }
+.t-title { margin: 0; font-family: var(--t-display); font-weight: var(--t-title-w, 600); text-transform: var(--t-title-case, none); font-size: clamp(38px, 5vw, 72px); line-height: 1.04; letter-spacing: var(--t-title-track, -.02em); }
+.t-title em, .t-h2 em { font-style: var(--t-title-style, italic); color: var(--t-accent-deep); }
+.t-h2 { margin: 0; font-family: var(--t-display); font-weight: var(--t-title-w, 600); text-transform: var(--t-title-case, none); font-size: clamp(28px, 3.6vw, 48px); line-height: 1.1; letter-spacing: var(--t-title-track, -.015em); }
 .t-lede { font-size: 1.12em; color: var(--t-muted); max-width: 60ch; }
 .t-muted { color: var(--t-muted); }
 
@@ -311,7 +354,7 @@ ${editions ? `\n/* Colour editions: <html data-edition="morning|noon|dusk|night"
   padding: clamp(20px, 3vw, 32px); transition: transform .35s var(--t-ease), box-shadow .35s var(--t-ease);
 }
 .t-card .t-muted, .t-card .t-lede { color: color-mix(in srgb, var(--t-surface-ink) 70%, transparent); }
-.t-window { overflow: hidden; background: #fff; color: var(--t-surface-ink); border: var(--t-border); border-radius: var(--t-r); box-shadow: var(--t-card-shadow); }
+.t-window { overflow: hidden; background: var(--t-window-bg, #fff); color: var(--t-surface-ink); border: var(--t-border); border-radius: var(--t-r); box-shadow: var(--t-card-shadow); }
 .t-window-bar { display: flex; gap: 6px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--t-line-2); font-family: var(--t-mono); font-size: 12px; }
 .t-window-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--t-accent); } .t-window-bar i + i { background: var(--t-accent-3); } .t-window-bar i + i + i { background: var(--t-accent-2); }
 .t-nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px clamp(16px, 4vw, 40px); background: color-mix(in srgb, var(--t-bg) 82%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--t-line); }
@@ -319,18 +362,18 @@ ${editions ? `\n/* Colour editions: <html data-edition="morning|noon|dusk|night"
 /* ---------- Controls ---------- */
 .t-btn {
   position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 46px; padding: 0 22px; border: var(--t-border); border-radius: ${t.r === '0px' ? '0' : '999px'};
-  background: #fff; color: #1b1d2a; font: 600 15px/1 var(--t-sans); cursor: pointer; text-decoration: none; white-space: nowrap;
+  min-height: 46px; padding: 0 22px; border: var(--t-btn2-border, var(--t-border)); border-radius: var(--t-btn-r, ${t.r === '0px' ? '0' : '999px'});
+  background: var(--t-btn2-bg, #fff); color: var(--t-btn2-ink, #1b1d2a); font: 600 15px/1 var(--t-sans); text-transform: var(--t-btn-case, none); cursor: pointer; text-decoration: none; white-space: nowrap;
   transition: transform .3s var(--t-spring), box-shadow .3s var(--t-ease), background .2s;
 }
 .t-btn:hover { transform: translateY(-2px); }
 .t-btn:active { transform: translateY(1px) scale(.98); }
-.t-btn--primary { background: var(--t-accent); color: #1b1d2a; border-color: color-mix(in srgb, var(--t-accent) 60%, var(--t-ink)); }
+.t-btn--primary { background: var(--t-btn-bg, var(--t-accent)); color: var(--t-btn-ink, #1b1d2a); border-color: color-mix(in srgb, var(--t-accent) 60%, var(--t-ink)); box-shadow: var(--t-btn-shadow, none); }
 .t-btn--ghost { background: transparent; color: inherit; border-color: transparent; }
 .t-btn--ghost:hover { background: var(--t-tint); color: #1b1d2a; }
-.t-input { width: 100%; min-height: 44px; padding: 10px 14px; border: var(--t-border); border-radius: var(--t-r-sm); background: #fff; color: #1b1d2a; font: 400 15px/1.4 var(--t-sans); box-sizing: border-box; }
+.t-input { width: 100%; min-height: 44px; padding: 10px 14px; border: var(--t-border); border-radius: var(--t-r-sm); background: var(--t-input-bg, #fff); color: var(--t-input-ink, #1b1d2a); font: 400 15px/1.4 var(--t-sans); box-sizing: border-box; }
 .t-input:focus { outline: none; border-color: var(--t-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--t-accent) 25%, transparent); }
-.t-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--t-line-2); border-radius: ${t['r-sm'] === '0px' ? '0' : '999px'}; background: var(--t-tint); color: #1b1d2a; font: 500 13px/1.2 var(--t-mono); }
+.t-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--t-line-2); border-radius: ${t['r-sm'] === '0px' ? '0' : '999px'}; background: var(--t-chip-bg, var(--t-tint)); color: var(--t-chip-ink, #1b1d2a); font: 500 13px/1.2 var(--t-mono); }
 
 /* ---------- Overlays ---------- */
 .t-dialog { border: var(--t-border); border-radius: var(--t-r); padding: 0; background: var(--t-surface); color: var(--t-surface-ink); box-shadow: var(--t-card-shadow); max-width: min(640px, 94vw); }
@@ -510,7 +553,7 @@ if (existsSync(SRC)) {
     manifest.unshift({ id, ...info });
   });
 }
-const order = ['liquid-glass', 'monolith-gloss'];
+const order = ['liquid-glass', 'monolith-gloss', 'unslop', 'unsloped'];
 manifest.sort((a, b) => (order.indexOf(b.id) + 1 || 0) - (order.indexOf(a.id) + 1 || 0) || 0);
 manifest.sort((a, b) => { const ia = order.indexOf(a.id), ib = order.indexOf(b.id); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
 writeFileSync(join(OUT, 'kits.json'), JSON.stringify({ updated: new Date().toISOString().slice(0, 10), kits: manifest }, null, 1));

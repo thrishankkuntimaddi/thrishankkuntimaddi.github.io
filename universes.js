@@ -5,7 +5,7 @@
    index.html, main.js and chapter.js read on load.
    ========================================================= */
 import { OCCASIONS } from './content.js?v=22';
-import { LOOP, NAMES, COPY } from './worlds.js?v=22';
+import { LOOP, KITS, NAMES, COPY, isDarkWorld, isDesigned } from './worlds.js?v=23';
 import { U as LOOP_SCENES } from './infinity.js?v=22';
 import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=23';
 
@@ -62,8 +62,29 @@ const WORLDS = [
   { id: 'blueprint', name: 'Blueprint', fonts: 'Space Mono, ink blue', about: 'Engineering drawings: thin blue lines, figures and specs.', h: 'I engineer <em>interfaces</em> to spec, then make them human.', cta: 'Open the drawings' },
   { id: 'news', name: 'Newsprint', fonts: 'Georgia, Space Mono', about: 'A broadsheet: double rules, headlines and small caps.', h: 'Developer builds <em>interfaces</em> people actually enjoy using.', cta: 'Read the full story' },
 ];
-// The 22 universes from the endless loop: dark pages with their scene behind them.
-LOOP.forEach((id) => WORLDS.push({ id, name: NAMES[id], dark: true, fonts: 'A dark page, with its scene drawn behind it', about: LOOP_SCENES[id]?.tag || '', h: `${COPY[id].h2} ${COPY[id].h3}`, cta: COPY[id].cta }));
+// The 22 universes from the endless loop: dark pages with their scene behind them, each a whole
+// website of its own (design.css): its own fonts, cards, buttons and layout.
+const DESIGN_FONTS = {
+  core: 'Unbounded, Sora · centred, glass', space: 'Space Grotesk, JetBrains Mono · HUD hairlines', future: 'Syne, Sora · huge type, soft slabs',
+  robots: 'IBM Plex Mono · hard steel edges', rage: 'Archivo Black · poster, thick borders', joy: 'Bricolage Grotesque, Figtree · round and bouncy',
+  sad: 'Newsreader, Figtree · quiet serif, lots of air', retro: 'Press Start 2P · double borders', music: 'Bebas Neue, DM Sans · gig poster, mirrored',
+  paint: 'Playfair Display · thick uneven edges', box: 'Unbounded, IBM Plex Mono · isometric boxes', village: 'Cormorant Garamond · double rules, centred',
+  city: 'Instrument Sans, JetBrains Mono · strict grid', sky: 'Figtree Light · floating glass', water: 'Sora Light · drifting glass, slow',
+  fire: 'Archivo Black, DM Sans · ember edges', ice: 'Instrument Serif, Instrument Sans · thin bright edges', brick: 'Bricolage Grotesque · studded slabs',
+  racer: 'Unbounded, Space Grotesk · chequered stripe', noir: 'Cormorant Garamond, IBM Plex Mono · rules, not boxes', glitch: 'JetBrains Mono · split-channel edges',
+  mars: 'Space Grotesk, DM Mono · rust markers',
+  liquid: 'SF Pro / Inter · frosted glass, capsules', monolith: 'Inter · near-black slabs, one gold button',
+  unslop: 'Newsreader, Instrument Sans · blue ink, double rule', unsloped: 'Newsreader, Instrument Sans · red khata cover, ledger pages',
+};
+LOOP.forEach((id) => WORLDS.push({ id, name: NAMES[id], dark: true, fonts: DESIGN_FONTS[id], about: LOOP_SCENES[id]?.tag || '', h: `${COPY[id].h2} ${COPY[id].h3}`, cta: COPY[id].cta }));
+// The four signature looks, also whole-site universes (and free kits below)
+const KIT_ABOUT = {
+  liquid: 'Apple-style Liquid Glass: colourless frosted panes, lit bevels, capsule buttons.',
+  monolith: 'Calm, premium: near-black slabs, 3px corners, one gold button with a specular top light.',
+  unslop: 'The household hisaab notebook: paper, blue ink, totals closed with a double rule.',
+  unsloped: 'The red cloth bahi-khata: a gold-stamped cover, cream ledger pages with the red margin.',
+};
+KITS.forEach((id) => WORLDS.push({ id, name: NAMES[id], dark: isDarkWorld(id), kit: true, fonts: DESIGN_FONTS[id], about: KIT_ABOUT[id], h: `${COPY[id].h2} ${COPY[id].h3}`, cta: COPY[id].cta }));
 const EDITIONS = [
   { id: 'morning', name: 'Coral', when: '5 am – 11 am' },
   { id: 'noon', name: 'Sky', when: '11 am – 5 pm' },
@@ -75,7 +96,7 @@ function drawUniverses() {
   $('#uniGrid').innerHTML = WORLDS.map((w) => {
     const pinned = prefs.world === w.id;
     return `<article class="uni${pinned ? ' pinned' : ''}">`
-      + `<div class="mini-site${w.id === 'sketch' ? ' sketch' : ''}" data-world="${w.id}" data-edition="${previewEd}"${w.dark ? ' data-dark data-loop' : ''} aria-hidden="true">`
+      + `<div class="mini-site${w.id === 'sketch' ? ' sketch' : ''}" data-world="${w.id}" data-edition="${previewEd}"${w.dark ? ` data-dark${w.kit ? '' : ' data-loop'}` : ''}${isDesigned(w.id) ? ' data-design' : ''} aria-hidden="true">`
       + '<div class="ms-nav"><span class="brand-mark">TK</span><i></i><i></i><i></i></div>'
       + `<p class="edition-tag"><span class="dot"></span> ${w.name} universe</p>`
       + `<p class="ms-title">${w.h}</p>`

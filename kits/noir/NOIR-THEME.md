@@ -58,17 +58,17 @@ A 1940s detective film: black and white, venetian-blind light, serif type.
 | `--t-faint` | `color-mix(in srgb, #f2f2f2 48%, #0b0b0b)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #f2f2f2 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #f2f2f2 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `transparent` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#f2f2f2` | Text inside cards |
 | `--t-accent` | `#d9d9d9` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#9a9a9a` | Secondary highlight |
 | `--t-accent-3` | `#ffffff` | Third highlight: stickers, marks, selection |
-| `--t-display` | `Georgia, "Times New Roman", serif` | Headings |
-| `--t-sans` | `Georgia, "Times New Roman", serif` | Body text |
-| `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
+| `--t-display` | `"Cormorant Garamond", Georgia, serif` | Headings |
+| `--t-sans` | `"IBM Plex Mono", ui-monospace, monospace` | Body text |
+| `--t-mono` | `"IBM Plex Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `2px` | Cards and windows |
-| `--t-r-sm` | `0px` | Buttons, inputs, chips |
+| `--t-r` | `0` | Cards and windows |
+| `--t-r-sm` | `0` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#141414, #050505)` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ A 1940s detective film: black and white, venetian-blind light, serif type.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;600&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `Georgia, "Times New Roman", serif` · Body: `Georgia, "Times New Roman", serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Cormorant Garamond", Georgia, serif` · Body: `"IBM Plex Mono", ui-monospace, monospace` · Labels: `"IBM Plex Mono", ui-monospace, monospace`
 
 ## 5. Components
 

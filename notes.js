@@ -9,7 +9,7 @@
    ========================================================= */
 import { readPublic } from './lib/firebase.js?v=2';
 import { md, esc, readMins, plainText } from './lib/md.js?v=1';
-import { ALL, NAMES, isLoopWorld } from './worlds.js?v=22';
+import { ALL, NAMES, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=23';
 import { setWorldBg } from './worldbg.js?v=22';
 
 const $ = (s) => document.querySelector(s);
@@ -26,7 +26,7 @@ let notes = [];
 function setWorld(w) {
   root.dataset.world = w;
   root.classList.toggle('sketch', w === 'sketch');
-  root.toggleAttribute('data-dark', isLoopWorld(w));
+  root.toggleAttribute('data-dark', isDarkWorld(w)); root.toggleAttribute('data-design', isDesigned(w));
   root.toggleAttribute('data-loop', isLoopWorld(w));
   setWorldBg(w, calm());
 }

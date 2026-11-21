@@ -1,0 +1,45 @@
+Category,Token_Name,Variant_Mode,Exact_Value
+Theme_Surface,us-canvas,Light,#F7F5F0
+Theme_Surface,us-canvas,Dark,#161513
+Theme_Surface,us-surface,Light,#FDFCF9
+Theme_Surface,us-surface,Dark,#1C1A18
+Theme_Surface,us-sunken,Light,#EFEAE1
+Theme_Surface,us-sunken,Dark,#282623
+Theme_Surface,us-sunken-2,Light,#F3F0E9
+Theme_Surface,us-sunken-2,Dark,#22201D
+Theme_Line,us-line,Light,"rgba(31, 27, 22, .08)"
+Theme_Line,us-line,Dark,"rgba(239, 233, 222, .08)"
+Theme_Line,us-line-2,Light,"rgba(31, 27, 22, .15)"
+Theme_Line,us-line-2,Dark,"rgba(239, 233, 222, .15)"
+Theme_Text,us-ink,Light,#1F1B16
+Theme_Text,us-ink,Dark,#EFE9DE
+Theme_Text,us-ink-2,Light,#5E554A
+Theme_Text,us-ink-2,Dark,#AAA398
+Theme_Text,us-ink-3,Light,#7B7266
+Theme_Text,us-ink-3,Dark,#8A847A
+Theme_Accent,us-accent,Light,#2A4BB0
+Theme_Accent,us-accent,Dark,#93A9F2
+Theme_Accent,us-accent-bg,Light,"rgba(42, 75, 176, .08)"
+Theme_Accent,us-accent-bg,Dark,"rgba(147, 169, 242, .12)"
+Theme_Text,us-on-accent,Light,#FFFFFF
+Theme_Text,us-on-accent,Dark,#161513
+Theme_Accent,us-positive,Light,#1E7B45
+Theme_Accent,us-positive,Dark,#4CC38A
+Theme_Accent,us-negative,Light,#C4362C
+Theme_Accent,us-negative,Dark,#E8665C
+Theme_Line,us-rule,Light,"rgba(42, 75, 176, .075)"
+Theme_Line,us-rule,Dark,"rgba(147, 169, 242, .07)"
+Shape_Depth,us-shadow,Light,"0 1px 2px rgba(31, 27, 22, .05)"
+Shape_Depth,us-shadow,Dark,none
+Shape_Depth,us-float,Light,"0 8px 24px rgba(31, 27, 22, .08), 0 0 0 1px var(--us-line)"
+Shape_Depth,us-float,Dark,"0 12px 32px -12px rgba(0, 0, 0, .7), 0 0 0 1px var(--us-line)"
+Type,us-sans,Light,"""Instrument Sans"", -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, system-ui, sans-serif"
+Type,us-serif,Light,"""Newsreader"", ""Iowan Old Style"", Georgia, serif"
+Type,us-mono,Light,"""DM Mono"", ui-monospace, Menlo, monospace"
+Shape_Depth,us-r-control,Light,10px
+Shape_Depth,us-r-card,Light,14px
+Shape_Depth,us-r-sheet,Light,20px
+Motion,us-ease,Light,"cubic-bezier(.22, 1, .36, 1)"
+Motion,us-dur-1,Light,140ms
+Motion,us-dur-2,Light,180ms
+Motion,us-dur-3,Light,320ms

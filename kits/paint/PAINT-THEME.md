@@ -58,17 +58,17 @@ An artist’s studio at night: bold strokes, splatters and hand lettering.
 | `--t-faint` | `color-mix(in srgb, #fff6ee 48%, #141014)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #fff6ee 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #fff6ee 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 6%, var(--t-bg))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#fff6ee` | Text inside cards |
 | `--t-accent` | `#ff8a65` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#6bb6ff` | Secondary highlight |
 | `--t-accent-3` | `#ffd166` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Caveat", cursive` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
+| `--t-display` | `"Playfair Display", Georgia, serif` | Headings |
+| `--t-sans` | `"DM Sans", system-ui, sans-serif` | Body text |
 | `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `24px` | Cards and windows |
-| `--t-r-sm` | `18px` | Buttons, inputs, chips |
+| `--t-r` | `26px 10px 30px 12px` | Cards and windows |
+| `--t-r-sm` | `18px 8px 20px 8px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(135deg, #141014, #241a24)` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ An artist’s studio at night: bold strokes, splatters and hand lettering.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Caveat", cursive` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Playfair Display", Georgia, serif` · Body: `"DM Sans", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
 
 ## 5. Components
 

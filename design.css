@@ -1,0 +1,481 @@
+/* =========================================================
+   DESIGN ENGINE — every universe a whole website, not a backdrop.
+
+   Paper, Pixel, Sketch, Blueprint and Newsprint already restyle
+   the page in style.css and stay exactly as they are. This file
+   gives the other 26 — the 22 loop universes and the four signature
+   looks (Liquid Glass, Monolith Gloss, Unslop, Unsloped) — a design
+   of their own: fonts, card and button shapes, hero and project
+   layout, section headers, type scale, spacing, motion and colour.
+
+   How it works
+   • <html data-design> marks a designed universe (set before first
+     paint in index.html, and by setWorld() in main.js).
+   • The components below read a small set of design tokens
+     (--t-*, --c-*, --b-*, --hero-*, …). Each universe is just a
+     recipe: a block of token values at the end of this file.
+   • In dark universes cards, buttons and chips are dark too (style.css
+     used to keep them light paper). App previews (.window, .mock)
+     and the photo stay light: they are screens and prints.
+
+   Directions follow the unslop method by Damir Sokolovsky
+   (github.com/heydamir/unslop, CC BY 4.0): each recipe has one
+   character, one world, a quiet chrome and one signature detail.
+   ========================================================= */
+
+/* ---------- Engine defaults ----------
+   :where() gives this block no weight, so every recipe below overrides it. */
+:where([data-design]) {   /* the page root, or a preview (universes.html) */
+  /* the page's own tokens, kept under other names so components can use them */
+  --pg-ink: var(--ink); --pg-muted: var(--muted); --pg-faint: var(--faint);
+  --pg-line: var(--line); --pg-line-2: var(--line-2); --pg-paper: var(--paper);
+
+  --surface: color-mix(in srgb, var(--paper) 86%, var(--ink) 8%);
+  --on-accent: #0b0b0b;
+
+  --t-font: var(--display); --t-w: 500; --t-case: none; --t-track: -0.02em; --t-lh: 1.06; --t-scale: 1; --h-scale: 1;
+  --em-style: normal; --em-color: var(--accent); --em-bg: none; --em-deco: none;
+
+  --c-bg: var(--surface); --c-border: 1px solid var(--line); --c-r: var(--r); --c-shadow: none; --c-blur: none;
+  --c-hover: translateY(-2px); --c-hover-shadow: var(--c-shadow);
+
+  --b-h: 48px; --b-r: var(--r-sm); --b-font: var(--sans); --b-w: 600; --b-case: none; --b-track: 0; --b-size: 15px;
+  --b-bg: var(--accent); --b-ink: var(--on-accent); --b-border: 1px solid transparent; --b-shadow: none; --b-hover: translateY(-1px);
+  --b2-bg: transparent; --b2-ink: var(--ink); --b2-border: 1px solid var(--line-2); --b2-shadow: none; --b2-deco: none;
+
+  --chip-bg: transparent; --chip-r: 6px;
+  --num-display: grid; --num-r: 50%; --num-bg: transparent; --num-border: 1px solid var(--line-2); --num-ink: var(--ink);
+  --head-rule: 1px solid var(--line); --head-align: start;
+
+  --hero-cols: 1.08fr .92fr; --hero-areas: "copy visual"; --hero-align: left; --hero-vis: 100%;
+  --proj-cols: 1fr 1fr;
+  --section-pad: clamp(70px, 11vh, 130px); --wrap: 1160px;
+  --dur: .25s; --ease-d: cubic-bezier(.22, 1, .36, 1); --tilt-k: 1; --grain: .3; --scene: .62;
+  --nav-font: var(--mono); --nav-case: none; --nav-track: 0;
+  --ticker-bg: var(--surface); --ticker-rot: -1.2deg;
+}
+
+/* Dark universes: components take the page's dark tokens (style.css kept them light paper) */
+[data-design] :is(.card, .btn, .chips li, .edition-tag, .mini-tag, .ticker, .tour, .jump, .sticker, .brand-mark, .menu-btn,
+  .sec-num, .skip, .stk, .ask-chip, .switch, .plaque, .welcome, dialog, .fall-inner, .orbit-label) {
+  --ink: var(--pg-ink); --muted: var(--pg-muted); --faint: var(--pg-faint);
+  --line: var(--pg-line); --line-2: var(--pg-line-2); --paper: var(--pg-paper);
+  color-scheme: inherit; color: var(--ink);
+}
+[data-design][data-dark] :is(.hero-title, .hero-sub, .sec-head, .post-title, .facts) { text-shadow: none; }
+
+/* The scene window in dark universes: the universe's own dark glass, not a light frosted box.
+   The coded app preview inside (.mock) stays light — it is a screen. */
+[data-design][data-dark] .window {
+  --ink: var(--pg-ink); --muted: var(--pg-muted); --line: var(--pg-line); --line-2: var(--pg-line-2);
+  background: color-mix(in srgb, var(--pg-paper) 45%, transparent);
+  border: var(--c-border); border-radius: max(var(--c-r), 6px);
+  box-shadow: var(--c-shadow), 0 30px 60px -30px rgba(0, 0, 0, .6);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color-scheme: dark;
+}
+[data-design][data-dark] .window::after { display: none; }
+[data-design][data-dark] .window :is(.win-bar, .win-foot) { background: color-mix(in srgb, var(--pg-paper) 82%, transparent); border-color: var(--pg-line); color: var(--pg-muted); }
+[data-design][data-dark] .window .win-foot b { color: var(--pg-ink); }
+[data-design][data-dark] .win-tag { background: var(--surface); color: var(--pg-ink); border-color: var(--pg-line); }
+
+/* ---------- Page ---------- */
+[data-design] body { font-family: var(--sans); }
+[data-design] .wrap { max-width: var(--wrap); }
+[data-design] .grain { opacity: var(--grain); }
+[data-design] .world-bg { opacity: var(--scene); }
+[data-design] .section { padding: var(--section-pad) 0; }
+[data-design] .nav { background: color-mix(in srgb, var(--paper) 86%, transparent); }
+[data-design] .nav-links a:not(.btn) { font-family: var(--nav-font); text-transform: var(--nav-case); letter-spacing: var(--nav-track); }
+[data-design] .nav-links a:not(.btn):hover { background: var(--surface); color: var(--ink); }
+[data-design] .menu-btn { background: var(--surface); border-color: var(--line-2); color: var(--ink); box-shadow: none; }
+[data-design] .brand-mark { background: var(--surface); box-shadow: none; border: 1px solid var(--line-2); border-radius: var(--b-r); }
+[data-design] :is(.edition-tag, .chips li, .mini-tag) { background: var(--chip-bg); border: 1px solid var(--line); border-radius: var(--chip-r); }
+[data-design] .ticker { background: var(--ticker-bg); transform: rotate(var(--ticker-rot)); box-shadow: none; border-block: 1px solid var(--line-2); }
+[data-design] .ticker-b { transform: rotate(calc(var(--ticker-rot) * -.8)); }
+[data-design] .sticker { background: var(--accent-3); color: var(--on-accent); box-shadow: none; }
+[data-design] .stamp { background: var(--surface); }
+
+/* ---------- Type ---------- */
+[data-design] :is(.hero-title, .ms-title, .sec-head h2, .contact-card h2, .project-card h3, .poelys-big, .facts b, .mini h3, .post-title) {
+  font-family: var(--t-font); font-weight: var(--t-w); text-transform: var(--t-case); letter-spacing: var(--t-track);
+}
+[data-design] .hero-title { font-size: calc(clamp(32px, 4.1vw, 58px) * var(--t-scale)); line-height: var(--t-lh); }
+[data-design] :is(.sec-head h2, .contact-card h2) { font-size: calc(clamp(34px, 4.6vw, 60px) * var(--h-scale)); line-height: 1.02; }
+[data-design] .project-card h3 { font-size: calc(clamp(30px, 3.4vw, 44px) * var(--h-scale)); }
+[data-design] :is(.hero-title, .ms-title) em { font-style: var(--em-style); color: var(--em-color); background: var(--em-bg); text-decoration: var(--em-deco); text-underline-offset: .12em; text-decoration-thickness: .06em; }
+
+/* ---------- Cards ---------- */
+[data-design] .card {
+  background: var(--c-bg); border: var(--c-border); border-radius: var(--c-r); box-shadow: var(--c-shadow);
+  backdrop-filter: var(--c-blur); -webkit-backdrop-filter: var(--c-blur);
+  transition: transform var(--dur) var(--ease-d), box-shadow var(--dur) var(--ease-d), border-color var(--dur) var(--ease-d);
+}
+[data-design] :is(a.card, .project-card):hover { transform: var(--c-hover); box-shadow: var(--c-hover-shadow); }
+[data-design] .contact-card { background: var(--c-bg); }
+[data-design] .mini { transform: rotate(calc(var(--tilt, 0deg) * var(--tilt-k))); }
+[data-design] .mini-self { background: color-mix(in srgb, var(--accent) 8%, var(--c-bg)); }
+
+/* ---------- Buttons ---------- */
+[data-design] .btn {
+  height: var(--b-h); border-radius: var(--b-r); font-family: var(--b-font); font-weight: var(--b-w); font-size: var(--b-size);
+  text-transform: var(--b-case); letter-spacing: var(--b-track);
+  transition: transform var(--dur) var(--ease-d), box-shadow var(--dur) var(--ease-d), background-color var(--dur) var(--ease-d);
+}
+/* .btn.btn-… outweighs the dark-component rules (their lists include .chips li) */
+[data-design] .btn.btn-gloss { background: var(--b-bg); color: var(--b-ink); border: var(--b-border); box-shadow: var(--b-shadow); }
+[data-design] .btn-gloss::before { display: none; }
+[data-design] .btn.btn-paper { background: var(--b2-bg); color: var(--b2-ink); border: var(--b2-border); box-shadow: var(--b2-shadow); text-decoration: var(--b2-deco); text-underline-offset: 5px; }
+[data-design] .btn:hover { transform: var(--b-hover); box-shadow: var(--b-shadow); }
+[data-design] .btn.btn-paper:hover { box-shadow: var(--b2-shadow); background: color-mix(in srgb, var(--ink) 6%, var(--b2-bg)); }
+[data-design] .btn:active { transform: scale(.97); }
+
+/* ---------- Section headers ---------- */
+[data-design] .sec-head { border-bottom: var(--head-rule); justify-items: var(--head-align); grid-template-columns: var(--head-cols, auto 1fr); }
+[data-design] .sec-num {
+  display: var(--num-display); border-radius: var(--num-r); background: var(--num-bg); border: var(--num-border); color: var(--num-ink);
+  box-shadow: none; font-family: var(--mono);
+}
+[data-design] .facts { border-top: var(--head-rule); }
+
+/* ---------- Layout (desktop; phones stay one column) ---------- */
+@media (min-width: 981px) {
+  [data-design] .hero-grid { grid-template-columns: var(--hero-cols); grid-template-areas: var(--hero-areas); text-align: var(--hero-align); }
+  [data-design] .hero-copy { grid-area: copy; }
+  [data-design] .hero-visual { grid-area: visual; width: var(--hero-vis); justify-self: center; }
+  [data-design] .hero-actions, [data-design] .facts { justify-content: var(--hero-justify, start); }
+  [data-design] .hero-sub { margin-inline: var(--hero-sub-m, 0); }
+  [data-design] .project { grid-template-columns: var(--proj-cols); }
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-design] :is(.card, .btn) { transition: none; }
+  [data-design] :is(a.card, .project-card, .btn):hover { transform: none; }
+}
+
+/* =========================================================
+   RECIPES — one block per universe
+   ========================================================= */
+
+/* The Core · luminous, central, exact — gold light at the centre of a glass lattice */
+[data-world="core"] {
+  --display: "Unbounded", system-ui, sans-serif; --sans: "Sora", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --t-w: 400; --t-track: -0.03em; --t-scale: .92; --t-lh: 1.08;
+  --c-bg: rgba(255, 255, 255, .035); --c-border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent); --c-r: 18px;
+  --c-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); --c-blur: blur(14px);
+  --b-r: 999px; --b-ink: #1a1205; --b2-border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  --chip-r: 999px; --num-display: none; --head-cols: 1fr; --head-rule: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  --hero-cols: 1fr; --hero-areas: "copy" "visual"; --hero-align: center; --hero-justify: center; --hero-sub-m: auto; --hero-vis: min(560px, 100%);
+  --section-pad: clamp(90px, 14vh, 160px); --scene: .7;
+}
+
+/* Deep space · mission control: calm, technical, exact — HUD hairlines, square corners */
+[data-world="space"] {
+  --display: "Space Grotesk", system-ui, sans-serif; --sans: "Space Grotesk", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --t-w: 500; --t-track: -0.035em;
+  --c-bg: color-mix(in srgb, var(--accent) 5%, var(--paper)); --c-border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent); --c-r: 2px;
+  --c-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 6%, transparent);
+  --b-r: 2px; --b-font: var(--mono); --b-size: 13.5px; --b-w: 500; --b-ink: #120d24; --b-h: 46px;
+  --chip-r: 2px; --num-r: 2px; --head-rule: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  --proj-cols: .95fr 1.05fr; --ticker-rot: 0deg;
+}
+
+/* Year 3000 · bold, smooth, confident — big type, soft slabs, magenta light */
+[data-world="future"] {
+  --display: "Syne", system-ui, sans-serif; --sans: "Sora", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --t-w: 700; --t-track: -0.04em; --t-scale: 1.3; --t-lh: .96; --h-scale: 1.3;
+  --c-bg: color-mix(in srgb, var(--accent) 9%, var(--paper)); --c-border: 0 solid transparent; --c-r: 30px;
+  --b-r: 999px; --b-h: 56px; --b-ink: #1a0016; --b-size: 16px; --b2-border: 0 solid transparent; --b2-bg: color-mix(in srgb, var(--ink) 9%, transparent);
+  --chip-r: 999px; --chip-bg: color-mix(in srgb, var(--ink) 7%, transparent); --num-display: none; --head-cols: 1fr; --head-rule: 0 solid transparent;
+  --hero-cols: 1.45fr .55fr; --tilt-k: 0;
+}
+
+/* Robot republic · literal, tidy, mechanical — all mono, hard steel edges */
+[data-world="robots"] {
+  --display: "IBM Plex Mono", ui-monospace, monospace; --sans: "IBM Plex Mono", ui-monospace, monospace; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --t-w: 600; --t-track: -0.04em; --t-scale: .86; --h-scale: .82;
+  --c-bg: var(--paper); --c-border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); --c-r: 0;
+  --c-shadow: 6px 6px 0 color-mix(in srgb, var(--accent) 38%, transparent); --c-hover: translate(-2px, -2px); --c-hover-shadow: 8px 8px 0 color-mix(in srgb, var(--accent) 50%, transparent);
+  --b-r: 0; --b-ink: #032420; --b-shadow: 4px 4px 0 var(--ink); --b2-border: 2px solid var(--line-2); --b-size: 14px;
+  --chip-r: 0; --num-r: 0; --head-rule: 2px solid var(--line-2);
+  --section-pad: clamp(60px, 9vh, 110px); --tilt-k: 0; --ticker-rot: 0deg;
+}
+
+/* Rage · loud, blunt, physical — poster type, thick borders, red offset */
+[data-world="rage"] {
+  --display: "Archivo Black", Impact, sans-serif; --sans: "Space Grotesk", system-ui, sans-serif;
+  --t-w: 400; --t-case: uppercase; --t-track: -0.01em; --t-scale: 1.32; --t-lh: .94; --h-scale: 1.2;
+  --c-bg: var(--paper); --c-border: 3px solid var(--ink); --c-r: 0; --c-shadow: 9px 9px 0 var(--accent);
+  --c-hover: translate(-3px, -3px); --c-hover-shadow: 12px 12px 0 var(--accent);
+  --b-r: 0; --b-bg: var(--accent); --b-ink: #fff; --b-border: 3px solid var(--ink); --b-shadow: 5px 5px 0 var(--ink); --b-case: uppercase; --b-w: 700;
+  --b2-border: 3px solid var(--ink); --chip-r: 0; --num-r: 0; --num-bg: var(--accent); --num-ink: #fff; --head-rule: 3px solid var(--ink);
+  --hero-cols: 1fr; --hero-areas: "copy" "visual"; --hero-vis: min(640px, 100%); --tilt-k: 2.2; --ticker-rot: -2.4deg; --ticker-bg: var(--accent);
+}
+
+/* Pure joy · warm, bouncy, generous — round slabs, chunky shadows, big friendly type */
+[data-world="joy"] {
+  --display: "Bricolage Grotesque", system-ui, sans-serif; --sans: "Figtree", system-ui, sans-serif;
+  --t-w: 700; --t-track: -0.035em; --t-scale: 1.18; --t-lh: 1;
+  --c-bg: color-mix(in srgb, var(--accent) 10%, var(--paper)); --c-border: 2px solid color-mix(in srgb, var(--accent) 36%, transparent); --c-r: 30px;
+  --c-shadow: 0 10px 0 rgba(0, 0, 0, .28); --c-hover: translateY(-4px); --c-hover-shadow: 0 14px 0 rgba(0, 0, 0, .28);
+  --b-r: 999px; --b-h: 56px; --b-ink: #2a1300; --b-shadow: 0 5px 0 color-mix(in srgb, var(--accent) 55%, #000); --b-w: 700; --b-size: 16px;
+  --b2-border: 2px solid var(--line-2); --chip-r: 999px; --num-bg: var(--accent); --num-ink: #2a1300; --num-border: 0 solid transparent;
+  --em-color: var(--accent-3); --hero-cols: 1fr; --hero-areas: "copy" "visual"; --hero-align: center; --hero-justify: center; --hero-sub-m: auto; --hero-vis: min(560px, 100%);
+  --dur: .35s; --ease-d: cubic-bezier(.34, 1.4, .64, 1); --tilt-k: 1.6;
+}
+
+/* The rain · quiet, reflective, slow — serif type, hairlines, airy space */
+[data-world="sad"] {
+  --display: "Newsreader", Georgia, serif; --sans: "Figtree", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --t-w: 400; --t-track: -0.015em; --t-scale: 1.08; --t-lh: 1.1; --em-style: italic; --em-color: var(--ink); --em-deco: underline;
+  --c-bg: rgba(255, 255, 255, .025); --c-border: 1px solid var(--line); --c-r: 14px;
+  --b-r: 999px; --b-bg: transparent; --b-ink: var(--ink); --b-border: 1px solid var(--accent); --b-w: 500;
+  --b2-border: 0 solid transparent; --b2-deco: underline; --chip-r: 999px;
+  --num-display: none; --head-cols: 1fr; --head-rule: 1px solid var(--line);
+  --hero-cols: 1fr; --hero-areas: "copy" "visual"; --hero-vis: min(600px, 100%);
+  --section-pad: clamp(100px, 16vh, 180px); --dur: .6s; --tilt-k: 0; --ticker-rot: 0deg;
+}
+
+/* Retro 1986 · arcade, punchy — pixel type (style.css sizes), double borders, flat colour offsets */
+[data-world="retro"] {
+  --t-scale: 1; --h-scale: 1;
+  --c-bg: var(--paper); --c-border: 4px double var(--accent); --c-r: 0; --c-shadow: 6px 6px 0 var(--accent-2);
+  --b-r: 0; --b-font: var(--display); --b-size: 10px; --b-ink: #12002b; --b-shadow: 4px 4px 0 var(--accent-2); --b2-border: 2px solid var(--accent);
+  --chip-r: 0; --num-r: 0; --head-rule: 4px double var(--accent); --tilt-k: 0; --ticker-rot: 0deg; --ticker-bg: var(--accent);
+}
+[data-world="retro"] .hero-title { font-size: clamp(17px, 2.2vw, 30px); line-height: 1.7; }
+[data-world="retro"] :is(.sec-head h2, .contact-card h2) { font-size: clamp(15px, 2vw, 26px); line-height: 1.5; }
+[data-world="retro"] .project-card h3 { font-size: clamp(15px, 1.7vw, 21px); }
+
+/* The beat · rhythmic, loud, nocturnal — gig-poster type, pill tracks, reversed hero */
+[data-world="music"] {
+  --display: "Bebas Neue", Impact, sans-serif; --sans: "DM Sans", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --t-w: 400; --t-track: .005em; --t-scale: 1.55; --t-lh: .9; --h-scale: 1.45;
+  --c-bg: color-mix(in srgb, var(--accent) 7%, var(--paper)); --c-border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); --c-r: 24px;
+  --b-r: 999px; --b-ink: #110a22; --b2-bg: color-mix(in srgb, var(--accent) 14%, transparent); --b2-border: 0 solid transparent;
+  --chip-r: 999px; --num-bg: var(--accent); --num-ink: #110a22; --num-border: 0 solid transparent; --head-rule: 0 solid transparent;
+  --hero-cols: .85fr 1.15fr; --hero-areas: "visual copy"; --proj-cols: 1.15fr .85fr; --tilt-k: .5;
+}
+
+/* Paint · expressive, hand-made, warm — italic display, thick uneven edges */
+[data-world="paint"] {
+  --display: "Playfair Display", Georgia, serif; --sans: "DM Sans", system-ui, sans-serif;
+  --t-w: 600; --t-track: -0.02em; --t-scale: 1.12; --em-style: italic; --em-color: var(--accent-3);
+  --c-bg: color-mix(in srgb, var(--accent) 6%, var(--paper)); --c-border: 3px solid color-mix(in srgb, var(--accent) 55%, transparent); --c-r: 26px 10px 30px 12px;
+  --c-shadow: 6px 8px 0 color-mix(in srgb, var(--accent-2) 45%, transparent);
+  --b-r: 18px 8px 20px 8px; --b-ink: #2a0e05; --b2-border: 2px solid var(--line-2);
+  --chip-r: 10px 4px 10px 4px; --num-r: 42% 58% 50% 50%; --num-bg: var(--accent-3); --num-ink: #2a0e05; --head-rule: 2px dashed var(--line-2);
+  --tilt-k: 2; --ticker-rot: -2deg;
+}
+
+/* Box world · sturdy, stacked, playful — wide type, isometric corners */
+[data-world="box"] {
+  --display: "Unbounded", system-ui, sans-serif; --sans: "IBM Plex Mono", ui-monospace, monospace; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --t-w: 600; --t-track: -0.03em; --t-scale: .9; --h-scale: .85;
+  --c-bg: color-mix(in srgb, var(--accent) 7%, var(--paper)); --c-border: 2px solid var(--line-2); --c-r: 4px;
+  --c-shadow: 10px 10px 0 -2px color-mix(in srgb, var(--accent) 30%, var(--paper)), 10px 10px 0 0 var(--line-2);
+  --b-r: 4px; --b-ink: #06101d; --b-shadow: 4px 4px 0 var(--line-2); --b2-border: 2px solid var(--line-2); --b-size: 13.5px;
+  --chip-r: 2px; --num-r: 4px; --head-rule: 2px solid var(--line-2); --proj-cols: 1fr; --tilt-k: 0;
+}
+
+/* The village · unhurried, homely, warm — old-style serif, double rules, lamplight */
+[data-world="village"] {
+  --display: "Cormorant Garamond", Georgia, serif; --sans: "Figtree", system-ui, sans-serif;
+  --t-w: 600; --t-track: -0.01em; --t-scale: 1.22; --t-lh: 1.02; --h-scale: 1.2; --em-style: italic; --em-color: var(--accent);
+  --c-bg: color-mix(in srgb, var(--accent) 5%, var(--paper)); --c-border: 3px double color-mix(in srgb, var(--accent) 45%, transparent); --c-r: 6px;
+  --b-r: 999px; --b-ink: #241a02; --b2-border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  --chip-r: 999px; --num-display: none; --head-cols: 1fr; --head-rule: 3px double color-mix(in srgb, var(--accent) 40%, transparent); --head-align: center;
+  --hero-cols: 1fr; --hero-areas: "copy" "visual"; --hero-align: center; --hero-justify: center; --hero-sub-m: auto; --hero-vis: min(560px, 100%);
+  --section-pad: clamp(90px, 14vh, 150px); --dur: .45s; --tilt-k: .5;
+}
+
+/* Night city · sharp, nocturnal, signposted — tight grotesk, underlined nav, strict grid */
+[data-world="city"] {
+  --display: "Instrument Sans", system-ui, sans-serif; --sans: "Instrument Sans", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --t-w: 600; --t-track: -0.045em; --t-scale: 1.12; --t-lh: .98;
+  --c-bg: var(--paper); --c-border: 1px solid var(--line-2); --c-r: 0; --c-shadow: inset 0 3px 0 var(--accent);
+  --b-r: 0; --b-ink: #1a1203; --b2-border: 1px solid var(--line-2); --b-h: 46px;
+  --chip-r: 0; --num-r: 0; --num-bg: var(--accent); --num-ink: #1a1203; --num-border: 0 solid transparent; --head-rule: 1px solid var(--line-2);
+  --proj-cols: .9fr 1.1fr; --tilt-k: 0; --ticker-rot: 0deg; --nav-font: var(--sans);
+}
+[data-world="city"] .nav-links a:not(.btn):hover { background: transparent; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 6px; }
+
+/* Open sky · light, open, effortless — thin large type, floating glass, lots of air */
+[data-world="sky"] {
+  --display: "Figtree", system-ui, sans-serif; --sans: "Figtree", system-ui, sans-serif;
+  --t-w: 300; --t-track: -0.045em; --t-scale: 1.3; --t-lh: 1;
+  --c-bg: rgba(255, 255, 255, .07); --c-border: 1px solid rgba(255, 255, 255, .16); --c-r: 28px; --c-blur: blur(18px);
+  --c-shadow: 0 20px 40px -24px rgba(0, 0, 0, .5);
+  --b-r: 999px; --b-ink: #2b1405; --b2-bg: rgba(255, 255, 255, .08); --b2-border: 1px solid rgba(255, 255, 255, .2);
+  --chip-r: 999px; --num-display: none; --head-cols: 1fr; --head-rule: 0 solid transparent;
+  --hero-cols: 1fr; --hero-areas: "copy" "visual"; --hero-align: center; --hero-justify: center; --hero-sub-m: auto; --hero-vis: min(520px, 100%);
+  --section-pad: clamp(100px, 16vh, 180px); --dur: .5s; --tilt-k: 0; --scene: .8;
+}
+
+/* The deep · calm, slow, enveloping — soft round type, drifting glass */
+[data-world="water"] {
+  --display: "Sora", system-ui, sans-serif; --sans: "Sora", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --t-w: 300; --t-track: -0.04em; --t-scale: 1.12;
+  --c-bg: color-mix(in srgb, var(--accent) 6%, rgba(255, 255, 255, .03)); --c-border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); --c-r: 24px; --c-blur: blur(12px);
+  --b-r: 999px; --b-bg: transparent; --b-ink: var(--accent); --b-border: 1px solid var(--accent); --b2-border: 1px solid var(--line);
+  --chip-r: 999px; --num-bg: color-mix(in srgb, var(--accent) 14%, transparent); --num-border: 0 solid transparent; --head-rule: 1px solid var(--line);
+  --hero-cols: .9fr 1.1fr; --dur: .6s; --tilt-k: 0; --scene: .78;
+}
+
+/* Fire · intense, forged, direct — heavy display, ember underline, hard edges */
+[data-world="fire"] {
+  --display: "Archivo Black", Impact, sans-serif; --sans: "DM Sans", system-ui, sans-serif;
+  --t-w: 400; --t-track: -0.02em; --t-scale: 1.12; --t-lh: .98; --h-scale: 1.05;
+  --c-bg: var(--paper); --c-border: 1px solid var(--line); --c-r: 6px; --c-shadow: inset 0 -3px 0 var(--accent);
+  --b-r: 6px; --b-ink: #1a0700; --b2-border: 1px solid var(--line-2);
+  --chip-r: 4px; --num-r: 6px; --num-bg: var(--accent); --num-ink: #1a0700; --num-border: 0 solid transparent; --head-rule: 2px solid var(--accent);
+  --em-color: var(--accent-3); --hero-cols: 1.25fr .75fr; --tilt-k: 0;
+}
+
+/* Ice · crisp, clear, precise — elegant serif over clean sans, thin bright edges */
+[data-world="ice"] {
+  --display: "Instrument Serif", Georgia, serif; --sans: "Instrument Sans", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --t-w: 400; --t-track: -0.01em; --t-scale: 1.3; --t-lh: 1; --h-scale: 1.25; --em-style: italic;
+  --c-bg: color-mix(in srgb, var(--accent) 5%, rgba(255, 255, 255, .03)); --c-border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); --c-r: 3px; --c-blur: blur(8px);
+  --b-r: 3px; --b-bg: var(--ink); --b-ink: #020617; --b2-border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); --b-w: 500;
+  --chip-r: 2px; --num-display: none; --head-cols: 1fr; --head-rule: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  --section-pad: clamp(90px, 14vh, 150px); --tilt-k: 0; --ticker-rot: 0deg;
+}
+
+/* Brick world · bright, buildable, chunky — studded slabs, primary colours */
+[data-world="brick"] {
+  --display: "Bricolage Grotesque", system-ui, sans-serif; --sans: "DM Sans", system-ui, sans-serif;
+  --t-w: 800; --t-track: -0.04em; --t-scale: 1.1;
+  --c-bg: color-mix(in srgb, var(--accent) 8%, var(--paper)); --c-border: 0 solid transparent; --c-r: 8px;
+  --c-shadow: inset 0 -6px 0 rgba(0, 0, 0, .3), 0 6px 0 rgba(0, 0, 0, .35);
+  --b-r: 8px; --b-ink: #1c1600; --b-shadow: inset 0 -4px 0 rgba(0, 0, 0, .25); --b-w: 700; --b2-bg: color-mix(in srgb, var(--ink) 10%, transparent); --b2-border: 0 solid transparent;
+  --chip-r: 6px; --chip-bg: color-mix(in srgb, var(--ink) 8%, transparent); --num-r: 8px; --num-bg: var(--accent); --num-ink: #1c1600; --num-border: 0 solid transparent; --head-rule: 0 solid transparent;
+  --tilt-k: 0; --ticker-bg: var(--accent);
+}
+[data-world="brick"] .card::before { content: ""; position: absolute; left: 18px; top: -7px; width: 22px; height: 8px; border-radius: 4px 4px 0 0; background: color-mix(in srgb, var(--accent) 60%, var(--paper)); box-shadow: 30px 0 0 color-mix(in srgb, var(--accent) 60%, var(--paper)), 60px 0 0 color-mix(in srgb, var(--accent) 60%, var(--paper)); }
+
+/* Toy racer · fast, cheerful, competitive — wide italic type, chequered stripe */
+[data-world="racer"] {
+  --display: "Unbounded", system-ui, sans-serif; --sans: "Space Grotesk", system-ui, sans-serif;
+  --t-w: 700; --t-track: -0.04em; --t-scale: 1; --em-style: italic;
+  --c-bg: var(--paper); --c-border: 2px solid var(--line-2); --c-r: 16px;
+  --c-shadow: inset 0 6px 0 transparent;
+  --b-r: 999px; --b-ink: #1f1000; --b-w: 700; --b-case: none; --b2-border: 2px solid var(--line-2);
+  --chip-r: 999px; --num-bg: var(--accent); --num-ink: #1f1000; --num-border: 0 solid transparent; --head-rule: 2px solid var(--line-2);
+  --hero-cols: 1.2fr .8fr; --tilt-k: 0; --ticker-rot: -3deg; --ticker-bg: var(--accent);
+}
+[data-world="racer"] .card { background-image: repeating-linear-gradient(90deg, var(--ink) 0 10px, transparent 10px 20px), repeating-linear-gradient(90deg, transparent 0 10px, var(--ink) 10px 20px); background-size: 100% 5px, 100% 5px; background-position: 0 0, 0 5px; background-repeat: no-repeat; }
+
+/* Noir · terse, shadowed, literary — high-contrast serif, typewriter meta, rules not boxes */
+[data-world="noir"] {
+  --display: "Cormorant Garamond", Georgia, serif; --sans: "IBM Plex Mono", ui-monospace, monospace; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --t-w: 500; --t-track: -0.02em; --t-scale: 1.4; --t-lh: .98; --h-scale: 1.3; --em-style: italic; --em-color: var(--ink);
+  --c-bg: transparent; --c-border: 0 solid transparent; --c-r: 0; --c-shadow: inset 0 1px 0 var(--line-2), inset 0 -1px 0 var(--line-2);
+  --b-r: 0; --b-bg: var(--ink); --b-ink: #0b0b0b; --b2-border: 0 solid transparent; --b2-deco: underline; --b-size: 14px;
+  --chip-r: 0; --num-display: none; --head-cols: 1fr; --head-rule: 1px solid var(--line-2);
+  --hero-cols: 1fr; --hero-areas: "copy" "visual"; --hero-vis: min(600px, 100%); --tilt-k: 0; --ticker-rot: 0deg; --scene: .5;
+}
+
+/* The glitch · unstable, sharp, wry — mono type, split-channel edges */
+[data-world="glitch"] {
+  --display: "JetBrains Mono", ui-monospace, monospace; --sans: "Space Grotesk", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --t-w: 700; --t-track: -0.06em; --t-scale: .98;
+  --c-bg: var(--paper); --c-border: 1px solid var(--accent); --c-r: 0;
+  --c-shadow: 3px 0 0 color-mix(in srgb, #ff2bd6 70%, transparent), -3px 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
+  --b-r: 0; --b-ink: #001a15; --b-shadow: 3px 0 0 #ff2bd6; --b2-border: 1px solid var(--accent);
+  --chip-r: 0; --num-r: 0; --head-rule: 1px dashed var(--accent); --proj-cols: 1.1fr .9fr; --tilt-k: 0; --ticker-rot: 1deg;
+}
+
+/* Planet fall · rugged, pioneering, dusty — survey type, rust markers */
+[data-world="mars"] {
+  --display: "Space Grotesk", system-ui, sans-serif; --sans: "Space Grotesk", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --t-w: 700; --t-track: -0.045em; --t-scale: 1.1;
+  --c-bg: color-mix(in srgb, var(--accent) 6%, var(--paper)); --c-border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); --c-r: 10px;
+  --c-shadow: inset 4px 0 0 var(--accent);
+  --b-r: 10px; --b-ink: #1f0a03; --b2-border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  --chip-r: 4px; --num-r: 10px; --head-rule: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); --tilt-k: .4;
+}
+
+/* =========================================================
+   SIGNATURE LOOKS — the four kits as whole-site universes
+   ========================================================= */
+
+/* Liquid Glass · Apple-style: colourless frosted glass, lit bevels, capsules */
+[data-world="liquid"] {
+  --paper: #EEF0F6; --tint: #ffffff; --ink: #0A0A0C; --muted: rgba(10, 10, 12, .62); --faint: rgba(10, 10, 12, .45);
+  --line: rgba(60, 60, 67, .13); --line-2: rgba(60, 60, 67, .22); --card: rgba(255, 255, 255, .45);
+  --accent: #0A0A0C; --accent-2: #007AFF; --accent-3: #34C759; --accent-deep: #0A0A0C; --shadow: rgba(0, 0, 0, .12);
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif; --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif; --mono: "SF Mono", "DM Mono", ui-monospace, monospace;
+  --r: 28px; --r-sm: 999px; --on-accent: #fff;
+  --surface: rgba(255, 255, 255, .5);
+  --t-w: 600; --t-track: -0.035em; --em-color: var(--accent-2);
+  --c-bg: rgba(255, 255, 255, .42); --c-border: 1px solid rgba(255, 255, 255, .7); --c-r: 28px; --c-blur: blur(24px) saturate(180%);
+  --c-shadow: inset 1.5px 1.5px 0 -.5px rgba(255, 255, 255, .95), inset 0 0 22px rgba(255, 255, 255, .22), 0 12px 30px -12px rgba(0, 0, 0, .22);
+  --b-r: 999px; --b-bg: #0A0A0C; --b-ink: #fff; --b2-bg: rgba(255, 255, 255, .55); --b2-border: 1px solid rgba(255, 255, 255, .8);
+  --b2-shadow: inset 0 1px 0 #fff, 0 6px 16px -8px rgba(0, 0, 0, .25);
+  --chip-r: 999px; --chip-bg: rgba(255, 255, 255, .55); --num-bg: rgba(255, 255, 255, .55); --num-border: 1px solid rgba(255, 255, 255, .8); --head-rule: 1px solid var(--line);
+  --grain: 0; --tilt-k: 0; --ticker-rot: 0deg; --ticker-bg: rgba(255, 255, 255, .5);
+}
+/* the colour field the glass bends (on the layer above the live scene) */
+[data-world="liquid"] .grain { opacity: 1; mix-blend-mode: normal; background:
+  radial-gradient(55vmax 42vmax at 8% 0%, rgba(122, 178, 255, .5), transparent 64%),
+  radial-gradient(50vmax 40vmax at 100% 18%, rgba(255, 184, 150, .45), transparent 64%),
+  radial-gradient(60vmax 48vmax at 70% 108%, rgba(186, 164, 255, .4), transparent 66%); }
+
+/* Monolith Gloss · calm, premium: near-black slabs, 3px corners, one gold button with a specular top light */
+[data-world="monolith"] {
+  --paper: #0c0c0c; --tint: #161616; --ink: #e4e4e4; --muted: #8a8a8a; --faint: #6a6a6a;
+  --line: #1f1f1f; --line-2: #2c2c2c; --card: #111111;
+  --accent: #b8956a; --accent-2: #d9b98f; --accent-3: #5aba8a; --accent-deep: #d9b98f; --shadow: rgba(0, 0, 0, .5);
+  --display: "Inter", system-ui, sans-serif; --sans: "Inter", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --r: 3px; --r-sm: 3px; --surface: #111111; --on-accent: #120d06;
+  --t-w: 600; --t-track: -0.04em; --t-scale: 1.05; --em-color: var(--accent);
+  --c-bg: #111111; --c-border: 1px solid #222; --c-r: 3px; --c-hover-shadow: 0 0 0 1px #383838;
+  --b-r: 3px; --b-bg: linear-gradient(180deg, #c9a87c, #b8956a); --b-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 16px -8px rgba(0, 0, 0, .8);
+  --b2-bg: #161616; --b2-border: 1px solid #2c2c2c;
+  --chip-r: 3px; --chip-bg: #141414; --num-r: 3px; --num-bg: #141414; --head-rule: 1px solid #1f1f1f;
+  --grain: 0; --tilt-k: 0; --ticker-rot: 0deg; --ticker-bg: #111;
+}
+[data-world="monolith"] .mock { --tint: #efe9df; }
+[data-world="monolith"] .grain { opacity: 1; mix-blend-mode: normal; background: radial-gradient(600px 220px at 50% -60px, rgba(200, 162, 116, .18), transparent 70%); }
+
+/* Unslop · the household hisaab notebook: paper-warm, blue ink, totals closed with a double rule */
+[data-world="unslop"] {
+  --paper: #F7F5F0; --tint: #EFEAE1; --ink: #1F1B16; --muted: #5E554A; --faint: #7B7266;
+  --line: rgba(31, 27, 22, .08); --line-2: rgba(31, 27, 22, .15); --card: #FDFCF9;
+  --accent: #2A4BB0; --accent-2: #9A5B12; --accent-3: #EFEAE1; --accent-deep: #2A4BB0; --shadow: rgba(31, 27, 22, .06);
+  --display: "Newsreader", Georgia, serif; --sans: "Instrument Sans", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --r: 14px; --r-sm: 10px; --surface: #FDFCF9; --on-accent: #fff;
+  --t-w: 500; --t-track: -0.015em; --t-scale: 1.1; --em-color: var(--accent);
+  --c-bg: #FDFCF9; --c-border: 1px solid rgba(31, 27, 22, .08); --c-r: 14px; --c-shadow: 0 1px 2px rgba(31, 27, 22, .05);
+  --b-r: 10px; --b-w: 500; --b2-bg: #FDFCF9; --b2-border: 1px solid rgba(31, 27, 22, .12);
+  --chip-r: 6px; --num-display: none; --head-cols: 1fr; --head-rule: 1px solid rgba(31, 27, 22, .08);
+  --hero-cols: 1.15fr .85fr; --grain: 0; --tilt-k: 0; --ticker-rot: 0deg; --ticker-bg: #FDFCF9;
+}
+/* the signature: totals closed with the accountant's double rule */
+[data-world="unslop"] .facts b { display: inline-block; padding-bottom: 4px; border-bottom: 3px double currentColor; font-variant-numeric: lining-nums tabular-nums; }
+
+/* Unsloped · the red cloth bahi-khata: ledger paper, gold-stamped cover, red double margin */
+[data-world="unsloped"] {
+  --paper: #F2ECE0; --tint: #E9E1D2; --ink: #1E1A15; --muted: #5A4F42; --faint: #7D7062;
+  --line: rgba(45, 30, 15, .09); --line-2: rgba(45, 30, 15, .17); --card: #FAF6EE;
+  --accent: #7A1D1C; --accent-2: #DDB866; --accent-3: #E9E1D2; --accent-deep: #7A1D1C; --shadow: rgba(45, 30, 15, .08);
+  --display: "Newsreader", Georgia, serif; --sans: "Instrument Sans", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+  --r: 4px; --r-sm: 8px; --surface: #FAF6EE; --on-accent: #F5EAD0;
+  --t-w: 500; --t-track: -0.02em; --t-scale: 1.22; --t-lh: 1.02; --h-scale: 1.15; --em-color: var(--accent);
+  --c-bg: #FAF6EE linear-gradient(90deg, transparent 22px, rgba(176, 38, 34, .5) 22px 23px, transparent 23px 25px, rgba(176, 38, 34, .5) 25px 26px, transparent 26px);
+  --c-border: 1px solid rgba(45, 30, 15, .1); --c-r: 4px 14px 14px 4px; --c-shadow: 0 1px 2px rgba(45, 30, 15, .06);
+  --b-r: 8px; --b-bg: #1E1A15; --b-ink: #FAF6EE; --b-w: 500; --b2-bg: transparent; --b2-border: 1px solid rgba(45, 30, 15, .2);
+  --chip-r: 4px; --num-r: 3px; --num-bg: #7A1D1C; --num-ink: #DDB866; --num-border: 0 solid transparent; --head-rule: 1px solid rgba(45, 30, 15, .1);
+  --hero-cols: 1.1fr .9fr; --grain: 0; --tilt-k: 0; --ticker-rot: 0deg; --ticker-bg: #7A1D1C;
+}
+/* the cover: the hero window becomes the red cloth khata, framed in gold foil */
+[data-world="unsloped"] .hero .window.portal {
+  background: linear-gradient(155deg, rgba(255, 255, 255, .07), rgba(0, 0, 0, .12) 75%), repeating-linear-gradient(0deg, rgba(0, 0, 0, .05) 0 1px, transparent 1px 3px), #7A1D1C;
+  border: 0; border-radius: 6px 18px 18px 6px; box-shadow: 0 2px 3px rgba(20, 10, 5, .18), 0 24px 40px -20px rgba(20, 10, 5, .55);
+}
+[data-world="unsloped"] .hero .window.portal::after { content: ""; position: absolute; inset: 14px 14px 14px 30px; border: 3px double rgba(221, 184, 102, .65); border-radius: 4px 12px 12px 4px; background: none; transform: none; opacity: 1; height: auto; left: 30px; right: 14px; top: 14px; }
+[data-world="unsloped"] .hero .window.portal :is(.win-bar, .win-foot) { background: transparent; border-color: rgba(221, 184, 102, .3); color: #DDB866; }
+[data-world="unsloped"] .project-card { padding-left: clamp(40px, 4vw, 52px); }
+[data-world="unsloped"] .facts b { display: inline-block; padding-bottom: 4px; border-bottom: 3px double currentColor; }
+[data-world="unsloped"] .ticker { color: #DDB866; } [data-world="unsloped"] .ticker span { color: #DDB866; }

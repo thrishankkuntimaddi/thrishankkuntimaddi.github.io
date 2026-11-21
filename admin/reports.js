@@ -9,7 +9,7 @@
    ========================================================= */
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-import { NAMES } from '../worlds.js?v=22';
+import { NAMES } from '../worlds.js?v=23';
 let F, toast, DEMO, rows = [], range = 7, loaded = false, tab = 'overview', person = '', openId = '';
 
 const RANGES = [[1, 'Today'], [7, '7 days'], [30, '30 days'], [90, '90 days']];

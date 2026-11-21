@@ -1,14 +1,21 @@
 /* =========================================================
-   All 27 universes. The first five restyle the light page;
-   the other 22 come from the endless loop and turn the page
-   dark, with their scene drawn behind it (worldbg.js).
+   All 31 universes. The first five restyle the light page
+   (style.css); the 22 from the endless loop turn the page dark
+   with their scene drawn behind it (worldbg.js); the last four
+   are the signature looks. The 26 after the first five are each
+   designed as a whole website in design.css.
    Generated from one table, with the matching tokens in
    style.css ("The 22 loop universes as page themes").
    ========================================================= */
 export const BASE = ['paper', 'pixel', 'sketch', 'blueprint', 'news'];
 export const LOOP = ["core", "space", "future", "robots", "rage", "joy", "sad", "retro", "music", "paint", "box", "village", "city", "sky", "water", "fire", "ice", "brick", "racer", "noir", "glitch", "mars"];
-export const ALL = BASE.concat(LOOP);
-export const NAMES = { paper: 'Paper', pixel: 'Pixel', sketch: 'Sketch', blueprint: 'Blueprint', news: 'Newsprint', core: "The Core", space: "Deep space", future: "Year 3000", robots: "Robot republic", rage: "Rage", joy: "Pure joy", sad: "The rain", retro: "Retro 1986", music: "The beat", paint: "Paint", box: "Box world", village: "The village", city: "Night city", sky: "Open sky", water: "The deep", fire: "Fire", ice: "Ice", brick: "Brick world", racer: "Toy racer", noir: "Noir", glitch: "The glitch", mars: "Planet fall" };
+// The four signature looks, also whole-site universes (design.css). Liquid Glass, Unslop and
+// Unsloped are light pages; Monolith Gloss is dark.
+export const KITS = ['liquid', 'monolith', 'unslop', 'unsloped'];
+export const ALL = BASE.concat(LOOP, KITS);
+// Universes the design engine (design.css) styles as a whole website: all but the first five.
+export const DESIGNED = LOOP.concat(KITS);
+export const NAMES = { paper: 'Paper', pixel: 'Pixel', sketch: 'Sketch', blueprint: 'Blueprint', news: 'Newsprint', core: "The Core", space: "Deep space", future: "Year 3000", robots: "Robot republic", rage: "Rage", joy: "Pure joy", sad: "The rain", retro: "Retro 1986", music: "The beat", paint: "Paint", box: "Box world", village: "The village", city: "Night city", sky: "Open sky", water: "The deep", fire: "Fire", ice: "Ice", brick: "Brick world", racer: "Toy racer", noir: "Noir", glitch: "The glitch", mars: "Planet fall", liquid: "Liquid Glass", monolith: "Monolith Gloss", unslop: "Unslop", unsloped: "Unsloped" };
 export const COPY = {
   paper:     { h2: 'I design and build <em>interfaces</em>', h3: 'people enjoy using.', cta: 'See my projects', work: 'Projects', poelys: 'Poelys', more: 'More work', about: 'About me', contact: "Let's build something <em>people love</em>." },
   pixel:     { h2: 'I build <em>interfaces</em>', h3: 'worth pressing START for.', cta: 'Start', work: 'Level 01: Projects', poelys: 'Home base: Poelys', more: 'Side quests', about: 'Player stats', contact: 'Insert coin. <em>Hire player 1.</em>' },
@@ -37,5 +44,12 @@ export const COPY = {
   noir: {"h2": "Every <em>interface</em> has a story.", "h3": "Mine end well.", "cta": "Open the case files", "work": "Case files", "poelys": "The agency: Poelys", "more": "Loose ends", "about": "The detective", "contact": "Got a case? <em>Knock twice.</em>"},
   glitch: {"h2": "I build <em>interf@ces</em>", "h3": "that never cr̷ash.", "cta": "Run anyway", "work": "ERR_PROJECTS_FOUND", "poelys": "P0ELYS.EXE", "more": "Corrupted files", "about": "user://me", "contact": "Reboot. <em>Then hire me.</em>"},
   mars: {"h2": "Interfaces built for <em>new worlds</em>", "h3": "and the first footprints.", "cta": "Land the rover", "work": "Samples: Projects", "poelys": "Base camp: Poelys", "more": "Rocks of interest", "about": "The astronaut", "contact": "Earth, do you copy? <em>Message me.</em>"},
+  liquid:    { h2: 'I build <em>interfaces</em>', h3: 'clear enough to see straight through.', cta: 'Look through', work: 'Projects', poelys: 'Poelys', more: 'More work', about: 'About me', contact: "Let's make something <em>clear</em>." },
+  monolith:  { h2: 'I build <em>interfaces</em>', h3: 'solid underneath, polished on top.', cta: 'See the work', work: 'Work', poelys: 'Poelys, the studio', more: 'Other work', about: 'About', contact: 'Have a product to build? <em>Let’s talk.</em>' },
+  unslop:    { h2: 'I design and build <em>interfaces</em>', h3: 'for people who use them every day.', cta: 'See my projects', work: 'Projects', poelys: 'Poelys, my studio', more: 'More work', about: 'About me', contact: 'Building something people use daily? <em>Write to me.</em>' },
+  unsloped:  { h2: 'I keep a careful <em>ledger</em>', h3: 'of every interface I ship.', cta: 'Open the book', work: 'Projects, page one', poelys: 'Poelys, the studio', more: 'More entries', about: 'About the keeper', contact: 'Open a new page <em>with me</em>.' },
 };
 export const isLoopWorld = (id) => LOOP.includes(id);
+/** A dark page: the 22 loop universes and Monolith Gloss. */
+export const isDarkWorld = (id) => LOOP.includes(id) || id === 'monolith';
+export const isDesigned = (id) => DESIGNED.includes(id);

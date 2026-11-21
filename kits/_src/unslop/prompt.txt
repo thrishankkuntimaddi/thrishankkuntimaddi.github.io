@@ -1,0 +1,11 @@
+Apply the "Unslop" theme to this project, using unslop.css, unslop.csv and UNSLOP-THEME.md. Made with the unslop method by Damir Sokolovsky (@heydamir) — https://github.com/heydamir/unslop (CC BY 4.0). Follow the rules exactly:
+1. Load Instrument Sans and Newsreader from Google Fonts, then unslop.css after the project's own CSS. Put class "us-root" on <body>. Light is the default; dark is <html data-theme="dark">.
+2. World: the household hisaab notebook. Surfaces stay near-neutral paper (--us-canvas, --us-surface); the world shows in the blue-ink accent (--us-accent), the serif figures and the double rule — never in tinted backgrounds, gradients, glows or glass.
+3. One accent, used rarely: the primary action (us-btn--primary), the selection (segmented, tab bar) and the one key figure. Money in/out may use --us-positive / --us-negative; everything else is ink.
+4. Type: Instrument Sans for the interface (400/500, 600 at most); Newsreader only for page titles (us-title) and large figures (us-figure). Sentence case everywhere — no ALL-CAPS tracked labels. Numbers are tabular.
+5. Signature, and only here: totals get the accountant's double rule (us-total). Never on non-totals.
+6. Map components: cards → us-card (us-card--ruled only for a chart); lists → us-list + us-row with us-tile (category as a dot: us-tile--dot, style="--dot:<colour>"); buttons → us-btn (primary / ghost); choices → us-segmented; inputs → us-input; toggles → us-switch; budget bars → us-meter (data-state near|over); bottom navigation → us-tabbar; sheets and dialogs → us-sheet / us-dialog.
+7. Radii by size: controls 10px, cards 14px, sheets 20px. Hairlines are the ink at 8%. Light shadows are tiny and warm; dark mode uses surface steps, not shadows.
+8. Motion: one curve (--us-ease), 140–180ms for presses and toggles, a press is scale(.97). No overshoot, no hover lift, no looping animation.
+9. Copy: titles name the place or the period, not a greeting. No exclamation marks, no emoji, no hype words.
+10. Must work at 390px, tablet and desktop, light and dark.

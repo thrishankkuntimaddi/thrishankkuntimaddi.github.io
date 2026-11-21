@@ -56,17 +56,17 @@ Polished ice: crisp edges, frosted glass, cool blue light.
 | `--t-faint` | `color-mix(in srgb, #eef8ff 48%, #020617)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #eef8ff 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #eef8ff 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 5%, rgba(255, 255, 255, .03))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#eef8ff` | Text inside cards |
 | `--t-accent` | `#7fd8ff` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#8affc1` | Secondary highlight |
 | `--t-accent-3` | `#b39bff` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Inter", system-ui, sans-serif` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
-| `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
+| `--t-display` | `"Instrument Serif", Georgia, serif` | Headings |
+| `--t-sans` | `"Instrument Sans", system-ui, sans-serif` | Body text |
+| `--t-mono` | `"DM Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `14px` | Cards and windows |
-| `--t-r-sm` | `8px` | Buttons, inputs, chips |
+| `--t-r` | `3px` | Cards and windows |
+| `--t-r-sm` | `3px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#020617, #0b1d3a)` | Full page background (gradient / pattern) |
@@ -78,10 +78,10 @@ Polished ice: crisp edges, frosted glass, cool blue light.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Inter", system-ui, sans-serif` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Instrument Serif", Georgia, serif` · Body: `"Instrument Sans", system-ui, sans-serif` · Labels: `"DM Mono", ui-monospace, monospace`
 
 ## 5. Components
 

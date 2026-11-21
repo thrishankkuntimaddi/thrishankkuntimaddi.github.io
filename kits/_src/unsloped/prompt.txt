@@ -1,0 +1,10 @@
+Apply the "Unsloped" theme to this project, using unsloped.css, unsloped.csv and UNSLOPED-THEME.md. Made with the unslop method by Damir Sokolovsky (@heydamir) — https://github.com/heydamir/unslop (CC BY 4.0). Follow the rules exactly:
+1. Load Instrument Sans and Newsreader from Google Fonts, then unsloped.css after the project's own CSS. Put class "kh-root" on <body>. Light (cream ledger paper) is the default; dark is <html data-theme="dark">.
+2. World: the red cloth-bound bahi-khata. The page is cream ledger paper and ink; colour lives in ONE moment per screen — the cover (kh-cover): red cloth, a gold foil frame, the key total stamped in gold. Never more than one cover on a screen.
+3. Signature: ledger pages. Lists are kh-ledger with kh-entry rows — the red double margin rule runs down the left; the category is a small dot (kh-entry-mark, style="--dot:<colour>") left of the margin. Day or group headers are kh-day with the day's total in kh-total.
+4. Type: Instrument Sans for the interface; Newsreader for titles (kh-title), section heads (kh-section), figures (kh-figure) and amounts. Sentence case, no ALL-CAPS labels. Totals only get the double rule (kh-total).
+5. Actions are written in ink: primary kh-btn--primary (ink fill), others kh-btn. The pen colour (--kh-pen) marks links and focus only.
+6. Navigation index pages may use kh-contents (numbered entries, no icons). Text inputs that feel like writing use kh-line-input. Bottom navigation uses kh-tabbar — the current tab gets the red ribbon.
+7. No gradients except inside the cover's cloth; no glow, no glass, no emoji, no overshoot. Motion: one curve, 140–180ms, press = scale(.97).
+8. Copy: titles name the period or the book, not a greeting. No exclamation marks.
+9. Must work at 390px, tablet and desktop, light and dark.

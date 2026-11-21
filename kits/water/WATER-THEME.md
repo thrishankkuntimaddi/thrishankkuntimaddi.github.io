@@ -56,17 +56,17 @@ Under the sea: deep teal, rising bubbles, calm wave motion.
 | `--t-faint` | `color-mix(in srgb, #e8fbff 48%, #021b2c)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #e8fbff 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #e8fbff 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 6%, rgba(255, 255, 255, .03))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#e8fbff` | Text inside cards |
 | `--t-accent` | `#39c6e6` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#7fe0c3` | Secondary highlight |
 | `--t-accent-3` | `#ffd28a` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Fraunces", Georgia, serif` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
-| `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
+| `--t-display` | `"Sora", system-ui, sans-serif` | Headings |
+| `--t-sans` | `"Sora", system-ui, sans-serif` | Body text |
+| `--t-mono` | `"DM Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `22px` | Cards and windows |
-| `--t-r-sm` | `16px` | Buttons, inputs, chips |
+| `--t-r` | `24px` | Cards and windows |
+| `--t-r-sm` | `999px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#04425e, #032a40 50%, #010d17)` | Full page background (gradient / pattern) |
@@ -78,10 +78,10 @@ Under the sea: deep teal, rising bubbles, calm wave motion.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Fraunces", Georgia, serif` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Sora", system-ui, sans-serif` · Body: `"Sora", system-ui, sans-serif` · Labels: `"DM Mono", ui-monospace, monospace`
 
 ## 5. Components
 

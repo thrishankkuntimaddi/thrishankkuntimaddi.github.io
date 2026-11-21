@@ -58,17 +58,17 @@ Night sky and stars, violet nebula light, calm and vast.
 | `--t-faint` | `color-mix(in srgb, #eef0ff 48%, #04040d)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #eef0ff 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #eef0ff 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 5%, var(--t-bg))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#eef0ff` | Text inside cards |
 | `--t-accent` | `#a78bfa` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#5ad1e6` | Secondary highlight |
 | `--t-accent-3` | `#ffb38a` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Fraunces", Georgia, serif` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
-| `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
+| `--t-display` | `"Space Grotesk", system-ui, sans-serif` | Headings |
+| `--t-sans` | `"Space Grotesk", system-ui, sans-serif` | Body text |
+| `--t-mono` | `"JetBrains Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `18px` | Cards and windows |
-| `--t-r-sm` | `12px` | Buttons, inputs, chips |
+| `--t-r` | `2px` | Cards and windows |
+| `--t-r-sm` | `2px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `radial-gradient(circle at 30% 30%, #3a1d6e 0, transparent 45%), radial-gradient(circle at 75% 70%, #0f4a55 0, transparent 40%), #04040d` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ Night sky and stars, violet nebula light, calm and vast.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Fraunces", Georgia, serif` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Space Grotesk", system-ui, sans-serif` · Body: `"Space Grotesk", system-ui, sans-serif` · Labels: `"JetBrains Mono", ui-monospace, monospace`
 
 ## 5. Components
 

@@ -58,17 +58,17 @@ Toy bricks: studs, primary colours and chunky shapes.
 | `--t-faint` | `color-mix(in srgb, #f7f7f2 48%, #10141a)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #f7f7f2 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #f7f7f2 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 8%, var(--t-bg))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#f7f7f2` | Text inside cards |
 | `--t-accent` | `#ffcd03` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#e3242b` | Secondary highlight |
 | `--t-accent-3` | `#6bb6ff` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Inter", system-ui, sans-serif` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
+| `--t-display` | `"Bricolage Grotesque", system-ui, sans-serif` | Headings |
+| `--t-sans` | `"DM Sans", system-ui, sans-serif` | Body text |
 | `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `6px` | Cards and windows |
-| `--t-r-sm` | `0px` | Buttons, inputs, chips |
+| `--t-r` | `8px` | Cards and windows |
+| `--t-r-sm` | `8px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `linear-gradient(#10141a, #1b222c)` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ Toy bricks: studs, primary colours and chunky shapes.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Inter", system-ui, sans-serif` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Bricolage Grotesque", system-ui, sans-serif` · Body: `"DM Sans", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
 
 ## 5. Components
 

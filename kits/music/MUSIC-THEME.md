@@ -58,17 +58,17 @@ A dark stage with equalizer bars pulsing in violet and pink.
 | `--t-faint` | `color-mix(in srgb, #f2edff 48%, #08070f)` | Hints, captions, disabled |
 | `--t-line` | `color-mix(in srgb, #f2edff 16%, transparent)` | Hairlines and dividers |
 | `--t-line-2` | `color-mix(in srgb, #f2edff 30%, transparent)` | Stronger borders on cards and controls |
-| `--t-surface` | `rgba(255, 255, 255, .9)` | Cards, windows, dialogs |
-| `--t-surface-ink` | `#2c3046` | Text inside cards |
+| `--t-surface` | `color-mix(in srgb, var(--t-accent) 7%, var(--t-bg))` | Cards, windows, dialogs |
+| `--t-surface-ink` | `#f2edff` | Text inside cards |
 | `--t-accent` | `#a78bfa` | Primary action, key highlights (one per view) |
 | `--t-accent-2` | `#ff5fa2` | Secondary highlight |
 | `--t-accent-3` | `#7fe0c3` | Third highlight: stickers, marks, selection |
-| `--t-display` | `"Fraunces", Georgia, serif` | Headings |
-| `--t-sans` | `"Inter", system-ui, sans-serif` | Body text |
-| `--t-mono` | `"Space Mono", ui-monospace, monospace` | Labels, numbers, code |
+| `--t-display` | `"Bebas Neue", Impact, sans-serif` | Headings |
+| `--t-sans` | `"DM Sans", system-ui, sans-serif` | Body text |
+| `--t-mono` | `"DM Mono", ui-monospace, monospace` | Labels, numbers, code |
 | `--t-hand` | `"Caveat", cursive` | Hand-written notes |
-| `--t-r` | `18px` | Cards and windows |
-| `--t-r-sm` | `12px` | Buttons, inputs, chips |
+| `--t-r` | `24px` | Cards and windows |
+| `--t-r-sm` | `999px` | Buttons, inputs, chips |
 | `--t-base-size` | `16px` | Body size |
 | `--t-base-lh` | `1.6` | Body line height |
 | `--t-page-bg` | `radial-gradient(circle at 50% 45%, #2a1d4a 0, #08070f 70%)` | Full page background (gradient / pattern) |
@@ -80,10 +80,10 @@ A dark stage with equalizer bars pulsing in violet and pink.
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Caveat:wght@500;700&display=swap">
 ```
 
-Display: `"Fraunces", Georgia, serif` · Body: `"Inter", system-ui, sans-serif` · Labels: `"Space Mono", ui-monospace, monospace`
+Display: `"Bebas Neue", Impact, sans-serif` · Body: `"DM Sans", system-ui, sans-serif` · Labels: `"DM Mono", ui-monospace, monospace`
 
 ## 5. Components
 
