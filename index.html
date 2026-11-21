@@ -38,14 +38,19 @@
       if (mo.calm) pr.motion = 'calm';
       // Settings page choices (universes.html): a pinned edition or universe wins over the automatic one.
       d.dataset.edition = q ? q[1] : list.indexOf(pr.edition) >= 0 ? pr.edition : list[i];
-      // The universe: normal Paper on the first open of a visit. Every refresh deals the next one from a shuffled
-      // deck of all 31 (kept for this tab only), so none repeats until all have shown. Must match worlds.js.
+      // The universe: on the first open of a visit, one picked by the local time (below). Every refresh deals the
+      // next one from a shuffled deck of all 31 (kept for this tab only), so none repeats until all have shown.
+      // Must match worlds.js.
       var base = ['paper', 'pixel', 'sketch', 'blueprint', 'news'];
       var loop = ['core', 'space', 'future', 'robots', 'rage', 'joy', 'sad', 'retro', 'music', 'paint', 'box', 'village', 'city', 'sky', 'water', 'fire', 'ice', 'brick', 'racer', 'noir', 'glitch', 'mars'];
       var kits = ['liquid', 'monolith', 'unslop', 'unsloped'];
-      var every = base.concat(loop, kits), all = every.slice();
-      if (th.universes && th.universes.length) all = all.filter(function (x) { return x === 'paper' || th.universes.indexOf(x) >= 0; });
-      var w = all.indexOf(th.firstWorld) >= 0 ? th.firstWorld : 'paper';
+      var every = base.concat(loop, kits), all = every.slice();   // every refresh deals from all of them
+      // First open of a visit: by the visitor's local time. The day (from 5 am) is split evenly between the
+      // universes ticked in the Studio (default: the five light ones), so each has its hours.
+      var pool = (th.universes && th.universes.length ? every.filter(function (x) { return th.universes.indexOf(x) >= 0; }) : []);
+      if (!pool.length) pool = base.slice();
+      var now = new Date(), mins = (now.getHours() * 60 + now.getMinutes() - 300 + 1440) % 1440;
+      var w = pool[Math.min(pool.length - 1, Math.floor(mins / (1440 / pool.length)))];
       try {
         var cur = sessionStorage.getItem('tk-world');
         if (cur !== null) {

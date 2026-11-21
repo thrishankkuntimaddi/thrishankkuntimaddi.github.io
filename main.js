@@ -59,7 +59,9 @@ const hour = new Date().getHours();
 $('#greeting').textContent = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 22 ? 'Good evening' : 'Hello, night owl';
 /* Universes: 31 of them (worlds.js). Each has its own fonts, shapes and wording; the 22 from the
    endless loop also turn the page dark and draw their scene behind it (worldbg.js). */
-const WORLDS = SITE.universes?.length ? ALL.filter((w) => SITE.universes.includes(w) || w === 'paper') : ALL, WORLD_NAMES = NAMES;
+// Every refresh and glitch deals from all of them; the Studio's ticked universes only decide the
+// first open of a visit, by local time (index.html).
+const WORLDS = ALL, WORLD_NAMES = NAMES;
 const tagText = () => `${WORLD_NAMES[root.dataset.world] || 'Paper'} universe · ${UNIVERSES[settings.universe].name.replace(' edition', '')}${root.dataset.sky ? ` · ${root.dataset.sky}` : ''}`;
 function applyCopy(world) {
   const c = COPY[world] || COPY.paper;

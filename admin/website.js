@@ -64,10 +64,9 @@ function draw() {
       <label class="f">Universe<select data-p="theme.world">${worldOpts(c.theme.world, 'Automatic (shuffle)')}</select></label>
       <label class="f">Colours<select data-p="theme.edition">${edOpts(c.theme.edition)}</select></label>
     </div>
-    <div class="row"><label class="f">First universe of a new visit<select data-p="theme.firstWorld">${WORLDS.map((w) => opt(w, NAMES[w], c.theme.firstWorld || 'paper')).join('')}</select></label><span></span></div>
     <p class="legend">Saved changes reach pages visitors already have open within about 20 seconds — no refresh. Each universe is a whole website: its own fonts, cards, buttons and layout.</p>
-    <p class="legend">Universes in the shuffle (none ticked = all ${WORLDS.length}). Paper always stays in.</p>
-    <div class="ws-chips">${WORLDS.map((w) => `<label class="ws-chip${isDarkWorld(w) ? ' dark' : ''}"><input type="checkbox" data-uni="${w}" ${c.theme.universes.includes(w) || w === 'paper' ? 'checked' : ''} ${w === 'paper' ? 'disabled' : ''}><span>${esc(NAMES[w])}</span></label>`).join('')}</div>
+    <p class="legend"><b>First open of a visit, by the visitor’s local time:</b> the day (from 5 am) is shared between the ticked universes, so each has its hours (none ticked = the five light ones). <b>Every refresh after that</b> shows another of all ${WORLDS.length}, and none repeats until every one has been seen.</p>
+    <div class="ws-chips">${WORLDS.map((w) => `<label class="ws-chip${isDarkWorld(w) ? ' dark' : ''}"><input type="checkbox" data-uni="${w}" ${c.theme.universes.includes(w) ? 'checked' : ''}><span>${esc(NAMES[w])}</span></label>`).join('')}</div>
     <div class="adders"><button class="btn sm" type="button" data-ws="uni-all">All</button><button class="btn sm" type="button" data-ws="uni-light">Light only</button><button class="btn sm" type="button" data-ws="uni-dark">Dark only</button><button class="btn sm" type="button" data-ws="uni-kits">Signature looks</button></div>
   </div></section>`);
 
@@ -153,10 +152,10 @@ export async function initWebsite(ctx) {
   body.addEventListener('click', (e) => {
     const b = e.target.closest('[data-ws]'); if (!b) return;
     const a = b.dataset.ws;
-    if (a === 'uni-all') cfg.theme.universes = [];
+    if (a === 'uni-all') cfg.theme.universes = [...WORLDS];
     else if (a === 'uni-light') cfg.theme.universes = [...BASE];
-    else if (a === 'uni-dark') cfg.theme.universes = ['paper', ...LOOP];
-    else if (a === 'uni-kits') cfg.theme.universes = ['paper', ...KITS];
+    else if (a === 'uni-dark') cfg.theme.universes = [...LOOP];
+    else if (a === 'uni-kits') cfg.theme.universes = [...KITS];
     else if (a === 'tpl') cfg.automations = [...(cfg.automations || []), JSON.parse(JSON.stringify(TEMPLATES[+b.dataset.i]))];
     else if (a === 'auto-add') cfg.automations = [...(cfg.automations || []), { name: 'New automation', do: {} }];
     else if (a === 'auto-del') { if (!confirm('Delete this automation?')) return; cfg.automations.splice(+b.dataset.i, 1); }
@@ -170,8 +169,7 @@ function onInput(e) {
   if (t.dataset.uni) {
     const set = new Set(cfg.theme.universes.length ? cfg.theme.universes : []);
     if (t.checked) set.add(t.dataset.uni); else set.delete(t.dataset.uni);
-    set.add('paper');
-    cfg.theme.universes = set.size >= WORLDS.length ? [] : [...set];
+    cfg.theme.universes = [...set];   // the first-open rotation (none = the five light ones)
   } else if (t.dataset.day) {
     const [i, k] = t.dataset.day.split(':').map(Number);
     const a = cfg.automations[i]; const days = new Set(a.days || []);
