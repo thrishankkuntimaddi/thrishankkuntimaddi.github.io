@@ -27,6 +27,8 @@ PREFS = mergePrefs(PREFS, SITE);
 if (PREFS.edition && root.dataset.edition !== PREFS.edition && !/[?&]edition=/.test(location.search)) root.dataset.edition = PREFS.edition;
 const calm = () => osReduced.matches || PREFS.motion === 'calm';
 const isSmall = () => innerWidth < 980;
+// The standard universe (standard.css) is the calm one: no auto-tour, no story glitches, no 3D scene.
+const isStd = () => root.dataset.world === 'standard';
 
 /* ---------------------------------------------------------
    Editions: light palettes shared by the CSS and the 3D scene
@@ -85,8 +87,8 @@ function markWorld(name) {
   const loop = isLoopWorld(name);
   root.toggleAttribute('data-dark', isDarkWorld(name)); root.toggleAttribute('data-loop', loop);
   root.toggleAttribute('data-design', isDesigned(name));   // a whole-website design (design.css)
-  if (engineReady) { engine?.setPaused?.(loop); engine?.setUniverse?.(); }   // the scene takes the universe's page colour
-  const m = $('meta[name="theme-color"]'); if (m) m.content = loop ? getComputedStyle(root).getPropertyValue('--paper').trim() || '#000' : UNIVERSES[settings.universe].bg;
+  if (engineReady) { engine?.setPaused?.(loop || name === 'standard'); engine?.setUniverse?.(); }   // the scene takes the universe's page colour
+  const m = $('meta[name="theme-color"]'); if (m) m.content = loop || name === 'standard' ? getComputedStyle(root).getPropertyValue('--paper').trim() || '#000' : UNIVERSES[settings.universe].bg;
   setWorldBg(name, calm());
 }
 // The next universe: a shuffled deck of all 27, kept for this tab only, so none repeats until all have shown.
@@ -234,7 +236,7 @@ if (!calm()) {
         scrollTo(0, tour.pos);
         if (tour.pos >= maxScroll() - 0.5) { tour.on = false; tour.done = finale.fired; }
       }
-    } else if (!falling && !tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open') && !document.querySelector('dialog[open]')) tourPlay();
+    } else if (!falling && !isStd() && !tour.held && !tour.done && now >= tour.resumeAt && !links.classList.contains('open') && !document.querySelector('dialog[open]')) tourPlay();
     storyTick();
     tourUI(now);
     requestAnimationFrame(frame);
@@ -697,9 +699,18 @@ const moreEl = $('#more');
 const story = { warned: false, first: calm(), finale: calm() };
 const finale = { get fired() { return story.finale; } };
 let holdTour = false, pendingNormal = false, jumped = false, looping = false;
-if (!calm()) postEl.hidden = true;
+if (!calm() && !isStd()) postEl.hidden = true;
 function storyTick() {
   if (glitching) return;
+  if (isStd()) { // the standard universe shows everything calmly; only the very end changes the theme
+    postEl.hidden = false;
+    if (!story.finale && !tour.glide && maxScroll() > 200 && scrollY >= maxScroll() - 3) {
+      story.finale = true; story.first = true;
+      glitch(3000, 'FINAL SCENE', () => { prevEdition = settings.universe; nextEdition(); return postEl; })
+        .then(() => { tour.on = false; tour.done = true; tour.speed = 0; game.start(); });
+    }
+    return;
+  }
   // After the quick jump, reaching the very bottom again opens the endless loop (infinity.js).
   if (jumped && !looping && SITE.motion.loop !== false && !falling && !tour.glide && !calm() && maxScroll() > 200 && scrollY >= maxScroll() - 3) { enterLoop(); return; }
   if (pendingNormal && !falling && scrollY > innerHeight * 0.55) { pendingNormal = false; glitch(1500, '', null, 'paper'); return; }
@@ -737,6 +748,7 @@ function enterLoop() {
   })).catch((err) => { looping = false; tour.held = false; console.warn('[loop]', err); });
 }
 document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-act="shift"]')) { glitch(1700, '', null, nextWorld()); return; } // a deliberate disturbance: leave for another universe
   if (e.target.closest('[data-act="replay"]')) { tour.done = false; tour.held = false; glideTo(0, 1600, () => { tour.resumeAt = performance.now() + 800; }); }
 });
 
@@ -785,7 +797,15 @@ const game = (() => {
   let ry = 0, rvy = 0, jumps = 0, obs = [], toks = [], dist = 0, bonus = 0, speed = 210, nextObs = 1.4, nextTok = 2.2, invul = 0; // run
   let best = 0; try { best = parseInt(localStorage.getItem('tk-best'), 10) || 0; } catch { /* private mode */ }
   const css = (n) => getComputedStyle(cv).getPropertyValue(n).trim();
-  const readCols = () => { col = { ink: css('--ink'), a: css('--accent'), a2: css('--accent-2'), a3: css('--accent-3'), tint: css('--tint') }; };
+  // The game screen stays light in every universe, so in dark ones its words and outlines need dark ink
+  // (the page's --ink is light there, which drew white words on white pills).
+  const inkOf = () => { // the canvas normalises any CSS colour to #rrggbb (or rgba) for us
+    const ink = css('--ink'), was = g.fillStyle; g.fillStyle = '#000'; g.fillStyle = ink; const c = g.fillStyle; g.fillStyle = was;
+    const v = /^#([0-9a-f]{6})$/i.exec(c) ? [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)) : (/rgba?\(([^)]+)\)/.exec(c) || [, ''])[1].split(/[\s,]+/).map(Number);
+    const L = (0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]) / 255;
+    return L > 0.55 ? '#1d1b22' : ink;
+  };
+  const readCols = () => { col = { ink: inkOf(), a: css('--accent'), a2: css('--accent-2'), a3: css('--accent-3'), tint: css('--tint') }; };
   const sayLine = (t) => { $('#gSay').textContent = t; };
   function hud() {
     $('#gScore').textContent = score; $('#gBest').textContent = best;
@@ -1325,7 +1345,7 @@ try {
 // A refresh arrives glitching, then settles. It starts once the 3D scene is ready, so the effect is not cut short.
 engine?.setPixelated(root.dataset.world === 'pixel');
 engineReady = true;
-engine?.setPaused(isLoopWorld(root.dataset.world));
+engine?.setPaused(isLoopWorld(root.dataset.world) || isStd());
 if (root.dataset.reload && !calm()) requestAnimationFrame(() => glitch(1700, '', null, root.dataset.world));
 
 /* =========================================================

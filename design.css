@@ -479,3 +479,19 @@
 [data-world="unsloped"] .project-card { padding-left: clamp(40px, 4vw, 52px); }
 [data-world="unsloped"] .facts b { display: inline-block; padding-bottom: 4px; border-bottom: 3px double currentColor; }
 [data-world="unsloped"] .ticker { color: #DDB866; } [data-world="unsloped"] .ticker span { color: #DDB866; }
+
+/* =========================================================
+   READABILITY — shared pieces that keep their own surface.
+   In dark universes --ink is light, but a few pieces stay on a
+   light or accent surface (white plaques and labels, the game's
+   tabs, the Quick jump card, stickers, the selected tab), so they
+   take dark text. In the light signature looks the accent is dark,
+   so the selected tab takes light text. lib/contrast.js catches
+   anything else at run time.
+   ========================================================= */
+[data-dark]:not([data-world="standard"]) :is(.plaque, .plaque i, .plaque i.decoded, .plaque b, .orbit-label, .game-tabs button:not([aria-pressed="true"]), .jump b, .jump .jump-face) { color: #1d1b22; }
+[data-dark]:not([data-world="standard"]) .jump span:not(.jump-face) { color: #4a4652; }
+[data-dark]:not([data-world="standard"]) :is(.rv-tab[aria-selected="true"], .game-tabs button[aria-pressed="true"], .tour-ico, .sticker) { color: #141416; }
+[data-dark]:not([data-world="standard"]) .note-b { color: var(--pg-ink, var(--ink)); }
+:is([data-world="liquid"], [data-world="unslop"], [data-world="unsloped"]) :is(.rv-tab[aria-selected="true"], .game-tabs button[aria-pressed="true"]) { color: #fff; }
+[data-dark]:not([data-world="standard"]) .rv-tab:not([aria-selected="true"]) { color: #4a4652; }

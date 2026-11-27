@@ -37,6 +37,9 @@ A light, pencil-sketch portfolio with retro space styling that runs itself.
 - **Notes (`notes.html`):** short posts written in the Studio (*Content → Notes*, simple Markdown), each shown in its own universe. Stored at `site/notes`; the home page gets a small index for its “Notes” link. Local preview: `notes.html?demo`.
 - Works on phones, respects reduced motion (no tour, no animation), and still shows all content without WebGL.
 
+- **Standard universe (`standard.css`, `standard.js`):** every visit opens here. A calm, premium monograph look: warm bone paper by day, graphite by night (6 pm – 6 am local time; preview with `?world=standard&tone=dark`), Instrument Serif set large, DM Mono captions, hairline rules and one vermilion "TK" seal. No 3D scene, doodles, auto-tour or mid-page glitches; Pip is a small ink orb that answers questions. Every refresh after the first open, **Shift universe ↯** in the footer, and reaching the very end of the page glitch into another universe. The Studio can turn it off with `theme.standardFirst: false` (back to the time-of-day rotation).
+- **Contrast guard (`lib/contrast.js`):** after every universe change it measures each piece of text against the colour behind it and switches anything too faint to near-black or near-white, so all 32 universes stay readable.
+
 ## Stack
 
 Plain HTML, CSS and JavaScript (ES modules) with no build step. Three.js 0.160 is loaded from jsDelivr through an import map. Physics is a hand-written leapfrog integrator.

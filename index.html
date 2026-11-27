@@ -44,13 +44,17 @@
       var base = ['paper', 'pixel', 'sketch', 'blueprint', 'news'];
       var loop = ['core', 'space', 'future', 'robots', 'rage', 'joy', 'sad', 'retro', 'music', 'paint', 'box', 'village', 'city', 'sky', 'water', 'fire', 'ice', 'brick', 'racer', 'noir', 'glitch', 'mars'];
       var kits = ['liquid', 'monolith', 'unslop', 'unsloped'];
-      var every = base.concat(loop, kits), all = every.slice();   // every refresh deals from all of them
-      // First open of a visit: by the visitor's local time. The day (from 5 am) is split evenly between the
-      // universes ticked in the Studio (default: the five light ones), so each has its hours.
-      var pool = (th.universes && th.universes.length ? every.filter(function (x) { return th.universes.indexOf(x) >= 0; }) : []);
-      if (!pool.length) pool = base.slice();
-      var now = new Date(), mins = (now.getHours() * 60 + now.getMinutes() - 300 + 1440) % 1440;
-      var w = pool[Math.min(pool.length - 1, Math.floor(mins / (1440 / pool.length)))];
+      var every = ['standard'].concat(base, loop, kits), all = every.slice();   // every refresh deals from all of them
+      // First open of a visit: the standard universe (standard.css), light by day and dark by night.
+      // If the Studio turns "Open on Standard" off, the day (from 5 am) is split evenly between the
+      // universes ticked there (default: the five light ones), so each has its hours.
+      var now = new Date(), w = 'standard';
+      if (th.standardFirst === false) {
+        var pool = (th.universes && th.universes.length ? every.filter(function (x) { return th.universes.indexOf(x) >= 0; }) : []);
+        if (!pool.length) pool = base.slice();
+        var mins = (now.getHours() * 60 + now.getMinutes() - 300 + 1440) % 1440;
+        w = pool[Math.min(pool.length - 1, Math.floor(mins / (1440 / pool.length)))];
+      }
       try {
         var cur = sessionStorage.getItem('tk-world');
         if (cur !== null) {
@@ -69,6 +73,9 @@
       if (d.dataset.world === 'sketch') d.classList.add('sketch');
       if (loop.indexOf(d.dataset.world) >= 0) { d.setAttribute('data-dark', ''); d.setAttribute('data-loop', ''); }
       if (d.dataset.world === 'monolith') d.setAttribute('data-dark', '');
+      // Standard: dark from 6 pm to 6 am local time (?tone=light|dark previews either). Must match worlds.js.
+      var tone = /[?&]tone=(light|dark)/.exec(location.search), hr = now.getHours();
+      if (d.dataset.world === 'standard' && (tone ? tone[1] === 'dark' : hr >= 18 || hr < 6)) d.setAttribute('data-dark', '');
       // designed as a whole website by design.css: every universe but the first five
       if (base.indexOf(d.dataset.world) < 0) d.setAttribute('data-design', '');
       if (pr.motion === 'calm') d.classList.add('calm');
@@ -84,7 +91,8 @@
        downloads only when a universe actually uses it. -->
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Sora:wght@300;400;600&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Syne:wght@700&family=IBM+Plex+Mono:wght@400;600&family=Archivo+Black&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Figtree:wght@300;400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,600;1,600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=24">
-  <link rel="stylesheet" href="design.css?v=1">
+  <link rel="stylesheet" href="design.css?v=2">
+  <link rel="stylesheet" href="standard.css?v=2">
 
   <script type="importmap">
     { "imports": {
@@ -117,6 +125,7 @@
       </a>
       <nav aria-label="Primary">
         <ul class="nav-links" id="navLinks">
+          <li class="std-clock" aria-hidden="true"><i></i><span id="stdClock"></span></li>
           <li><a href="#work">Projects</a></li>
           <li><a href="#poelys">Poelys</a></li>
           <li><a href="#more">More work</a></li>
@@ -587,6 +596,7 @@
       <span>© <span id="year">2026</span> Thrishank Kuntimaddi</span>
       <a href="universes.html">Free themes, prompts &amp; settings ⚙</a>
       <a href="#" data-contact data-kind="feedback">Feedback ✉</a>
+      <button type="button" class="std-shift" data-act="shift" title="Glitch into another universe">Shift universe <span aria-hidden="true">↯</span></button>
       <a href="#top">Back to top ↑</a>
     </div>
   </footer>
@@ -678,8 +688,10 @@
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=24"></script>
+  <script type="module" src="main.js?v=25"></script>
   <script type="module" src="lib/contact.js?v=1"></script>
   <script type="module" src="lib/live.js?v=4"></script>
+  <script type="module" src="lib/contrast.js?v=1"></script>
+  <script type="module" src="standard.js?v=1"></script>
 </body>
 </html>

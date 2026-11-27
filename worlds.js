@@ -12,11 +12,17 @@ export const LOOP = ["core", "space", "future", "robots", "rage", "joy", "sad", 
 // The four signature looks, also whole-site universes (design.css). Liquid Glass, Unslop and
 // Unsloped are light pages; Monolith Gloss is dark.
 export const KITS = ['liquid', 'monolith', 'unslop', 'unsloped'];
-export const ALL = BASE.concat(LOOP, KITS);
+// The standard universe: the calm, premium design every visit opens on (standard.css). Light by day,
+// dark by night (6 pm – 6 am, the visitor's local time). Every refresh after the first open moves on to
+// another universe with a glitch.
+export const STANDARD = 'standard';
+export const stdNight = (d = new Date()) => { const q = /[?&]tone=(light|dark)/.exec(typeof location !== 'undefined' ? location.search : ''); if (q) return q[1] === 'dark'; const h = d.getHours(); return h >= 18 || h < 6; };
+export const ALL = [STANDARD].concat(BASE, LOOP, KITS);
 // Universes the design engine (design.css) styles as a whole website: all but the first five.
-export const DESIGNED = LOOP.concat(KITS);
-export const NAMES = { paper: 'Paper', pixel: 'Pixel', sketch: 'Sketch', blueprint: 'Blueprint', news: 'Newsprint', core: "The Core", space: "Deep space", future: "Year 3000", robots: "Robot republic", rage: "Rage", joy: "Pure joy", sad: "The rain", retro: "Retro 1986", music: "The beat", paint: "Paint", box: "Box world", village: "The village", city: "Night city", sky: "Open sky", water: "The deep", fire: "Fire", ice: "Ice", brick: "Brick world", racer: "Toy racer", noir: "Noir", glitch: "The glitch", mars: "Planet fall", liquid: "Liquid Glass", monolith: "Monolith Gloss", unslop: "Unslop", unsloped: "Unsloped" };
+export const DESIGNED = [STANDARD].concat(LOOP, KITS);
+export const NAMES = { standard: 'Standard', paper: 'Paper', pixel: 'Pixel', sketch: 'Sketch', blueprint: 'Blueprint', news: 'Newsprint', core: "The Core", space: "Deep space", future: "Year 3000", robots: "Robot republic", rage: "Rage", joy: "Pure joy", sad: "The rain", retro: "Retro 1986", music: "The beat", paint: "Paint", box: "Box world", village: "The village", city: "Night city", sky: "Open sky", water: "The deep", fire: "Fire", ice: "Ice", brick: "Brick world", racer: "Toy racer", noir: "Noir", glitch: "The glitch", mars: "Planet fall", liquid: "Liquid Glass", monolith: "Monolith Gloss", unslop: "Unslop", unsloped: "Unsloped" };
 export const COPY = {
+  standard:  { h2: 'I design and build <em>interfaces</em>', h3: 'that feel considered, end to end.', cta: 'Selected work', work: 'Selected work', poelys: 'Poelys, my studio', more: 'Also built', about: 'About', contact: 'Have something worth building? <em>Let’s talk.</em>' },
   paper:     { h2: 'I design and build <em>interfaces</em>', h3: 'people enjoy using.', cta: 'See my projects', work: 'Projects', poelys: 'Poelys', more: 'More work', about: 'About me', contact: "Let's build something <em>people love</em>." },
   pixel:     { h2: 'I build <em>interfaces</em>', h3: 'worth pressing START for.', cta: 'Start', work: 'Level 01: Projects', poelys: 'Home base: Poelys', more: 'Side quests', about: 'Player stats', contact: 'Insert coin. <em>Hire player 1.</em>' },
   sketch:    { h2: 'I sketch <em>interfaces</em>,', h3: 'then build every line.', cta: 'Flip to my projects', work: 'The good pages', poelys: 'My studio, Poelys', more: 'Scribbles and side work', about: 'About the artist', contact: "Let's draw up something <em>people love</em>." },
@@ -51,5 +57,5 @@ export const COPY = {
 };
 export const isLoopWorld = (id) => LOOP.includes(id);
 /** A dark page: the 22 loop universes and Monolith Gloss. */
-export const isDarkWorld = (id) => LOOP.includes(id) || id === 'monolith';
+export const isDarkWorld = (id) => LOOP.includes(id) || id === 'monolith' || (id === STANDARD && stdNight());
 export const isDesigned = (id) => DESIGNED.includes(id);
