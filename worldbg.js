@@ -3,7 +3,7 @@
    same drawing as in the endless loop, drawn softly at 30 fps
    on one fixed canvas. Only loaded when such a universe shows.
    ========================================================= */
-import { isLoopWorld } from './worlds.js?v=23';
+import { isLoopWorld } from './worlds.js?v=24';
 
 let U = null, cv = null, g = null, raf = 0, cur = '', S = {}, t0 = 0, last = 0, dpr = 1, W = 0, H = 0, still = false;
 const resize = () => { if (!cv) return; dpr = Math.min(devicePixelRatio || 1, 1.25); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; S = {}; if (still) once(); };

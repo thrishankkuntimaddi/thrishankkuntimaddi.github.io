@@ -9,7 +9,7 @@
    ========================================================= */
 import { readPublic } from './lib/firebase.js?v=2';
 import { md, esc, readMins, plainText } from './lib/md.js?v=1';
-import { ALL, NAMES, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=23';
+import { ALL, NAMES, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=24';
 import { setWorldBg } from './worldbg.js?v=22';
 
 const $ = (s) => document.querySelector(s);

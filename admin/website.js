@@ -2,13 +2,14 @@
    Studio → Website: control the live site from the app.
    Saved to site/config as JSON (public read, owner write).
    ========================================================= */
-import { DEFAULTS, withDefaults, effective } from '../lib/site-config.js?v=3';
-import { BASE, LOOP, KITS, NAMES, isDarkWorld } from '../worlds.js?v=23';
+import { DEFAULTS, withDefaults, effective } from '../lib/site-config.js?v=4';
+import { STANDARD, BASE, LOOP, KITS, NAMES, isDarkWorld } from '../worlds.js?v=24';
 import { OCCASIONS } from '../content.js?v=22';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const WORLDS = [...BASE, ...LOOP, ...KITS];
+const WORLDS = [STANDARD, ...BASE, ...LOOP, ...KITS];
+const dark = (w) => w !== STANDARD && isDarkWorld(w); // Standard is light by day, dark by night
 const EDITIONS = { morning: 'Coral (morning)', noon: 'Sky (noon)', dusk: 'Lilac (dusk)', night: 'Mint (night)' };
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MOTION = [
@@ -41,7 +42,7 @@ function draw() {
   const eff = effective(c);
   const h = [];
   h.push(`<div class="ws-now${eff.running.length || eff.banner ? ' on' : ''}"><b>Right now:</b> ${[
-    eff.world ? `universe fixed to ${NAMES[eff.world]}` : 'universes shuffle',
+    eff.world ? `universe fixed to ${NAMES[eff.world]}` : c.theme.standardFirst === false ? 'first open by time of day' : 'opens on Standard',
     eff.edition ? `${EDITIONS[eff.edition]} colours` : 'colours by time',
     eff.motion.calm ? 'calm mode' : '',
     eff.banner ? 'banner showing' : '',
@@ -65,8 +66,9 @@ function draw() {
       <label class="f">Colours<select data-p="theme.edition">${edOpts(c.theme.edition)}</select></label>
     </div>
     <p class="legend">Saved changes reach pages visitors already have open within about 20 seconds — no refresh. Each universe is a whole website: its own fonts, cards, buttons and layout.</p>
-    <p class="legend"><b>First open of a visit, by the visitor’s local time:</b> the day (from 5 am) is shared between the ticked universes, so each has its hours (none ticked = the five light ones). <b>Every refresh after that</b> shows another of all ${WORLDS.length}, and none repeats until every one has been seen.</p>
-    <div class="ws-chips">${WORLDS.map((w) => `<label class="ws-chip${isDarkWorld(w) ? ' dark' : ''}"><input type="checkbox" data-uni="${w}" ${c.theme.universes.includes(w) ? 'checked' : ''}><span>${esc(NAMES[w])}</span></label>`).join('')}</div>
+    ${sw('theme.standardFirst', c.theme.standardFirst !== false, 'Open every visit on Standard', 'The calm, premium design: light by day, dark from 6 pm to 6 am. Refreshes, “Shift universe” and the end of the page glitch into the others.')}
+    <p class="legend"><b>First open of a visit:</b> ${c.theme.standardFirst === false ? 'by the visitor’s local time. The day (from 5 am) is shared between the ticked universes, so each has its hours (none ticked = the five light ones).' : 'Standard. (Turn the switch off to share the day between the ticked universes instead.)'} <b>Every refresh after that</b> shows another of all ${WORLDS.length}, and none repeats until every one has been seen.</p>
+    <div class="ws-chips"${c.theme.standardFirst === false ? '' : ' style="opacity:.55"'}>${WORLDS.map((w) => `<label class="ws-chip${dark(w) ? ' dark' : ''}"><input type="checkbox" data-uni="${w}" ${c.theme.universes.includes(w) ? 'checked' : ''}><span>${esc(NAMES[w])}</span></label>`).join('')}</div>
     <div class="adders"><button class="btn sm" type="button" data-ws="uni-all">All</button><button class="btn sm" type="button" data-ws="uni-light">Light only</button><button class="btn sm" type="button" data-ws="uni-dark">Dark only</button><button class="btn sm" type="button" data-ws="uni-kits">Signature looks</button></div>
   </div></section>`);
 

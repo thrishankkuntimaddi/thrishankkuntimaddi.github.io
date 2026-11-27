@@ -6,7 +6,7 @@
    in front of you, then dives past as you scroll on.
    ========================================================= */
 import { PROJECTS, projectName } from './tunes.js?v=22';
-import { NAMES, isLoopWorld } from './worlds.js?v=23';
+import { NAMES, isLoopWorld } from './worlds.js?v=24';
 
 let started = false;
 export async function startDive({ calm, say }) {

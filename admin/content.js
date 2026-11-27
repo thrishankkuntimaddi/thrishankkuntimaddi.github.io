@@ -7,7 +7,7 @@ import { PROJECTS_SEED } from '../lib/projects-seed.js?v=22';
 import { TEXT_SEED } from '../lib/text-seed.js?v=22';
 import { STORIES, ASK, ASK_SUGGEST, CHANGELOG } from '../content.js?v=22';
 import { keypad } from '../lib/content-live.js?v=22';
-import { BASE, LOOP, KITS, NAMES, isDarkWorld } from '../worlds.js?v=23';
+import { BASE, LOOP, KITS, NAMES, isDarkWorld } from '../worlds.js?v=24';
 import { md, readMins } from '../lib/md.js?v=1';
 
 const $ = (s, el = document) => el.querySelector(s);

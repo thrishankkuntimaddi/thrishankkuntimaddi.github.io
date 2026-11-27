@@ -5,10 +5,10 @@
    two glitches change the colours and reveal a final scene, and the
    3D gravity scenes change with each section.
    ========================================================= */
-import { ALL, NAMES, COPY, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=23';
+import { ALL, NAMES, COPY, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=24';
 import { setWorldBg } from './worldbg.js?v=22';
 import { playTune, PROJECTS } from './tunes.js?v=22';
-import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=3';
+import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=4';
 import { loadContent, applyContent } from './lib/content-live.js?v=2';
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);

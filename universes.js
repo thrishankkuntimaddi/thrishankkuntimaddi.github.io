@@ -5,7 +5,7 @@
    index.html, main.js and chapter.js read on load.
    ========================================================= */
 import { OCCASIONS } from './content.js?v=22';
-import { LOOP, KITS, NAMES, COPY, isDarkWorld, isDesigned } from './worlds.js?v=23';
+import { LOOP, KITS, NAMES, COPY, isDarkWorld, isDesigned } from './worlds.js?v=24';
 import { U as LOOP_SCENES } from './infinity.js?v=22';
 import { PIP_WEAR, GETUPS, SHADES } from './chapter.js?v=23';
 
