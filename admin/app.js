@@ -6,7 +6,7 @@
 import { loadSDK, loadAuth, OWNER, KINDS } from '../lib/firebase.js?v=2';
 import { loadEngine, toSVG, download, toText, resumeFontCSS } from '../lib/resume.js?v=1';
 import { SEED } from '../lib/resume-seed.js?v=1';
-import { initWebsite } from './website.js?v=2';
+import { initWebsite } from './website.js?v=4';
 import { initDevices, forgetThisDevice } from './devices.js?v=2';
 import { unlock, watchAway, lockOn, lockAvailable, setUpLock, removeLock } from './lock.js?v=1';
 import { initContent } from './content.js?v=2';

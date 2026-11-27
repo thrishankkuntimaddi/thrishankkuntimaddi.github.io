@@ -32,6 +32,10 @@
       var pr = {}; try { pr = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch (err) {}
       // The owner's settings from the Studio app (cached from the last visit; main.js refreshes them).
       var site = {}; try { site = (JSON.parse(localStorage.getItem('tk-site')) || {}).data || {}; } catch (err) {}
+      // A draft preview from the Studio (#preview=…) wins over the published settings.
+      var pvm = /[#&]preview=([A-Za-z0-9_-]+)/.exec(location.hash);
+      if (pvm) { try { site = JSON.parse(decodeURIComponent(escape(atob(pvm[1].replace(/-/g, '+').replace(/_/g, '/'))))) || {}; d.dataset.preview = ''; } catch (err) {} }
+      var std = site.standard || {};
       var th = site.theme || {}, mo = site.motion || {};
       if (!pr.edition && list.indexOf(th.edition) >= 0) pr.edition = th.edition;
       if (!pr.world && th.world) pr.world = th.world;
@@ -57,7 +61,8 @@
       }
       try {
         var cur = sessionStorage.getItem('tk-world');
-        if (cur !== null) {
+        if (cur !== null && std.stay && (cur === 'standard' || th.standardFirst !== false)) { w = 'standard'; } // the Studio keeps refreshes on Standard
+        else if (cur !== null) {
           if (all.indexOf(cur) < 0) cur = base[parseInt(cur, 10)] || 'paper'; // older visits stored a number
           var bag = []; try { bag = JSON.parse(sessionStorage.getItem('tk-bag')) || []; } catch (err) {}
           bag = bag.filter(function (x) { return all.indexOf(x) >= 0 && x !== cur; });
@@ -75,7 +80,8 @@
       if (d.dataset.world === 'monolith') d.setAttribute('data-dark', '');
       // Standard: dark from 6 pm to 6 am local time (?tone=light|dark previews either). Must match worlds.js.
       var tone = /[?&]tone=(light|dark)/.exec(location.search), hr = now.getHours();
-      if (d.dataset.world === 'standard' && (tone ? tone[1] === 'dark' : hr >= 18 || hr < 6)) d.setAttribute('data-dark', '');
+      window.TK_STD_TONE = tone ? tone[1] : std.tone === 'light' || std.tone === 'dark' ? std.tone : 'auto';
+      if (d.dataset.world === 'standard' && (window.TK_STD_TONE === 'auto' ? hr >= 18 || hr < 6 : window.TK_STD_TONE === 'dark')) d.setAttribute('data-dark', '');
       // designed as a whole website by design.css: every universe but the first five
       if (base.indexOf(d.dataset.world) < 0) d.setAttribute('data-design', '');
       if (pr.motion === 'calm') d.classList.add('calm');
@@ -92,7 +98,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Sora:wght@300;400;600&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Syne:wght@700&family=IBM+Plex+Mono:wght@400;600&family=Archivo+Black&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Figtree:wght@300;400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,600;1,600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=24">
   <link rel="stylesheet" href="design.css?v=2">
-  <link rel="stylesheet" href="standard.css?v=2">
+  <link rel="stylesheet" href="standard.css?v=4">
 
   <script type="importmap">
     { "imports": {
@@ -688,10 +694,10 @@
   </button>
 
   <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-  <script type="module" src="main.js?v=25"></script>
+  <script type="module" src="main.js?v=26"></script>
   <script type="module" src="lib/contact.js?v=1"></script>
-  <script type="module" src="lib/live.js?v=4"></script>
+  <script type="module" src="lib/live.js?v=5"></script>
   <script type="module" src="lib/contrast.js?v=1"></script>
-  <script type="module" src="standard.js?v=1"></script>
+  <script type="module" src="standard.js?v=2"></script>
 </body>
 </html>

@@ -16,7 +16,15 @@ export const KITS = ['liquid', 'monolith', 'unslop', 'unsloped'];
 // dark by night (6 pm – 6 am, the visitor's local time). Every refresh after the first open moves on to
 // another universe with a glitch.
 export const STANDARD = 'standard';
-export const stdNight = (d = new Date()) => { const q = /[?&]tone=(light|dark)/.exec(typeof location !== 'undefined' ? location.search : ''); if (q) return q[1] === 'dark'; const h = d.getHours(); return h >= 18 || h < 6; };
+// The tone: ?tone= previews, else the Studio's choice (window.TK_STD_TONE, set in index.html and by
+// standard.js), else by the visitor's local time.
+export const stdNight = (d = new Date()) => {
+  const q = /[?&]tone=(light|dark)/.exec(typeof location !== 'undefined' ? location.search : '');
+  if (q) return q[1] === 'dark';
+  const t = typeof window !== 'undefined' && window.TK_STD_TONE;
+  if (t === 'light' || t === 'dark') return t === 'dark';
+  const h = d.getHours(); return h >= 18 || h < 6;
+};
 export const ALL = [STANDARD].concat(BASE, LOOP, KITS);
 // Universes the design engine (design.css) styles as a whole website: all but the first five.
 export const DESIGNED = [STANDARD].concat(LOOP, KITS);

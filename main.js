@@ -5,10 +5,10 @@
    two glitches change the colours and reveal a final scene, and the
    3D gravity scenes change with each section.
    ========================================================= */
-import { ALL, NAMES, COPY, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=24';
+import { ALL, BASE, LOOP, KITS, NAMES, COPY, isLoopWorld, isDarkWorld, isDesigned } from './worlds.js?v=24';
 import { setWorldBg } from './worldbg.js?v=22';
 import { playTune, PROJECTS } from './tunes.js?v=22';
-import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=4';
+import { load as loadSite, effective, mergePrefs } from './lib/site-config.js?v=5';
 import { loadContent, applyContent } from './lib/content-live.js?v=2';
 const root = document.documentElement;
 const $ = (s, el = document) => el.querySelector(s);
@@ -21,6 +21,8 @@ const [siteCfg, siteContent] = await Promise.all([loadSite(), loadContent()]);
 applyContent(siteContent); // your projects, text, stories and Pip's answers, from the Studio app
 const SITE = effective(siteCfg);
 window.TK_SITE = SITE;
+let STD = SITE.standard || {}; // the Studio's Standard options (lib/site-config.js)
+window.dispatchEvent(new CustomEvent('tk:std', { detail: SITE })); // standard.js applies looks and sections
 let PREFS = {};
 try { PREFS = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch { /* private mode */ }
 PREFS = mergePrefs(PREFS, SITE);
@@ -65,8 +67,11 @@ $('#greeting').textContent = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 1
 // first open of a visit, by local time (index.html).
 const WORLDS = ALL, WORLD_NAMES = NAMES;
 const tagText = () => `${WORLD_NAMES[root.dataset.world] || 'Paper'} universe · ${UNIVERSES[settings.universe].name.replace(' edition', '')}${root.dataset.sky ? ` · ${root.dataset.sky}` : ''}`;
+// The Studio's own Standard headline: plain text, *word* becomes the accent italic.
+const stdLine = (t) => String(t).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])).replace(/\*([^*]+)\*/g, '<em>$1</em>');
 function applyCopy(world) {
-  const c = COPY[world] || COPY.paper;
+  let c = COPY[world] || COPY.paper;
+  if (world === 'standard' && (STD.h2 || STD.h3)) c = { ...c, ...(STD.h2 ? { h2: stdLine(STD.h2) } : {}), ...(STD.h3 ? { h3: stdLine(STD.h3) } : {}) };
   $$('[data-copy]').forEach((el) => { const k = el.dataset.copy; el.innerHTML = k === 'cta' ? `${c[k]} <span aria-hidden="true">↓</span>` : c[k]; });
   $('#editionText').textContent = tagText();
 }
@@ -91,6 +96,14 @@ function markWorld(name) {
   const m = $('meta[name="theme-color"]'); if (m) m.content = loop || name === 'standard' ? getComputedStyle(root).getPropertyValue('--paper').trim() || '#000' : UNIVERSES[settings.universe].bg;
   setWorldBg(name, calm());
 }
+// Where "Shift universe" goes, as chosen in the Studio: any universe, light ones, dark ones or the signature looks.
+function shiftTarget() {
+  const LIGHT = BASE.concat(['liquid', 'unslop', 'unsloped']), DARKS = LOOP.concat(['monolith']);
+  const pool = { light: LIGHT, dark: DARKS, kits: KITS }[STD.shiftTo];
+  if (!pool) return nextWorld();
+  const left = pool.filter((w) => w !== root.dataset.world);
+  return left[(Math.random() * left.length) | 0] || nextWorld();
+}
 // The next universe: a shuffled deck of all 27, kept for this tab only, so none repeats until all have shown.
 function nextWorld() {
   let bag = [];
@@ -113,6 +126,7 @@ const EDITION_ORDER = ['morning', 'noon', 'dusk', 'night'];
    at once — unless the visitor pinned their own on the settings page, or is previewing ?world= */
 addEventListener('tk:site', (e) => {
   const eff = e.detail || {};
+  if (eff.standard) { const was = JSON.stringify(STD); STD = eff.standard; if (isStd() && JSON.stringify(STD) !== was) applyCopy('standard'); }
   let mine = {}; try { mine = JSON.parse(localStorage.getItem('tk-prefs')) || {}; } catch { /* private mode */ }
   if (eff.world && ALL.includes(eff.world) && !mine.world && !PREVIEW_WORLD && eff.world !== root.dataset.world) setWorld(eff.world, true);
   if (eff.edition && UNIVERSES[eff.edition] && !mine.edition && !/[?&]edition=/.test(location.search) && eff.edition !== root.dataset.edition) setEdition(eff.edition);
@@ -704,7 +718,7 @@ function storyTick() {
   if (glitching) return;
   if (isStd()) { // the standard universe shows everything calmly; only the very end changes the theme
     postEl.hidden = false;
-    if (!story.finale && !tour.glide && maxScroll() > 200 && scrollY >= maxScroll() - 3) {
+    if (STD.endGlitch !== false && !story.finale && !tour.glide && maxScroll() > 200 && scrollY >= maxScroll() - 3) {
       story.finale = true; story.first = true;
       glitch(3000, 'FINAL SCENE', () => { prevEdition = settings.universe; nextEdition(); return postEl; })
         .then(() => { tour.on = false; tour.done = true; tour.speed = 0; game.start(); });
@@ -748,7 +762,7 @@ function enterLoop() {
   })).catch((err) => { looping = false; tour.held = false; console.warn('[loop]', err); });
 }
 document.addEventListener('click', (e) => {
-  if (e.target.closest('[data-act="shift"]')) { glitch(1700, '', null, nextWorld()); return; } // a deliberate disturbance: leave for another universe
+  if (e.target.closest('[data-act="shift"]')) { glitch(1700, '', null, shiftTarget()); return; } // a deliberate disturbance: leave for another universe
   if (e.target.closest('[data-act="replay"]')) { tour.done = false; tour.held = false; glideTo(0, 1600, () => { tour.resumeAt = performance.now() + 800; }); }
 });
 
@@ -1346,7 +1360,7 @@ try {
 engine?.setPixelated(root.dataset.world === 'pixel');
 engineReady = true;
 engine?.setPaused(isLoopWorld(root.dataset.world) || isStd());
-if (root.dataset.reload && !calm()) requestAnimationFrame(() => glitch(1700, '', null, root.dataset.world));
+if (root.dataset.reload && !calm() && !(isStd() && STD.stay)) requestAnimationFrame(() => glitch(1700, '', null, root.dataset.world));
 
 /* =========================================================
    Engine implementation

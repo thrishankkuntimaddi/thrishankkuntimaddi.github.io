@@ -39,6 +39,8 @@ service cloud.firestore {
         && request.resource.data.revokedBefore == request.time;
     }
     match /versions/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
+    // Every website-settings Publish from the Studio, for roll-back.
+    match /siteVersions/{id} { allow read: if isOwner(); allow create: if isFreshOwner() && request.resource.data.keys().hasOnly(['data', 'note', 'at']) && str(request.resource.data.data, 2, 400000) && request.resource.data.at == request.time; allow delete: if isFreshOwner(); }
     match /devices/{id} { allow read: if isOwner(); allow write: if isOwner(); }
     match /resumes/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
     match /resumeFiles/{id} { allow read: if isOwner(); allow write: if isFreshOwner(); }
